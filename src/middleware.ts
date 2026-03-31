@@ -1,10 +1,20 @@
 import { type NextRequest, NextResponse } from 'next/server'
 
+const ADMIN_PATH_PREFIX = '/admin'
+const PROFILE_PATH_PREFIX = '/profile'
+
+function getServerUrl() {
+  const serverUrl = process.env.SERVER_URL
+  if (!serverUrl) return null
+  return serverUrl.replace(/\/+$/, '')
+}
+
 export default function middleware(request: NextRequest) {
   const { url, cookies, nextUrl } = request
 
   const session = cookies.get('session')?.value
-  const isProfilePage = nextUrl.pathname.startsWith('/profile')
+  const isProfilePage = nextUrl.pathname.startsWith(PROFILE_PATH_PREFIX)
+  const isAdminPage = nextUrl.pathname === ADMIN_PATH_PREFIX || nextUrl.pathname.startsWith(`${ADMIN_PATH_PREFIX}/`)
 
   if (isProfilePage && !session) {
     return NextResponse.redirect(new URL('/?auth=true', url))
@@ -14,9 +24,41 @@ export default function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/profile/settings', url))
   }
 
+  if (isAdminPage) {
+    const serverUrl = getServerUrl()
+    if (!serverUrl) {
+      return NextResponse.redirect(new URL('/', url))
+    }
+
+    const cookieHeader = request.headers.get('cookie') ?? ''
+
+    return fetch(`${serverUrl}/users/profile`, {
+      method: 'GET',
+      headers: {
+        cookie: cookieHeader
+      },
+      cache: 'no-store'
+    })
+      .then(async res => {
+        if (!res.ok) {
+          return NextResponse.redirect(new URL('/?auth=true', url))
+        }
+
+        const profile = (await res.json()) as { role?: string } | null
+        const role = profile?.role
+
+        if (role !== 'ADMIN') {
+          return NextResponse.redirect(new URL('/profile/settings', url))
+        }
+
+        return NextResponse.next()
+      })
+      .catch(() => NextResponse.redirect(new URL('/?auth=true', url)))
+  }
+
   return NextResponse.next()
 }
 
 export const config = {
-  matcher: ['/profile/:path*']
+  matcher: ['/profile/:path*', '/admin/:path*']
 }
