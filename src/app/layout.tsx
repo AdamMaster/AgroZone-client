@@ -1,21 +1,30 @@
 import type { Metadata } from 'next'
-import { Inter, Geist } from 'next/font/google'
+import { Inter } from 'next/font/google'
 
-import '../shared/styles/globals.css'
-import { cn } from "@/lib/utils";
+import { MainProvider } from '@/components/providers'
 
-const geist = Geist({subsets:['latin'],variable:'--font-sans'});
+import { cn } from '@/lib/utils'
+
+import './globals.css'
 
 const inter = Inter({
   subsets: ['latin', 'cyrillic'],
   weight: ['400', '500', '600', '700', '900'],
-  variable: '--font-inter',
+  variable: '--font-sans',
   display: 'swap'
 })
 
 export const metadata: Metadata = {
-  title: 'GreenBase',
-  description: 'Оптовая продажа пищевой продукции'
+  title: {
+    absolute: 'GreenBase — Оптовый маркетплейс продуктов питания',
+    template: '%s | GreenBase'
+  },
+  description: 'Покупайте и продавайте свежие овощи, фрукты и продукты питания оптом напрямую от производителей.',
+  icons: {
+    icon: '/favicon.ico',
+    shortcut: '/favicon.ico',
+    apple: '/apple-touch-icon.png'
+  }
 }
 
 export default function RootLayout({
@@ -24,8 +33,10 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang='ru' className={cn("h-full", "antialiased", inter.variable, "font-sans", geist.variable)}>
-      <body className='flex min-h-full flex-col'>{children}</body>
+    <html lang='ru' className={cn('h-full', 'antialiased', inter.variable)}>
+      <body className={cn('flex min-h-full flex-col font-sans text-gray-900')}>
+        <MainProvider>{children}</MainProvider>
+      </body>
     </html>
   )
 }

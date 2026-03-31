@@ -1,0 +1,25 @@
+import { Logo } from '@/components/ui'
+
+import { Container } from '../container'
+import { HeaderActions } from './header-actions'
+
+export const Header = () => {
+  return (
+    <div className='bg-white'>
+      <div>
+        <Container>
+          <div className='flex items-center justify-between gap-6 py-4'>
+            <HeaderActions />
+          </div>
+        </Container>
+      </div>
+      <div className='bg-gray-50'>
+        <Container>
+          <div className='flex items-center justify-between gap-6 py-6'>
+            <Logo />
+          </div>
+        </Container>
+      </div>
+    </div>
+  )
+}

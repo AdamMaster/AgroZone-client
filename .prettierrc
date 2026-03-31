@@ -11,13 +11,13 @@
   "importOrder": [
     "<THIRD_PARTY_MODULES>",
     "^@/app/(.*)",
-    "^@/features/(.*)",
     "^@/components/(.*)",
+    "^@/components/layout/(.*)",
+    "^@/components/modules/(.*)",
     "^@/shared/(.*)",
     "^@/hooks/(.*)",
     "^@/lib/(.*)",
     "^[./]",
-    "^@/shared/styles/(.*)",
     "^.+\\.css$"
   ],
   "plugins": ["@trivago/prettier-plugin-sort-imports", "prettier-plugin-tailwindcss"]

@@ -1,1 +1,5 @@
-https://youtu.be/O5Qry8cBhG4?t=11179
+https://youtu.be/O5Qry8cBhG4?t=15929
+
+зависимости:
+npm install @tanstack/react-query react-hook-form zod @hookform/resolvers react-icons next-themes react-google-recaptcha
+npm install -D @types/react-google-recaptcha prettier-plugin-tailwindcss @trivago/prettier-plugin-sort-imports
