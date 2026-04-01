@@ -1,5 +1,9 @@
+'use client'
+
+import { useAuthModal } from '@/store'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Eye, EyeOff } from 'lucide-react'
+import Link from 'next/link'
 import React, { useState } from 'react'
 import ReCAPTCHA from 'react-google-recaptcha'
 import { Controller, useForm } from 'react-hook-form'
@@ -37,6 +41,7 @@ export const LoginForm = ({ onRegisterClick }: LoginFormProps) => {
   }
 
   const [showPassword, setShowPassword] = React.useState(false)
+  const { onClose } = useAuthModal()
 
   return (
     <AuthWrapper
@@ -87,6 +92,13 @@ export const LoginForm = ({ onRegisterClick }: LoginFormProps) => {
                     )}
                   </button>
                 </InputGroup>
+                <Link
+                  href='/reset-password'
+                  className='hover:text-primary inline-block text-right text-xs text-gray-900 underline'
+                  onClick={() => onClose()}
+                >
+                  Забыли пароль?
+                </Link>
                 {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
               </Field>
             )}
@@ -95,7 +107,7 @@ export const LoginForm = ({ onRegisterClick }: LoginFormProps) => {
         <div className='mt-4 flex justify-center'>
           <ReCAPTCHA sitekey={process.env.GOOGLE_RECAPTCHA_SITE_KEY as string} onChange={setRecaptchaValue} />
         </div>
-        <Button variant='secondary' size='lg' type='submit' className='mt-8' disabled={isLoadingLogin}>
+        <Button variant='secondary' size='lg' type='submit' className='mt-8 w-full' disabled={isLoadingLogin}>
           Войти в аккаунт
         </Button>
       </form>

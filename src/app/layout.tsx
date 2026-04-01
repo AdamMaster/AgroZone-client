@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 
+import { AuthModal } from '@/components/modals'
 import { MainProvider } from '@/components/providers'
 
 import { cn } from '@/lib/utils'
@@ -35,7 +36,10 @@ export default function RootLayout({
   return (
     <html lang='ru' className={cn('h-full', 'antialiased', inter.variable)}>
       <body className={cn('flex min-h-full flex-col font-sans text-gray-900')}>
-        <MainProvider>{children}</MainProvider>
+        <MainProvider>
+          {children}
+          <AuthModal />
+        </MainProvider>
       </body>
     </html>
   )

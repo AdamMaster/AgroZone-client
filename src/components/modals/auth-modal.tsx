@@ -1,16 +1,13 @@
-import { useState } from 'react'
+'use client'
+
+import { useAuthModal } from '@/store'
 
 import { Dialog, DialogContent } from '@/components/ui/dialog'
 
 import { LoginForm, RegisterForm } from '../modules'
 
-interface AuthModalProps {
-  isOpen: boolean
-  onClose: () => void
-}
-
-export const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
-  const [view, setView] = useState<'login' | 'register'>('login')
+export const AuthModal = () => {
+  const { isOpen, view, onClose, setView } = useAuthModal()
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>

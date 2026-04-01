@@ -77,7 +77,8 @@ export class FetchClient {
     return this.request<T>(endpoint, 'GET', options)
   }
 
-  post<T>(endpoint: string, body?: Record<string, string>, options: RequestOptions = {}) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  post<T>(endpoint: string, body?: Record<string, any>, options: RequestOptions = {}) {
     return this.request<T>(endpoint, 'POST', {
       ...options,
       headers: {

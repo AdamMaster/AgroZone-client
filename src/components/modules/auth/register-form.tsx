@@ -1,3 +1,5 @@
+'use client'
+
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Eye, EyeOff } from 'lucide-react'
 import React, { useState } from 'react'
@@ -145,7 +147,7 @@ export const RegisterForm = ({ onLoginClick }: RegisterFormProps) => {
         <div className='mt-4 flex justify-center'>
           <ReCAPTCHA sitekey={process.env.GOOGLE_RECAPTCHA_SITE_KEY as string} onChange={setRecaptchaValue} />
         </div>
-        <Button variant='secondary' size='lg' type='submit' className='mt-8' disabled={isLoadingRegister}>
+        <Button variant='secondary' size='lg' type='submit' className='mt-8 w-full' disabled={isLoadingRegister}>
           Создать аккаунт
         </Button>
       </form>

@@ -1,10 +1,16 @@
 import Image from 'next/image'
 import Link from 'next/link'
 
-export const Logo = () => {
+import { cn } from '@/lib/utils'
+
+interface LogoProps {
+  className?: string
+}
+
+export const Logo = ({ className }: LogoProps) => {
   return (
     <Link href='/' className=''>
-      <Image className='h-auto w-40' src='/images/logo.svg' width={100} height={40} alt='' priority />
+      <Image className={cn('h-auto w-40', className)} src='/images/logo.svg' width={100} height={40} alt='' priority />
     </Link>
   )
 }
