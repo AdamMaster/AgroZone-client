@@ -4,7 +4,7 @@ import { useAuthModal } from '@/store'
 
 import { Dialog, DialogContent } from '@/components/ui/dialog'
 
-import { LoginForm, NewPasswordForm, RegisterForm, ResetPasswordForm } from '../features'
+import { LoginForm, NewPasswordForm, RegisterForm, ResetPasswordForm } from '../../features'
 
 export const AuthModal = () => {
   const { isOpen, view, onClose, setView } = useAuthModal()

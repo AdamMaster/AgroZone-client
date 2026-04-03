@@ -5,7 +5,7 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import React, { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
-import { AuthModal } from '@/components/modals'
+import { AuthModal } from '@/components/modals/auth'
 
 interface Props {
   className?: string

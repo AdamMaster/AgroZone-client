@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 
-import { AuthModal } from '@/components/modals'
+import { AuthModal } from '@/components/modals/auth'
 import { MainProvider } from '@/components/providers'
 
 import { cn } from '@/lib/utils'
