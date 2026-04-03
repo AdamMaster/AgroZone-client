@@ -2,6 +2,7 @@
 
 import { useMutation } from '@tanstack/react-query'
 import { useRouter } from 'next/navigation'
+import { Dispatch, SetStateAction } from 'react'
 import { toast } from 'sonner'
 
 import { toastMessageHandler } from '@/shared/utils'
@@ -9,7 +10,7 @@ import { toastMessageHandler } from '@/shared/utils'
 import { TypeLoginSchema } from '../schemes'
 import { authService } from '../services'
 
-export function useLoginMutation() {
+export function useLoginMutation(setIsShowTwoFactor: Dispatch<SetStateAction<boolean>>) {
   const router = useRouter()
 
   const { mutate: login, isPending: isLoadingLogin } = useMutation({
@@ -21,10 +22,15 @@ export function useLoginMutation() {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onSuccess(data: any) {
       if (data.message) {
-        toastMessageHandler(data)
+        toast.info('Проверьте вашу почту', { description: 'Требуется код двухфакторной аутентификации.' })
+        setIsShowTwoFactor(true)
+
+        return data
       } else {
-        toast.success('Авторизация прошла усешно!')
+        toast.success('Вы успешно вошли в аккаунт!')
         router.push('/profile/settings')
+
+        return data
       }
     },
 

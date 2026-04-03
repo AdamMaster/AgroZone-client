@@ -1,5 +1,6 @@
 'use client'
 
+import { useAuthModal } from '@/store'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Eye, EyeOff } from 'lucide-react'
 import React, { useState } from 'react'
@@ -13,12 +14,9 @@ import { AuthWrapper } from './auth-wrapper'
 import { useRegisterMutation } from './hooks'
 import { RegisterSchema, TypeRegisterSchema } from './schemes'
 
-interface RegisterFormProps {
-  onLoginClick: () => void
-}
-
-export const RegisterForm = ({ onLoginClick }: RegisterFormProps) => {
+export const RegisterForm = () => {
   const [recaptchaValue, setRecaptchaValue] = useState<string | null>(null)
+  const { onOpen, onClose } = useAuthModal()
 
   const form = useForm<TypeRegisterSchema>({
     resolver: zodResolver(RegisterSchema),
@@ -40,6 +38,7 @@ export const RegisterForm = ({ onLoginClick }: RegisterFormProps) => {
           onSuccess: () => {
             form.reset()
             setRecaptchaValue(null)
+            onClose()
           }
         }
       )
@@ -61,7 +60,7 @@ export const RegisterForm = ({ onLoginClick }: RegisterFormProps) => {
         </>
       }
       isShowSocial
-      onSwitchButtonClick={onLoginClick}
+      onSwitchButtonClick={() => onOpen('login')}
     >
       <form id='form-rhf-demo' onSubmit={form.handleSubmit(onSubmit)}>
         <FieldGroup>

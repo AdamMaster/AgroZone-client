@@ -134,3 +134,15 @@
 button {
   cursor: pointer;
 }
+
+[data-sonner-toast][data-styled=true] {
+  align-items: start !important;
+}
+
+[data-sonner-toast][data-styled=true] [data-icon] {
+  translate: 0 3px;
+}
+
+[data-sonner-toast] {
+  font-size: 0.875rem !important;
+}

@@ -15,6 +15,7 @@ import { ResetPasswordSchema, TypeResetPasswordSchema } from './schemes'
 
 export const ResetPasswordForm = () => {
   const [recaptchaValue, setRecaptchaValue] = useState<string | null>(null)
+  const { onOpen, onClose } = useAuthModal()
 
   const form = useForm<TypeResetPasswordSchema>({
     resolver: zodResolver(ResetPasswordSchema),
@@ -27,19 +28,26 @@ export const ResetPasswordForm = () => {
 
   const onSubmit = (values: TypeResetPasswordSchema) => {
     if (recaptchaValue) {
-      reset({ values, recaptcha: recaptchaValue })
+      reset(
+        { values, recaptcha: recaptchaValue },
+        {
+          onSuccess: () => {
+            form.reset()
+            onClose()
+          }
+        }
+      )
     } else {
       toast.error('Пожалуйста, завершите проверку')
     }
   }
 
-  const { onOpen } = useAuthModal()
-
   return (
     <AuthWrapper
       heading='Сброс пароля'
       description='Для сброса пароля введите свою почту'
-      className='max-w-105 rounded-xl border bg-white p-8'
+      switchButtonLabel={<>Войти в аккаунт</>}
+      onSwitchButtonClick={() => onOpen('login')}
     >
       <form id='form-rhf-demo' onSubmit={form.handleSubmit(onSubmit)}>
         <FieldGroup>
@@ -61,9 +69,6 @@ export const ResetPasswordForm = () => {
           Сбросить
         </Button>
       </form>
-      <button className='mt-8 block w-full text-center hover:opacity-80' onClick={() => onOpen('login')}>
-        Войти в аккаунт
-      </button>
     </AuthWrapper>
   )
 }

@@ -15,9 +15,10 @@ export function useRegisterMutation() {
     mutationFn: ({ values, recaptcha }: { values: TypeRegisterSchema; recaptcha: string }) =>
       authService.register(values, recaptcha),
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    onSuccess(data: any) {
-      toast.success(data.message || 'Регистрация прошла успешно!')
+    onSuccess() {
+      toast.success('Регистрация прошла успешно!', {
+        description: 'Пожалуйста, подтвердите ваш email. Сообщение было отправлено на ваш почтовый адрес.'
+      })
     },
 
     onError(error) {
