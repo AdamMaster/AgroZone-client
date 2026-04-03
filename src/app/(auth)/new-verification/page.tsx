@@ -1,4 +1,4 @@
-import { NewVerificationForm } from '@/components/modules'
+import { NewVerificationForm } from '@/components/features'
 
 export default function NewVerification() {
   return (

@@ -2,8 +2,8 @@ import { ArrowLeftIcon } from 'lucide-react'
 import { Metadata } from 'next'
 import Link from 'next/link'
 
+import { NewPasswordForm } from '@/components/features'
 import { Container } from '@/components/layout'
-import { NewPasswordForm } from '@/components/modules'
 import { Button, Logo } from '@/components/ui'
 
 export const metadata: Metadata = {
