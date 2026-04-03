@@ -1,13 +1,11 @@
+import { SettingsForm } from '@/components/features/user/components'
 import { Container } from '@/components/layout'
-import { Heading } from '@/components/ui'
 
-export default function SettingsPage() {
+export default function ProfileSettings() {
   return (
-    <div className=''>
+    <div>
       <Container>
-        <Heading level={3} className='mt-8 text-center'>
-          Страница профиля
-        </Heading>
+        <SettingsForm />
       </Container>
     </div>
   )
