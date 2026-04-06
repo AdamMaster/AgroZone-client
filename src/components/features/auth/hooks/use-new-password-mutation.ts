@@ -23,7 +23,7 @@ export function useNewPasswordMutation() {
       toast.success('Пароль успешно изменен', {
         description: 'Теперь вы можете войти в свой аккаунт.'
       })
-      router.push('/profile/settings')
+      router.push('/?auth=true&reason=reset')
     },
 
     onError(error) {

@@ -2,10 +2,10 @@ import { create } from 'zustand'
 
 interface AuthModalStore {
   isOpen: boolean
-  view: 'login' | 'register' | 'new-password'
-  onOpen: (view?: 'login' | 'register' | 'new-password') => void
+  view: 'login' | 'login-after-reset' | 'register' | 'new-password' | 'code-message'
+  onOpen: (view?: 'login' | 'login-after-reset' | 'register' | 'new-password' | 'code-message') => void
   onClose: () => void
-  setView: (view: 'login' | 'register' | 'new-password') => void
+  setView: (view: 'login' | 'login-after-reset' | 'register' | 'new-password' | 'code-message') => void
 }
 
 export const useAuthModal = create<AuthModalStore>(set => ({

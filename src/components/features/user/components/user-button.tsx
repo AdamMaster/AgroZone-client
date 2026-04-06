@@ -23,11 +23,12 @@ export const UserButton = ({ user }: UserButtonProps) => {
           <AvatarFallback>{user.displayName.slice(0, 1)}</AvatarFallback>
         </Avatar>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className='w-40' align='end'></DropdownMenuContent>
-      <DropdownMenuItem disabled={isLoadingLogout} onClick={() => logout()}>
-        <LogOut className='mr-2 size-4' />
-        Выйти
-      </DropdownMenuItem>
+      <DropdownMenuContent className='w-40' align='end'>
+        <DropdownMenuItem disabled={isLoadingLogout} onClick={() => logout()}>
+          <LogOut className='mr-2 size-4' />
+          Выйти
+        </DropdownMenuItem>
+      </DropdownMenuContent>
     </DropdownMenu>
   )
 }

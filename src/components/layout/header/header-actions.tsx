@@ -17,12 +17,15 @@ export const HeaderActions: React.FC<Props> = () => {
   const searchParams = useSearchParams()
 
   useEffect(() => {
-    if (searchParams.get('auth') === 'true') {
-      const timer = setTimeout(() => {
-        onOpen()
-      }, 0)
+    const auth = searchParams.get('auth')
+    const reason = searchParams.get('reason')
 
-      return () => clearTimeout(timer)
+    if (auth === 'true') {
+      if (reason === 'reset') {
+        onOpen('login-after-reset')
+      } else {
+        onOpen('login')
+      }
     }
   }, [searchParams])
 

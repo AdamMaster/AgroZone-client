@@ -10,11 +10,17 @@ import { toast } from 'sonner'
 
 import { Button, Field, FieldError, FieldGroup, Input, InputGroup } from '@/components/ui'
 
+import { cn } from '@/lib/utils'
+
 import { AuthWrapper } from './auth-wrapper'
 import { useLoginMutation } from './hooks'
 import { LoginSchema, TypeLoginSchema } from './schemes'
 
-export const LoginForm = () => {
+interface LoginFormProps {
+  isShowSocial?: boolean
+}
+
+export const LoginForm = ({ isShowSocial = true }: LoginFormProps) => {
   const [recaptchaValue, setRecaptchaValue] = useState<string | null>(null)
   const [showPassword, setShowPassword] = useState(false)
   const [isShowTwoFactor, setIsShowTwoFactor] = useState(false)
@@ -33,6 +39,14 @@ export const LoginForm = () => {
 
   const onSubmit = (values: TypeLoginSchema) => {
     if (recaptchaValue) {
+      if (isShowTwoFactor && (!values.code || values.code.trim() === '')) {
+        form.setError('code', {
+          type: 'manual',
+          message: 'Введите код подтверждения'
+        })
+        return
+      }
+
       login(
         {
           values,
@@ -40,8 +54,6 @@ export const LoginForm = () => {
         },
         {
           onSuccess: data => {
-            // Проверяем прямо по ответу сервера (data), а не по стейту
-            // Если бэкенд прислал message (значит нужна 2FA), мы НЕ закрываем модалку
             if (!data?.message) {
               onClose()
               form.reset()
@@ -57,17 +69,19 @@ export const LoginForm = () => {
   return (
     <AuthWrapper
       heading='Войти'
-      description='Войти с помощью:'
+      description={isShowSocial ? 'Войти с помощью:' : ''}
       switchButtonLabel={
-        <>
-          Еще нет аккаунта? <span className='text-primary'>Зарегистрироваться</span>
-        </>
+        !isShowTwoFactor && (
+          <>
+            Еще нет аккаунта? <span className='text-primary'>Зарегистрироваться</span>
+          </>
+        )
       }
-      isShowSocial
+      isShowSocial={isShowSocial && !isShowTwoFactor}
       onSwitchButtonClick={() => onOpen('register')}
     >
       <form id='form-rhf-demo' onSubmit={form.handleSubmit(onSubmit)}>
-        {isShowTwoFactor && (
+        <FieldGroup className={cn('group', !isShowTwoFactor && 'hidden')}>
           <Controller
             name='code'
             control={form.control}
@@ -78,57 +92,64 @@ export const LoginForm = () => {
               </Field>
             )}
           />
-        )}
-        {!isShowTwoFactor && (
-          <FieldGroup>
-            <Controller
-              name='email'
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid} className='group'>
-                  <Input {...field} type='email' placeholder='Почта' disabled={isLoadingLogin} />
-                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                </Field>
-              )}
-            />
-            <Controller
-              name='password'
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid} className='group'>
-                  <InputGroup>
-                    <Input
-                      {...field}
-                      type={showPassword ? 'text' : 'password'}
-                      placeholder='Пароль'
-                      disabled={isLoadingLogin}
-                    />
-                    <button
-                      type='button'
-                      className='absolute top-1/2 right-2.5 h-auto -translate-y-[50%] hover:bg-transparent'
-                      onClick={() => setShowPassword(!showPassword)}
-                      aria-label={showPassword ? 'Скрыть пароль' : 'Показать пароль'}
-                    >
-                      {showPassword ? (
-                        <Eye className='text-muted-foreground h-4 w-4' />
-                      ) : (
-                        <EyeOff className='text-muted-foreground h-4 w-4' />
-                      )}
-                    </button>
-                  </InputGroup>
-                  <Button
-                    variant='link'
-                    className='hover:text-primary inline-block text-right text-xs text-gray-900 underline'
-                    onClick={() => onOpen('new-password')}
+        </FieldGroup>
+        <FieldGroup className={cn('group', isShowTwoFactor && 'hidden')}>
+          <Controller
+            name='email'
+            control={form.control}
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid} className='group'>
+                <Input {...field} type='email' placeholder='Почта' disabled={isLoadingLogin} />
+                {fieldState.invalid && (
+                  <FieldError
+                    errors={[fieldState.error]}
+                    {...form.register('email')}
+                    onInput={e => {
+                      const value = (e.target as HTMLInputElement).value
+                      form.setValue('email', value, { shouldValidate: true })
+                    }}
+                  />
+                )}
+              </Field>
+            )}
+          />
+          <Controller
+            name='password'
+            control={form.control}
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid} className='group'>
+                <InputGroup>
+                  <Input
+                    {...field}
+                    type={showPassword ? 'text' : 'password'}
+                    placeholder='Пароль'
+                    disabled={isLoadingLogin}
+                  />
+                  <button
+                    type='button'
+                    className='absolute top-1/2 right-2.5 h-auto -translate-y-[50%] hover:bg-transparent'
+                    onClick={() => setShowPassword(!showPassword)}
+                    aria-label={showPassword ? 'Скрыть пароль' : 'Показать пароль'}
                   >
-                    Забыли пароль?
-                  </Button>
-                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                </Field>
-              )}
-            />
-          </FieldGroup>
-        )}
+                    {showPassword ? (
+                      <Eye className='text-muted-foreground h-4 w-4' />
+                    ) : (
+                      <EyeOff className='text-muted-foreground h-4 w-4' />
+                    )}
+                  </button>
+                </InputGroup>
+                <Button
+                  variant='link'
+                  className='hover:text-primary inline-block h-auto text-right text-xs text-gray-900 underline'
+                  onClick={() => onOpen('new-password')}
+                >
+                  Забыли пароль?
+                </Button>
+                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+              </Field>
+            )}
+          />
+        </FieldGroup>
         <div className='mt-4 flex justify-center'>
           <ReCAPTCHA sitekey={process.env.GOOGLE_RECAPTCHA_SITE_KEY as string} onChange={setRecaptchaValue} />
         </div>

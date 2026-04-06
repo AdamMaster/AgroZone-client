@@ -15,7 +15,7 @@ import { ResetPasswordSchema, TypeResetPasswordSchema } from './schemes'
 
 export const ResetPasswordForm = () => {
   const [recaptchaValue, setRecaptchaValue] = useState<string | null>(null)
-  const { onOpen, onClose } = useAuthModal()
+  const { onOpen, onClose, setView } = useAuthModal()
 
   const form = useForm<TypeResetPasswordSchema>({
     resolver: zodResolver(ResetPasswordSchema),
@@ -33,7 +33,7 @@ export const ResetPasswordForm = () => {
         {
           onSuccess: () => {
             form.reset()
-            onClose()
+            setView('code-message')
           }
         }
       )

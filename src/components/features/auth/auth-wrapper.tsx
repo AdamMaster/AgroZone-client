@@ -24,14 +24,12 @@ export const AuthWrapper = ({
   description,
   switchButtonLabel,
   onSwitchButtonClick,
-  isShowSocial = false
+  isShowSocial = true
 }: PropsWithChildren<AuthWrapperProps>) => {
   return (
     <div className={cn('flex w-full flex-col text-center', className)}>
-      <div className='mb-8'>
-        <Heading level={2} className='my-2'>
-          {heading}
-        </Heading>
+      <div className='mb-8 flex flex-col gap-2'>
+        <Heading level={2}>{heading}</Heading>
         {description && <p className='text-gray-500'>{description}</p>}
       </div>
       <div>{isShowSocial && <AuthSocial />}</div>
