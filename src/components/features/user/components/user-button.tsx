@@ -7,17 +7,18 @@ import { IUser } from '../../auth/types'
 import { useLogoutMutation } from '../hooks'
 
 interface UserButtonProps {
+  className?: string
   user: IUser
 }
 
-export const UserButton = ({ user }: UserButtonProps) => {
+export const UserButton = ({ className, user }: UserButtonProps) => {
   const { logout, isLoadingLogout } = useLogoutMutation()
 
   if (!user) return null
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger>
+      <DropdownMenuTrigger className={className}>
         <Avatar>
           <AvatarImage src={user.picture} />
           <AvatarFallback>{user.displayName.slice(0, 1)}</AvatarFallback>
@@ -34,5 +35,5 @@ export const UserButton = ({ user }: UserButtonProps) => {
 }
 
 export function UserButtonLoading() {
-  return <Skeleton className='h-10 w-10 rounded-full' />
+  return <Skeleton className='h-8 w-8 rounded-full' />
 }

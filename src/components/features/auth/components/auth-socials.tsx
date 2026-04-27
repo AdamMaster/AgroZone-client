@@ -6,10 +6,10 @@ import { FaGoogle, FaYandex } from 'react-icons/fa'
 
 import { Button } from '@/components/ui'
 
-import { authService } from './services'
-import { type AuthProvider } from './types'
+import { authService } from '../services'
+import { type AuthProvider } from '../types'
 
-export const AuthSocial = () => {
+export const AuthSocials = () => {
   const router = useRouter()
 
   const { mutateAsync } = useMutation({

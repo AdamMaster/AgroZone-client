@@ -15,11 +15,11 @@ export function useRegisterMutation() {
     mutationFn: ({ values, recaptcha }: { values: TypeRegisterSchema; recaptcha: string }) =>
       authService.register(values, recaptcha),
 
-    onSuccess() {
-      toast.success('Регистрация прошла успешно!', {
-        description: 'Пожалуйста, подтвердите ваш email. Сообщение было отправлено на ваш почтовый адрес.'
-      })
-    },
+    // onSuccess() {
+    //   toast.success('Регистрация прошла успешно!', {
+    //     description: 'Пожалуйста, подтвердите ваш email. Сообщение было отправлено на ваш почтовый адрес.'
+    //   })
+    // },
 
     onError(error) {
       toastMessageHandler(error)

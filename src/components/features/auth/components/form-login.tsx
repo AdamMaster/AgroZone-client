@@ -8,19 +8,19 @@ import ReCAPTCHA from 'react-google-recaptcha'
 import { Controller, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 
-import { Button, Field, FieldError, FieldGroup, Input, InputGroup } from '@/components/ui'
+import { Button, Field, FieldError, FieldGroup, Input, InputGroup, Loading } from '@/components/ui'
 
 import { cn } from '@/lib/utils'
 
-import { AuthWrapper } from './auth-wrapper'
-import { useLoginMutation } from './hooks'
-import { LoginSchema, TypeLoginSchema } from './schemes'
+import { useLoginMutation } from '../hooks'
+import { LoginSchema, TypeLoginSchema } from '../schemes'
+import { AuthFormWrapper } from './auth-form-wrapper'
 
 interface LoginFormProps {
   isShowSocial?: boolean
 }
 
-export const LoginForm = ({ isShowSocial = true }: LoginFormProps) => {
+export const FormLogin = ({ isShowSocial = true }: LoginFormProps) => {
   const [recaptchaValue, setRecaptchaValue] = useState<string | null>(null)
   const [showPassword, setShowPassword] = useState(false)
   const [isShowTwoFactor, setIsShowTwoFactor] = useState(false)
@@ -67,9 +67,13 @@ export const LoginForm = ({ isShowSocial = true }: LoginFormProps) => {
   }
 
   return (
-    <AuthWrapper
-      heading='Войти'
-      description={isShowSocial ? 'Войти с помощью:' : ''}
+    <AuthFormWrapper
+      heading={!isShowTwoFactor ? 'Вход' : 'Подтверждение'}
+      description={
+        isShowSocial && !isShowTwoFactor
+          ? 'Войти с помощью:'
+          : 'Мы отправили одноразовый код подтверждения. Пожалуйста, введите его ниже'
+      }
       switchButtonLabel={
         !isShowTwoFactor && (
           <>
@@ -87,7 +91,7 @@ export const LoginForm = ({ isShowSocial = true }: LoginFormProps) => {
             control={form.control}
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid} className='group'>
-                <Input {...field} placeholder='Код' disabled={isLoadingLogin} value={field.value || ''} />
+                <Input {...field} placeholder='Код' value={field.value || ''} />
                 {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
               </Field>
             )}
@@ -98,18 +102,9 @@ export const LoginForm = ({ isShowSocial = true }: LoginFormProps) => {
             name='email'
             control={form.control}
             render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid} className='group'>
-                <Input {...field} type='email' placeholder='Почта' disabled={isLoadingLogin} />
-                {fieldState.invalid && (
-                  <FieldError
-                    errors={[fieldState.error]}
-                    {...form.register('email')}
-                    onInput={e => {
-                      const value = (e.target as HTMLInputElement).value
-                      form.setValue('email', value, { shouldValidate: true })
-                    }}
-                  />
-                )}
+              <Field data-invalid={fieldState.invalid} className={cn(fieldState.invalid && 'pb-5', 'group')}>
+                <Input {...field} type='email' placeholder='Почта' />
+                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
               </Field>
             )}
           />
@@ -117,14 +112,9 @@ export const LoginForm = ({ isShowSocial = true }: LoginFormProps) => {
             name='password'
             control={form.control}
             render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid} className='group'>
+              <Field data-invalid={fieldState.invalid} className={cn(fieldState.invalid && 'pb-5', 'group')}>
                 <InputGroup>
-                  <Input
-                    {...field}
-                    type={showPassword ? 'text' : 'password'}
-                    placeholder='Пароль'
-                    disabled={isLoadingLogin}
-                  />
+                  <Input {...field} type={showPassword ? 'text' : 'password'} placeholder='Пароль' />
                   <button
                     type='button'
                     className='absolute top-1/2 right-2.5 h-auto -translate-y-[50%] hover:bg-transparent'
@@ -138,25 +128,26 @@ export const LoginForm = ({ isShowSocial = true }: LoginFormProps) => {
                     )}
                   </button>
                 </InputGroup>
-                <Button
-                  variant='link'
-                  className='hover:text-primary inline-block h-auto text-right text-xs text-gray-900 underline'
-                  onClick={() => onOpen('new-password')}
-                >
-                  Забыли пароль?
-                </Button>
                 {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
               </Field>
             )}
           />
+          <Button
+            variant='link'
+            className='hover:text-primary inline-block h-auto text-right text-xs text-gray-900 underline'
+            onClick={() => onOpen('new-password')}
+          >
+            Забыли пароль?
+          </Button>
         </FieldGroup>
         <div className='mt-4 flex justify-center'>
           <ReCAPTCHA sitekey={process.env.GOOGLE_RECAPTCHA_SITE_KEY as string} onChange={setRecaptchaValue} />
         </div>
-        <Button variant='secondary' size='lg' type='submit' className='mt-8 w-full' disabled={isLoadingLogin}>
+        <Button variant='secondary' size='lg' type='submit' className='mt-8 w-full'>
           Войти в аккаунт
         </Button>
       </form>
-    </AuthWrapper>
+      {isLoadingLogin && <Loading />}
+    </AuthFormWrapper>
   )
 }

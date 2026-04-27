@@ -15,7 +15,8 @@ export function useLogoutMutation() {
     mutationKey: ['logout'],
     mutationFn: () => authService.logout(),
     onSuccess() {
-      queryClient.invalidateQueries({ queryKey: ['profile'] })
+      // queryClient.invalidateQueries({ queryKey: ['profile'] })
+      queryClient.setQueryData(['profile'], null)
       toast.success('Вы успешно вышли из системы')
       router.push('/?auth=true')
     },

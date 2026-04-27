@@ -8,11 +8,13 @@ import ReCAPTCHA from 'react-google-recaptcha'
 import { Controller, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 
-import { Button, Field, FieldError, FieldGroup, Input, InputGroup } from '@/components/ui'
+import { Button, Field, FieldError, FieldGroup, Input, InputGroup, Loading } from '@/components/ui'
 
-import { AuthWrapper } from './auth-wrapper'
-import { useNewPasswordMutation } from './hooks'
-import { NewPasswordSchema, TypeNewPasswordSchema } from './schemes'
+import { cn } from '@/lib/utils'
+
+import { useNewPasswordMutation } from '../hooks'
+import { NewPasswordSchema, TypeNewPasswordSchema } from '../schemes'
+import { AuthFormWrapper } from './auth-form-wrapper'
 
 export const NewPasswordForm = () => {
   const [recaptchaValue, setRecaptchaValue] = useState<string | null>(null)
@@ -24,7 +26,7 @@ export const NewPasswordForm = () => {
     }
   })
 
-  const { newPassword, isLoadNewPassword } = useNewPasswordMutation()
+  const { newPassword, isLoadingNewPassword } = useNewPasswordMutation()
 
   const onSubmit = (values: TypeNewPasswordSchema) => {
     if (recaptchaValue) {
@@ -39,7 +41,7 @@ export const NewPasswordForm = () => {
   const [showPassword, setShowPassword] = useState(false)
 
   return (
-    <AuthWrapper
+    <AuthFormWrapper
       heading='Новый пароль'
       description='Придумайте новый пароль для вашего аккаунта'
       className='max-w-105 rounded-xl border bg-white p-8'
@@ -50,14 +52,9 @@ export const NewPasswordForm = () => {
             name='password'
             control={form.control}
             render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid} className='group'>
+              <Field data-invalid={fieldState.invalid} className={cn(fieldState.invalid && 'pb-5', 'group')}>
                 <InputGroup>
-                  <Input
-                    {...field}
-                    type={showPassword ? 'text' : 'password'}
-                    placeholder='Новый пароль'
-                    disabled={isLoadNewPassword}
-                  />
+                  <Input {...field} type={showPassword ? 'text' : 'password'} placeholder='Новый пароль' />
                   <button
                     type='button'
                     className='absolute top-1/2 right-2.5 h-auto -translate-y-[50%] hover:bg-transparent'
@@ -79,13 +76,14 @@ export const NewPasswordForm = () => {
         <div className='mt-6 flex justify-center'>
           <ReCAPTCHA sitekey={process.env.GOOGLE_RECAPTCHA_SITE_KEY as string} onChange={setRecaptchaValue} />
         </div>
-        <Button variant='secondary' size='lg' type='submit' className='mt-10 w-full' disabled={isLoadNewPassword}>
+        <Button variant='secondary' size='lg' type='submit' className='mt-10 w-full'>
           Продолжить
         </Button>
       </form>
       <button className='mt-8 block w-full text-center hover:opacity-80' onClick={() => onOpen('login')}>
         Войти в аккаунт
       </button>
-    </AuthWrapper>
+      {isLoadingNewPassword && <Loading />}
+    </AuthFormWrapper>
   )
 }

@@ -1,28 +1,33 @@
 'use client'
 
 import { useSearchParams } from 'next/navigation'
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 
 import { Heading, Loading } from '@/components/ui'
 
-import { useVerificationMutation } from './hooks'
+import { useChangeEmailConfirmMutation } from '../hooks'
 
-export const NewVerificationForm = () => {
+export const EmailChangeConfirm = () => {
   const searchParams = useSearchParams()
   const token = searchParams.get('token')
 
-  const { verification } = useVerificationMutation()
+  const { confirmChange } = useChangeEmailConfirmMutation()
+
+  const hasCalled = useRef(false)
 
   useEffect(() => {
-    verification(token)
-  }, [token])
+    if (token && !hasCalled.current) {
+      confirmChange()
+      hasCalled.current = true
+    }
+  }, [token, confirmChange])
 
   return (
     <div className='max-w-lg rounded-xl border p-8 text-center'>
       <Heading level={3} className='mb-5'>
         Подтверждение почты
       </Heading>
-      <Loading />
+      <Loading className='relative' />
     </div>
   )
 }

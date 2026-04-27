@@ -79,25 +79,29 @@ export class FetchClient {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   post<T>(endpoint: string, body?: Record<string, any>, options: RequestOptions = {}) {
+    const isFormData = body instanceof FormData
+
     return this.request<T>(endpoint, 'POST', {
       ...options,
       headers: {
-        'Content-Type': 'application/json',
+        ...(!isFormData && { 'Content-Type': 'application/json' }),
         ...(options.headers || {})
       },
-      ...(!!body && { body: JSON.stringify(body) })
+      body: isFormData ? body : JSON.stringify(body)
     })
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   put<T>(endpoint: string, body?: Record<string, any>, options: RequestOptions = {}) {
+    const isFormData = body instanceof FormData
+
     return this.request<T>(endpoint, 'PUT', {
       ...options,
       headers: {
-        'Content-Type': 'application/json',
+        ...(!isFormData && { 'Content-Type': 'application/json' }),
         ...(options.headers || {})
       },
-      ...(!!body && { body: JSON.stringify(body) })
+      body: isFormData ? body : JSON.stringify(body)
     })
   }
 
@@ -107,13 +111,15 @@ export class FetchClient {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   patch<T>(endpoint: string, body?: Record<string, any>, options: RequestOptions = {}) {
+    const isFormData = body instanceof FormData
+
     return this.request<T>(endpoint, 'PATCH', {
       ...options,
       headers: {
-        'Content-Type': 'application/json',
+        ...(!isFormData && { 'Content-Type': 'application/json' }),
         ...(options.headers || {})
       },
-      ...(!!body && { body: JSON.stringify(body) })
+      body: isFormData ? body : JSON.stringify(body)
     })
   }
 }

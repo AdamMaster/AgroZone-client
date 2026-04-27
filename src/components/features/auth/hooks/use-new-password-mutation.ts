@@ -13,7 +13,7 @@ export function useNewPasswordMutation() {
 
   const token = searchParams.get('token')
 
-  const { mutate: newPassword, isPending: isLoadNewPassword } = useMutation({
+  const { mutate: newPassword, isPending: isLoadingNewPassword } = useMutation({
     mutationKey: ['new password'],
 
     mutationFn: ({ values, recaptcha }: { values: TypeNewPasswordSchema; recaptcha: string }) =>
@@ -31,5 +31,5 @@ export function useNewPasswordMutation() {
     }
   })
 
-  return { newPassword, isLoadNewPassword }
+  return { newPassword, isLoadingNewPassword }
 }

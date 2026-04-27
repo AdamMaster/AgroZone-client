@@ -1,0 +1,7 @@
+export * from './form-register'
+export * from './form-login'
+export * from './auth-form-wrapper'
+export * from './auth-socials'
+export * from './verification'
+export * from './form-reset-password'
+export * from './form-new-password'

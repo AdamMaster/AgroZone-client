@@ -1,12 +1,5 @@
-import { SettingsForm } from '@/components/features/user/components'
-import { Container } from '@/components/layout'
+import { redirect } from 'next/navigation'
 
-export default function ProfileSettings() {
-  return (
-    <div className='pt-10'>
-      <Container>
-        <SettingsForm />
-      </Container>
-    </div>
-  )
+export default function SettingsPage() {
+  redirect('/profile/settings/general')
 }

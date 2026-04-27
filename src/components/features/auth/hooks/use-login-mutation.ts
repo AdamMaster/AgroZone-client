@@ -16,7 +16,7 @@ export function useLoginMutation(setIsShowTwoFactor: Dispatch<SetStateAction<boo
   const { mutate: login, isPending: isLoadingLogin } = useMutation({
     mutationKey: ['login user'],
 
-    mutationFn: ({ values, recaptcha }: { values: TypeLoginSchema; recaptcha: string }) =>
+    mutationFn: ({ values, recaptcha }: { values: TypeLoginSchema; recaptcha?: string }) =>
       authService.login(values, recaptcha),
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

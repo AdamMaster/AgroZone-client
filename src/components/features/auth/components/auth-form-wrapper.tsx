@@ -6,9 +6,9 @@ import { Heading } from '@/components/ui'
 
 import { cn } from '@/lib/utils'
 
-import { AuthSocial } from './auth-social'
+import { AuthSocials } from './auth-socials'
 
-interface AuthWrapperProps {
+interface AuthFormWrapperProps {
   className?: string
   heading: string
   description?: string
@@ -17,7 +17,7 @@ interface AuthWrapperProps {
   onSwitchButtonClick?: () => void
 }
 
-export const AuthWrapper = ({
+export const AuthFormWrapper = ({
   children,
   className,
   heading,
@@ -25,14 +25,14 @@ export const AuthWrapper = ({
   switchButtonLabel,
   onSwitchButtonClick,
   isShowSocial = true
-}: PropsWithChildren<AuthWrapperProps>) => {
+}: PropsWithChildren<AuthFormWrapperProps>) => {
   return (
     <div className={cn('flex w-full flex-col text-center', className)}>
       <div className='mb-8 flex flex-col gap-2'>
         <Heading level={2}>{heading}</Heading>
         {description && <p className='text-gray-500'>{description}</p>}
       </div>
-      <div>{isShowSocial && <AuthSocial />}</div>
+      <div>{isShowSocial && <AuthSocials />}</div>
       {isShowSocial && (
         <div className='relative my-3 space-y-4'>
           <div className='relative flex justify-center text-xs uppercase'>

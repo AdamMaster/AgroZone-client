@@ -8,7 +8,7 @@ export const Header = () => {
     <div className='bg-white'>
       <div>
         <Container>
-          <div className='flex items-center justify-between gap-6 py-4'>
+          <div className='flex h-18 items-center justify-end gap-6 py-4'>
             <HeaderActions />
           </div>
         </Container>
