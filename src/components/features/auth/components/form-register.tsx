@@ -4,7 +4,7 @@ import { useAuthModal } from '@/store'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Eye, EyeOff } from 'lucide-react'
 import React, { useState } from 'react'
-import ReCAPTCHA from 'react-google-recaptcha'
+import { useGoogleReCaptcha } from 'react-google-recaptcha-v3'
 import { Controller, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 
@@ -17,8 +17,9 @@ import { RegisterSchema, TypeRegisterSchema } from '../schemes'
 import { AuthFormWrapper } from './auth-form-wrapper'
 
 export const FormRegister = () => {
-  const [recaptchaValue, setRecaptchaValue] = useState<string | null>(null)
   const { onOpen, setView } = useAuthModal()
+
+  const { executeRecaptcha } = useGoogleReCaptcha()
 
   const form = useForm<TypeRegisterSchema>({
     resolver: zodResolver(RegisterSchema),
@@ -32,20 +33,26 @@ export const FormRegister = () => {
 
   const { register, isLoadingRegister } = useRegisterMutation()
 
-  const onSubmit = (values: TypeRegisterSchema) => {
-    if (recaptchaValue) {
+  const onSubmit = async (values: TypeRegisterSchema) => {
+    if (!executeRecaptcha) {
+      toast.error('Капча еще не загрузилась, попробуйте снова')
+      return
+    }
+
+    try {
+      const recaptchaToken = await executeRecaptcha('register')
+
       register(
-        { values, recaptcha: recaptchaValue },
+        { values, recaptcha: recaptchaToken },
         {
           onSuccess: () => {
             form.reset()
-            setRecaptchaValue(null)
             setView('register-message')
           }
         }
       )
-    } else {
-      toast.error('Пожалуйста, завершите проверку')
+    } catch (error) {
+      toast.error('Ошибка проверки безопасности')
     }
   }
 
@@ -135,9 +142,7 @@ export const FormRegister = () => {
             )}
           />
         </FieldGroup>
-        <div className='mt-4 flex justify-center'>
-          <ReCAPTCHA sitekey={process.env.GOOGLE_RECAPTCHA_SITE_KEY as string} onChange={setRecaptchaValue} />
-        </div>
+        <div className='mt-4 flex justify-center'></div>
         <Button variant='secondary' size='lg' type='submit' className='mt-8 w-full'>
           Создать аккаунт
         </Button>

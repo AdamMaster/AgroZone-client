@@ -4,7 +4,7 @@ import { useAuthModal } from '@/store'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Eye, EyeOff } from 'lucide-react'
 import { useState } from 'react'
-import ReCAPTCHA from 'react-google-recaptcha'
+import { useGoogleReCaptcha } from 'react-google-recaptcha-v3'
 import { Controller, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 
@@ -21,10 +21,11 @@ interface LoginFormProps {
 }
 
 export const FormLogin = ({ isShowSocial = true }: LoginFormProps) => {
-  const [recaptchaValue, setRecaptchaValue] = useState<string | null>(null)
   const [showPassword, setShowPassword] = useState(false)
   const [isShowTwoFactor, setIsShowTwoFactor] = useState(false)
   const { onOpen, onClose } = useAuthModal()
+
+  const { executeRecaptcha } = useGoogleReCaptcha()
 
   const form = useForm<TypeLoginSchema>({
     resolver: zodResolver(LoginSchema),
@@ -37,20 +38,29 @@ export const FormLogin = ({ isShowSocial = true }: LoginFormProps) => {
 
   const { login, isLoadingLogin } = useLoginMutation(setIsShowTwoFactor)
 
-  const onSubmit = (values: TypeLoginSchema) => {
-    if (recaptchaValue) {
-      if (isShowTwoFactor && (!values.code || values.code.trim() === '')) {
-        form.setError('code', {
-          type: 'manual',
-          message: 'Введите код подтверждения'
-        })
-        return
-      }
+  const onSubmit = async (values: TypeLoginSchema) => {
+    if (isShowTwoFactor && (!values.code || values.code.trim() === '')) {
+      form.setError('code', {
+        type: 'manual',
+        message: 'Введите код подтверждения'
+      })
+      return
+    }
+
+    // 4. Проверяем, загрузилась ли капча на странице
+    if (!executeRecaptcha) {
+      toast.error('Капча еще не загрузилась, попробуйте снова')
+      return
+    }
+
+    try {
+      // 5. Генерируем невидимый токен с экшеном 'login'
+      const recaptchaToken = await executeRecaptcha('login')
 
       login(
         {
           values,
-          recaptcha: recaptchaValue
+          recaptcha: recaptchaToken // Передаем сгенерированный токен v3
         },
         {
           onSuccess: data => {
@@ -61,8 +71,8 @@ export const FormLogin = ({ isShowSocial = true }: LoginFormProps) => {
           }
         }
       )
-    } else {
-      toast.error('Пожалуйста, завершите проверку')
+    } catch (error) {
+      toast.error('Ошибка проверки безопасности')
     }
   }
 
@@ -82,7 +92,7 @@ export const FormLogin = ({ isShowSocial = true }: LoginFormProps) => {
         )
       }
       isShowSocial={isShowSocial && !isShowTwoFactor}
-      onSwitchButtonClick={() => onOpen('register')}
+      onSwitchButtonClick={() => onOpen('register-sms')}
     >
       <form id='form-rhf-demo' onSubmit={form.handleSubmit(onSubmit)}>
         <FieldGroup className={cn('group', !isShowTwoFactor && 'hidden')}>
@@ -140,11 +150,8 @@ export const FormLogin = ({ isShowSocial = true }: LoginFormProps) => {
             Забыли пароль?
           </Button>
         </FieldGroup>
-        <div className='mt-4 flex justify-center'>
-          <ReCAPTCHA sitekey={process.env.GOOGLE_RECAPTCHA_SITE_KEY as string} onChange={setRecaptchaValue} />
-        </div>
-        <Button variant='secondary' size='lg' type='submit' className='mt-8 w-full'>
-          Войти в аккаунт
+        <Button variant='secondary' size='lg' type='submit' className='mt-4 w-full'>
+          Войти
         </Button>
       </form>
       {isLoadingLogin && <Loading />}

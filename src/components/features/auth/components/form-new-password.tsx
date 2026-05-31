@@ -4,7 +4,7 @@ import { useAuthModal } from '@/store'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Eye, EyeOff } from 'lucide-react'
 import { useState } from 'react'
-import ReCAPTCHA from 'react-google-recaptcha'
+import { useGoogleReCaptcha } from 'react-google-recaptcha-v3'
 import { Controller, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 
@@ -17,7 +17,7 @@ import { NewPasswordSchema, TypeNewPasswordSchema } from '../schemes'
 import { AuthFormWrapper } from './auth-form-wrapper'
 
 export const NewPasswordForm = () => {
-  const [recaptchaValue, setRecaptchaValue] = useState<string | null>(null)
+  const { executeRecaptcha } = useGoogleReCaptcha()
 
   const form = useForm<TypeNewPasswordSchema>({
     resolver: zodResolver(NewPasswordSchema),
@@ -28,11 +28,18 @@ export const NewPasswordForm = () => {
 
   const { newPassword, isLoadingNewPassword } = useNewPasswordMutation()
 
-  const onSubmit = (values: TypeNewPasswordSchema) => {
-    if (recaptchaValue) {
-      newPassword({ values, recaptcha: recaptchaValue })
-    } else {
-      toast.error('Пожалуйста, завершите проверку')
+  const onSubmit = async (values: TypeNewPasswordSchema) => {
+    if (!executeRecaptcha) {
+      toast.error('Капча еще не загрузилась, попробуйте снова')
+      return
+    }
+
+    try {
+      const recaptchaToken = await executeRecaptcha('reset_password')
+
+      newPassword({ values, recaptcha: recaptchaToken })
+    } catch (error) {
+      toast.error('Ошибка проверки безопасности')
     }
   }
 
@@ -45,6 +52,7 @@ export const NewPasswordForm = () => {
       heading='Новый пароль'
       description='Придумайте новый пароль для вашего аккаунта'
       className='max-w-105 rounded-xl border bg-white p-8'
+      isShowSocial={false}
     >
       <form id='form-rhf-demo' onSubmit={form.handleSubmit(onSubmit)}>
         <FieldGroup>
@@ -73,9 +81,6 @@ export const NewPasswordForm = () => {
             )}
           />
         </FieldGroup>
-        <div className='mt-6 flex justify-center'>
-          <ReCAPTCHA sitekey={process.env.GOOGLE_RECAPTCHA_SITE_KEY as string} onChange={setRecaptchaValue} />
-        </div>
         <Button variant='secondary' size='lg' type='submit' className='mt-10 w-full'>
           Продолжить
         </Button>

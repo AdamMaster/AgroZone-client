@@ -2,7 +2,6 @@
 
 import { useAuthModal } from '@/store'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Eye, EyeOff } from 'lucide-react'
 import { useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -13,16 +12,15 @@ import { useProfile } from '@/shared/hooks'
 
 import { cn } from '@/lib/utils'
 
-import { useNewPasswordMutation } from '../../auth/hooks'
 import { usePasswordChangeMutation } from '../hooks'
 import { PasswordChangeSchema, TypePasswordChangeSchema } from '../schemes'
 import { UserFormWrapper } from './user-form-wrapper'
 
 export const FormPasswordChange = () => {
   const { user, isLoading } = useProfile()
-  const isOAuthOnly = user?.password === ''
+  const isOAuthOnly = user?.password === null
   const [showPassword, setShowPassword] = useState(false)
-  const { onClose, setView } = useAuthModal()
+  const { setView } = useAuthModal()
 
   const form = useForm<TypePasswordChangeSchema>({
     resolver: zodResolver(PasswordChangeSchema),

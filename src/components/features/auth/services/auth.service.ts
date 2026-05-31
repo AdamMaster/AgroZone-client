@@ -1,9 +1,23 @@
 import { api } from '@/shared/api'
 
-import { TypeLoginSchema, TypeRegisterSchema } from '../schemes'
+import { TypeLoginSchema, TypeRegisterSchema, TypeRegisterSmsFinalSchema } from '../schemes'
 import { IUser } from '../types'
 
 class AuthService {
+  async registerSmsStart(body: { phone: string }, recaptcha?: string | null) {
+    const headers = recaptcha ? { recaptcha } : undefined
+
+    const response = await api.post<{ message: string }>('auth/register/sms/start', body, { headers })
+
+    return response
+  }
+
+  async registerSmsComplete(body: TypeRegisterSmsFinalSchema) {
+    const response = await api.post<IUser>('auth/register/sms/complete', body)
+
+    return response
+  }
+
   async register(body: TypeRegisterSchema, recaptcha?: string) {
     const headers = recaptcha ? { recaptcha } : undefined
 
@@ -11,6 +25,7 @@ class AuthService {
 
     return response
   }
+
   async login(body: TypeLoginSchema, recaptcha?: string) {
     const headers = recaptcha ? { recaptcha } : undefined
 

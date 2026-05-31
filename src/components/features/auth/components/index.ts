@@ -1,4 +1,5 @@
 export * from './form-register'
+export * from './form-register-sms'
 export * from './form-login'
 export * from './auth-form-wrapper'
 export * from './auth-socials'

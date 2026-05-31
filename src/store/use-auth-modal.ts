@@ -3,9 +3,10 @@ import { create } from 'zustand'
 interface AuthModalStore {
   isOpen: boolean
   view:
+    | 'register'
+    | 'register-sms'
     | 'login'
     | 'login-after-reset'
-    | 'register'
     | 'new-password'
     | 'code-message'
     | 'change-email'
@@ -15,9 +16,10 @@ interface AuthModalStore {
     | 'change-password-confirm'
   onOpen: (
     view?:
+      | 'register'
+      | 'register-sms'
       | 'login'
       | 'login-after-reset'
-      | 'register'
       | 'new-password'
       | 'code-message'
       | 'change-email'
@@ -29,9 +31,10 @@ interface AuthModalStore {
   onClose: () => void
   setView: (
     view:
+      | 'register'
+      | 'register-sms'
       | 'login'
       | 'login-after-reset'
-      | 'register'
       | 'new-password'
       | 'code-message'
       | 'change-email'

@@ -5,19 +5,28 @@ import { useAuthModal } from '@/store'
 import { StatusMessage } from '@/components/ui'
 import { Dialog, DialogContent } from '@/components/ui/dialog'
 
-import { FormEmailChange, FormLogin, FormPasswordChange, FormRegister, FormResetPassword } from '../../features'
+import {
+  FormEmailChange,
+  FormLogin,
+  FormPasswordChange,
+  FormRegister,
+  FormRegisterSms,
+  FormResetPassword
+} from '../../features'
 
 export const AuthModal = () => {
   const { isOpen, view, onClose } = useAuthModal()
 
   const renderContent = () => {
     switch (view) {
+      case 'register':
+        return <FormRegister />
+      case 'register-sms':
+        return <FormRegisterSms />
       case 'login':
         return <FormLogin />
       case 'login-after-reset':
         return <FormLogin isShowSocial={false} />
-      case 'register':
-        return <FormRegister />
       case 'new-password':
         return <FormResetPassword />
       case 'change-password':

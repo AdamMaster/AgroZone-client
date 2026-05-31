@@ -9,8 +9,16 @@ interface LogoProps {
 
 export const Logo = ({ className }: LogoProps) => {
   return (
-    <Link href='/' className=''>
-      <Image className={cn('h-auto w-40', className)} src='/images/logo.svg' width={100} height={40} alt='' priority />
+    <Link href='/' className={className}>
+      <Image
+        className={cn('mb-0.5 h-auto w-40', className)}
+        src='/images/logo.svg'
+        width={100}
+        height={40}
+        alt=''
+        priority
+      />
+      <p className='text-secondary text-sm'>агропромышленный центр</p>
     </Link>
   )
 }

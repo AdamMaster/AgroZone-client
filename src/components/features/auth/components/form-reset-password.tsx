@@ -3,7 +3,7 @@
 import { useAuthModal } from '@/store'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useState } from 'react'
-import ReCAPTCHA from 'react-google-recaptcha'
+import { useGoogleReCaptcha } from 'react-google-recaptcha-v3'
 import { Controller, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 
@@ -16,7 +16,7 @@ import { ResetPasswordSchema, TypeResetPasswordSchema } from '../schemes'
 import { AuthFormWrapper } from './auth-form-wrapper'
 
 export const FormResetPassword = () => {
-  const [recaptchaValue, setRecaptchaValue] = useState<string | null>(null)
+  const { executeRecaptcha } = useGoogleReCaptcha()
   const { onOpen, setView } = useAuthModal()
 
   const form = useForm<TypeResetPasswordSchema>({
@@ -28,10 +28,17 @@ export const FormResetPassword = () => {
 
   const { reset, isLoadingReset } = useResetPasswordMutation()
 
-  const onSubmit = (values: TypeResetPasswordSchema) => {
-    if (recaptchaValue) {
+  const onSubmit = async (values: TypeResetPasswordSchema) => {
+    if (!executeRecaptcha) {
+      toast.error('Капча еще не загрузилась, попробуйте снова')
+      return
+    }
+
+    try {
+      const recaptchaToken = await executeRecaptcha('forgot_password')
+
       reset(
-        { values, recaptcha: recaptchaValue },
+        { values, recaptcha: recaptchaToken },
         {
           onSuccess: () => {
             form.reset()
@@ -39,8 +46,8 @@ export const FormResetPassword = () => {
           }
         }
       )
-    } else {
-      toast.error('Пожалуйста, завершите проверку')
+    } catch (error) {
+      toast.error('Ошибка проверки безопасности')
     }
   }
 
@@ -65,9 +72,6 @@ export const FormResetPassword = () => {
             )}
           />
         </FieldGroup>
-        <div className='mt-6 flex justify-center'>
-          <ReCAPTCHA sitekey={process.env.GOOGLE_RECAPTCHA_SITE_KEY as string} onChange={setRecaptchaValue} />
-        </div>
         <Button variant='secondary' size='lg' type='submit' className='mt-10 w-full'>
           Сбросить
         </Button>
