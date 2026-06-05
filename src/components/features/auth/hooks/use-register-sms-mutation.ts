@@ -1,39 +1,42 @@
 'use client'
 
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { toastMessageHandler } from '@/shared/utils'
 
-// Импортируем типы для всех шагов СМС-регистрации
 import { TypeRegisterSmsFinalSchema, TypeRegisterSmsPhoneSchema } from '../schemes'
 import { authService } from '../services'
 
 export function useRegisterSmsMutation() {
-  // 1. Мутация для первого шага (отправка телефона и получение СМС)
+  const queryClient = useQueryClient()
+
   const { mutate: registerSmsStart, isPending: isLoadingSmsStart } = useMutation({
     mutationKey: ['register sms start'],
-
     mutationFn: ({ values, recaptcha }: { values: TypeRegisterSmsPhoneSchema; recaptcha: string }) =>
       authService.registerSmsStart(values, recaptcha),
-
     onError(error) {
       toastMessageHandler(error)
     }
   })
 
-  // 2. Мутация для финального шага (отправка всех данных и создание юзера)
+  const { mutate: verifyRegisterCode, isPending: isLoadingCode } = useMutation({
+    mutationKey: ['register check code'],
+    mutationFn: (data: { phone: string; code: string }) => authService.checkRegisterCode(data),
+    onError(error) {
+      toastMessageHandler(error)
+    }
+  })
+
   const { mutate: registerSmsFinal, isPending: isLoadingSmsFinal } = useMutation({
     mutationKey: ['register sms final'],
-
-    // Собираем в аргументы финальные данные формы и сохраненные телефон с кодом
     mutationFn: (data: TypeRegisterSmsFinalSchema & { phone: string; code: string }) =>
       authService.registerSmsComplete(data),
 
     onSuccess() {
       toast.success('Регистрация успешно завершена!')
+      queryClient.invalidateQueries({ queryKey: ['profile'] })
     },
-
     onError(error) {
       toastMessageHandler(error)
     }
@@ -42,6 +45,8 @@ export function useRegisterSmsMutation() {
   return {
     registerSmsStart,
     isLoadingSmsStart,
+    verifyRegisterCode,
+    isLoadingCode,
     registerSmsFinal,
     isLoadingSmsFinal
   }

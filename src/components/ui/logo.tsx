@@ -18,7 +18,7 @@ export const Logo = ({ className }: LogoProps) => {
         alt=''
         priority
       />
-      <p className='text-secondary text-sm'>агропромышленный центр</p>
+      <p className='text-secondary text-xs leading-3'>агропромышленная торговая площадка</p>
     </Link>
   )
 }

@@ -40,6 +40,22 @@ class UserServices {
 
     return response
   }
+
+  async requestPhoneChange(newPhone: string) {
+    const response = await api.post<{ success: boolean }>('users/profile/change-phone/request', {
+      newPhone
+    })
+
+    return response
+  }
+
+  async confirmPhoneChange(code: string) {
+    const response = await api.patch<{ success: boolean }>('users/profile/change-phone/confirm', {
+      code
+    })
+
+    return response
+  }
 }
 
 export const userServices = new UserServices()

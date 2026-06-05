@@ -18,9 +18,8 @@ import { EmailChangeShema, TypeEmailChangeShema } from '../schemes'
 import { UserFormWrapper } from './user-form-wrapper'
 
 export const FormEmailChange = () => {
-  const { user, isLoading } = useProfile()
+  const { user } = useProfile()
   const [showPassword, setShowPassword] = useState(false)
-  const [isShowTwoFactor, setIsShowTwoFactor] = useState(false)
   const { onOpen, onClose, setView } = useAuthModal()
 
   const form = useForm<TypeEmailChangeShema>({
@@ -68,17 +67,21 @@ export const FormEmailChange = () => {
 
   return (
     <UserFormWrapper
-      heading='Смена почты'
-      description='Введите новый email. Мы отправим на него письмо с подтверждением.'
+      heading={user?.email ? 'Смена почты' : 'Привязка почты'}
+      description={
+        user?.email
+          ? 'Введите новую почту. Мы отправим на нее письмо с подтверждением.'
+          : 'Введите почту. Мы отправим на нее письмо с подтверждением.'
+      }
     >
       <form id='form-rhf-demo' onSubmit={form.handleSubmit(onSubmit)}>
-        <FieldGroup className={cn('group', isShowTwoFactor && 'hidden')}>
+        <FieldGroup className='group'>
           <Controller
             name='newEmail'
             control={form.control}
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid} className={cn(fieldState.invalid && 'pb-5', 'group')}>
-                <Input {...field} type='email' placeholder='Новая почта' />
+                <Input {...field} type='email' placeholder={user?.email ? 'Новая почта' : 'Почта'} />
                 {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
               </Field>
             )}

@@ -9,6 +9,7 @@ import {
   FormEmailChange,
   FormLogin,
   FormPasswordChange,
+  FormPhoneChange,
   FormRegister,
   FormRegisterSms,
   FormResetPassword
@@ -33,6 +34,8 @@ export const AuthModal = () => {
         return <FormPasswordChange />
       case 'change-email':
         return <FormEmailChange />
+      case 'change-phone':
+        return <FormPhoneChange />
       case 'code-message':
         return (
           <StatusMessage heading='Проверьте почту' text='На вашу почту была отправлена ссылка для подтверждения.' />
@@ -46,6 +49,8 @@ export const AuthModal = () => {
             text='Пожалуйста, подтвердите ваш email. Сообщение было отправлено на ваш почтовый адрес.'
           />
         )
+      case 'register-sms-message':
+        return <StatusMessage heading='Регистрация прошла успешно!' text='Вы вошли в систему.' />
       case 'change-password-confirm':
         return <StatusMessage heading='Пароль обновлен!' text='Ваши данные успешно сохранены.' />
     }

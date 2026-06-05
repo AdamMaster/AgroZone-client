@@ -25,10 +25,11 @@ export interface IUser {
   id: string
   createdAt: string
   updatedAt: string
-  email: string
+  email?: string
+  phone?: string
   password: string
-  displayName: string
-  picture: string
+  displayName?: string
+  picture?: string
   role: UserRole
   isVerified: boolean
   isTwoFactorEnabled: boolean

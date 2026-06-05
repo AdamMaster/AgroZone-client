@@ -9,7 +9,8 @@ function getServerUrl() {
   return serverUrl.replace(/\/+$/, '')
 }
 
-export default function middleware(request: NextRequest) {
+// 1. Делаем функцию асинхронной
+export default async function middleware(request: NextRequest) {
   const { url, cookies, nextUrl } = request
 
   const session = cookies.get('session')?.value
@@ -32,28 +33,31 @@ export default function middleware(request: NextRequest) {
 
     const cookieHeader = request.headers.get('cookie') ?? ''
 
-    return fetch(`${serverUrl}/users/profile`, {
-      method: 'GET',
-      headers: {
-        cookie: cookieHeader
-      },
-      cache: 'no-store'
-    })
-      .then(async res => {
-        if (!res.ok) {
-          return NextResponse.redirect(new URL('/?auth=true', url))
-        }
-
-        const profile = (await res.json()) as { role?: string } | null
-        const role = profile?.role
-
-        if (role !== 'ADMIN') {
-          return NextResponse.redirect(new URL('/profile/settings', url))
-        }
-
-        return NextResponse.next()
+    // 2. Переписываем fetch на async/await с обработкой ошибок через try/catch
+    try {
+      const res = await fetch(`${serverUrl}/users/profile`, {
+        method: 'GET',
+        headers: {
+          cookie: cookieHeader
+        },
+        cache: 'no-store'
       })
-      .catch(() => NextResponse.redirect(new URL('/?auth=true', url)))
+
+      if (!res.ok) {
+        return NextResponse.redirect(new URL('/?auth=true', url))
+      }
+
+      const profile = (await res.json()) as { role?: string } | null
+      const role = profile?.role
+
+      if (role !== 'ADMIN') {
+        return NextResponse.redirect(new URL('/profile/settings', url))
+      }
+
+      return NextResponse.next()
+    } catch (error) {
+      return NextResponse.redirect(new URL('/?auth=true', url))
+    }
   }
 
   return NextResponse.next()

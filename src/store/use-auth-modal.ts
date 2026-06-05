@@ -11,7 +11,9 @@ interface AuthModalStore {
     | 'code-message'
     | 'change-email'
     | 'change-email-message'
+    | 'change-phone'
     | 'register-message'
+    | 'register-sms-message'
     | 'change-password'
     | 'change-password-confirm'
   onOpen: (
@@ -24,7 +26,9 @@ interface AuthModalStore {
       | 'code-message'
       | 'change-email'
       | 'change-email-message'
+      | 'change-phone'
       | 'register-message'
+      | 'register-sms-message'
       | 'change-password'
       | 'change-password-confirm'
   ) => void
@@ -39,7 +43,9 @@ interface AuthModalStore {
       | 'code-message'
       | 'change-email'
       | 'change-email-message'
+      | 'change-phone'
       | 'register-message'
+      | 'register-sms-message'
       | 'change-password'
       | 'change-password-confirm'
   ) => void

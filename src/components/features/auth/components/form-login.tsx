@@ -30,12 +30,11 @@ export const FormLogin = ({ isShowSocial = true }: LoginFormProps) => {
   const form = useForm<TypeLoginSchema>({
     resolver: zodResolver(LoginSchema),
     defaultValues: {
-      email: '',
+      login: '',
       password: '',
       code: ''
     }
   })
-
   const { login, isLoadingLogin } = useLoginMutation(setIsShowTwoFactor)
 
   const onSubmit = async (values: TypeLoginSchema) => {
@@ -109,11 +108,11 @@ export const FormLogin = ({ isShowSocial = true }: LoginFormProps) => {
         </FieldGroup>
         <FieldGroup className={cn('group', isShowTwoFactor && 'hidden')}>
           <Controller
-            name='email'
+            name='login'
             control={form.control}
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid} className={cn(fieldState.invalid && 'pb-5', 'group')}>
-                <Input {...field} type='email' placeholder='Почта' />
+                <Input {...field} type='text' placeholder='Почта или номер телефона' />
                 {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
               </Field>
             )}

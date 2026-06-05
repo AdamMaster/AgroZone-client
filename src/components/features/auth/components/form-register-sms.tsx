@@ -3,12 +3,15 @@
 import { useAuthModal } from '@/store'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Eye, EyeOff } from 'lucide-react'
+import { useRouter } from 'next/navigation'
 import React, { useState } from 'react'
 import { useGoogleReCaptcha } from 'react-google-recaptcha-v3'
 import { Controller, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 
 import { Button, Field, FieldError, FieldGroup, Input, InputGroup, Loading, PasswordToggle } from '@/components/ui'
+
+import { formatPhoneNumber } from '@/shared/utils'
 
 import { cn } from '@/lib/utils'
 
@@ -24,11 +27,19 @@ import {
 import { AuthFormWrapper } from './auth-form-wrapper'
 
 export const FormRegisterSms = () => {
-  const { setView, onOpen } = useAuthModal()
+  const { setView, onOpen, onClose } = useAuthModal()
   const [step, setStep] = useState(1)
   const [regData, setRegData] = useState({ phone: '', code: '' })
   const [showPassword, setShowPassword] = useState(false)
-  const { registerSmsStart, isLoadingSmsStart, registerSmsFinal, isLoadingSmsFinal } = useRegisterSmsMutation()
+  const {
+    registerSmsStart,
+    isLoadingSmsStart,
+    registerSmsFinal,
+    isLoadingSmsFinal,
+    verifyRegisterCode,
+    isLoadingCode
+  } = useRegisterSmsMutation()
+  const router = useRouter()
 
   const { executeRecaptcha } = useGoogleReCaptcha()
 
@@ -56,11 +67,16 @@ export const FormRegisterSms = () => {
     try {
       const recaptchaToken = await executeRecaptcha('register_sms_start')
 
+      // Очищаем номер: "+7 (930) 408-79-71" -> "79304087971"
+      const cleanPhone = data.phone.replace(/\D/g, '')
+      const cleanedData = { phone: cleanPhone }
+
       registerSmsStart(
-        { values: data, recaptcha: recaptchaToken },
+        { values: cleanedData, recaptcha: recaptchaToken },
         {
           onSuccess: () => {
-            setRegData(prev => ({ ...prev, ...data }))
+            // Сохраняем в стейт именно очищенный телефон
+            setRegData(prev => ({ ...prev, ...cleanedData }))
             toast.success('Код успешно отправлен!')
             setStep(2)
           }
@@ -72,8 +88,17 @@ export const FormRegisterSms = () => {
   }
 
   const onFormCodeSubmit = (data: TypeRegisterSmsCodeSchema) => {
-    setRegData(prev => ({ ...prev, ...data }))
-    setStep(3)
+    const phone = regData.phone
+
+    verifyRegisterCode(
+      { phone, code: data.code },
+      {
+        onSuccess: () => {
+          setRegData(prev => ({ ...prev, ...data }))
+          setStep(3)
+        }
+      }
+    )
   }
 
   const onFormFinalSubmit = (data: TypeRegisterSmsFinalSchema) => {
@@ -84,7 +109,12 @@ export const FormRegisterSms = () => {
         formPhone.reset()
         formCode.reset()
         formFinal.reset()
-        onOpen('login')
+
+        setView('register-sms-message')
+
+        setTimeout(() => {
+          onClose()
+        }, 2500)
       }
     })
   }
@@ -106,9 +136,19 @@ export const FormRegisterSms = () => {
           <Controller
             name='phone'
             control={formPhone.control}
-            render={({ field, fieldState }) => (
+            render={({ field: { onChange, value, ...field }, fieldState }) => (
               <Field data-invalid={fieldState.invalid} className={cn(fieldState.invalid && 'pb-5', 'group')}>
-                <Input {...field} type='tel' placeholder='Номер телефона' />
+                <Input
+                  {...field}
+                  value={value}
+                  type='tel'
+                  placeholder='+7 (999) 999-99-99'
+                  maxLength={18}
+                  onChange={e => {
+                    const formatted = formatPhoneNumber(e.target.value)
+                    onChange(formatted)
+                  }}
+                />
                 {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
               </Field>
             )}

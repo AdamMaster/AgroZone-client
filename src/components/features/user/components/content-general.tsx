@@ -3,7 +3,7 @@
 import { useAuthModal } from '@/store'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { CameraIcon } from 'lucide-react'
-import { ChangeEvent, useEffect } from 'react'
+import { ChangeEvent } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 
 import {
@@ -39,7 +39,8 @@ export const ContentGeneral = () => {
     resolver: zodResolver(SettingsSchema),
     values: {
       name: user?.displayName || '',
-      email: user?.email || ''
+      email: user?.email || '',
+      phone: user?.phone || ''
     }
   })
 
@@ -100,7 +101,7 @@ export const ContentGeneral = () => {
       </div>
       <div className='relative'>
         <form id='form-rhf-demo' onSubmit={form.handleSubmit(onSubmit)}>
-          <FieldGroup>
+          <FieldGroup className='flex flex-col gap-5'>
             <Controller
               name='name'
               control={form.control}
@@ -128,7 +129,29 @@ export const ContentGeneral = () => {
                     <div className='relative'>
                       <Input {...field} type='email' placeholder='Почта' readOnly />
 
-                      <FieldButton onClick={() => onOpen('change-email')}>Изменить</FieldButton>
+                      <FieldButton onClick={() => onOpen('change-email')}>
+                        {user?.email ? 'Изменить' : 'Добавить почту'}
+                      </FieldButton>
+                    </div>
+                  )}
+                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                </Field>
+              )}
+            />
+            <Controller
+              name='phone'
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid} className={cn(fieldState.invalid && 'pb-5', 'group')}>
+                  <Label>Номер телефона</Label>
+                  {isLoading ? (
+                    <Skeleton className='rounded-1 h-10 w-full' />
+                  ) : (
+                    <div className='relative'>
+                      <Input {...field} type='tel' placeholder='Номер телефона' readOnly />
+                      <FieldButton onClick={() => onOpen('change-phone')}>
+                        {user?.phone ? 'Изменить' : 'Добавить телефон'}
+                      </FieldButton>
                     </div>
                   )}
                   {fieldState.invalid && <FieldError errors={[fieldState.error]} />}

@@ -12,6 +12,11 @@ class AuthService {
     return response
   }
 
+  async checkRegisterCode(data: { phone: string; code: string }) {
+    const response = await api.post<{ success: boolean }>('auth/register/check-code', data)
+    return response
+  }
+
   async registerSmsComplete(body: TypeRegisterSmsFinalSchema) {
     const response = await api.post<IUser>('auth/register/sms/complete', body)
 
@@ -29,7 +34,7 @@ class AuthService {
   async login(body: TypeLoginSchema, recaptcha?: string) {
     const headers = recaptcha ? { recaptcha } : undefined
 
-    const response = await api.post<IUser>('auth/login', body, { headers })
+    const response = await api.post<IUser & { message?: string }>('auth/login', body, { headers })
 
     return response
   }
