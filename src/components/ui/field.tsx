@@ -67,14 +67,15 @@ const fieldVariants = cva('group/field flex w-full gap-2 data-[invalid=true]:tex
 function Field({
   className,
   orientation = 'vertical',
+  isInvalid,
   ...props
-}: React.ComponentProps<'div'> & VariantProps<typeof fieldVariants>) {
+}: React.ComponentProps<'div'> & VariantProps<typeof fieldVariants> & { isInvalid?: boolean }) {
   return (
     <div
       role='group'
       data-slot='field'
       data-orientation={orientation}
-      className={cn(fieldVariants({ orientation }), className, 'relative')}
+      className={cn(fieldVariants({ orientation }), isInvalid && 'pb-5', 'group', className, 'relative')}
       {...props}
     />
   )

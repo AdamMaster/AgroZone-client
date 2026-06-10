@@ -1,6 +1,7 @@
 'use client'
 import { useAuthModal } from '@/store'
 import { Lock, Plus } from 'lucide-react'
+import Link from 'next/link'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import React, { PropsWithChildren, ReactNode, useEffect, useState } from 'react'
 import { toast } from 'sonner'
@@ -48,7 +49,7 @@ export const HeaderActions: React.FC<Props> = () => {
         </div>
       ) : (
         <div className='flex items-center'>
-          <ActionButton>
+          <ActionButton isLink={true} href='/ads/create'>
             <Plus className='h-4 w-4' />
             Разместить объявление
           </ActionButton>
@@ -60,12 +61,25 @@ export const HeaderActions: React.FC<Props> = () => {
 }
 
 interface ActionButtonProps {
+  isLink?: boolean
+  href?: string
   onClick?: () => void
 }
-const ActionButton = ({ children, onClick }: PropsWithChildren<ActionButtonProps>) => {
+const ActionButton = ({ children, isLink = false, href, onClick }: PropsWithChildren<ActionButtonProps>) => {
+  if (isLink) {
+    return (
+      <Link
+        href={isLink && href!}
+        className='hover:text-primary flex items-center gap-1.5 px-3 py-1 text-sm text-gray-900 transition-colors duration-200'
+      >
+        {children}
+      </Link>
+    )
+  }
+
   return (
     <button
-      className='flex items-center gap-1.5 px-3 py-1 text-sm text-gray-900 transition-colors duration-200 hover:text-black'
+      className='hover:text-primary flex items-center gap-1.5 px-3 py-1 text-sm text-gray-900 transition-colors duration-200'
       onClick={onClick}
     >
       {children}

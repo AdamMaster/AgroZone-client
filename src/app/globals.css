@@ -56,7 +56,7 @@
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
   --primary: oklch(64.933% 0.18406 133.297);
-  --primary-foreground: oklch(0.985 0 0);
+  --primary-foreground: oklch(71.79% 0.2033 133.438);
   --secondary: oklch(33.266% 0.07722 257.117);
   --secondary-foreground: oklch(0.205 0 0);
   --muted: oklch(0.97 0 0);
@@ -115,6 +115,7 @@
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
+  --tw-ring-color: #5ea50057;
 }
 
 @layer base {
@@ -145,4 +146,8 @@ button {
 
 [data-sonner-toast] {
   font-size: 0.875rem !important;
+}
+
+.focus-input {
+  border-color: #5ea50057;
 }

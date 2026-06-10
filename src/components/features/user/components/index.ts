@@ -1,3 +1,5 @@
+export * from './ad-short-card'
+export * from './content-ads'
 export * from './content-general'
 export * from './content-security'
 export * from './email-change-confirm'

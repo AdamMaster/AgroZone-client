@@ -8,6 +8,7 @@ import { cn } from '@/lib/utils'
 
 const items = [
   { label: 'Личные данные', icon: User, id: 'general', href: '/profile/settings/general' },
+  { label: 'Мои объявления', icon: User, id: 'ads', href: '/profile/settings/ads' },
   { label: 'Безопасность', icon: Shield, id: 'security', href: '/profile/settings/security' },
   { label: 'Организация', icon: Building2, id: 'company', href: '/profile/settings/company' },
   { label: 'Уведомления', icon: Bell, id: 'notifications', href: '/profile/settings/notifications' }

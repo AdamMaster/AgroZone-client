@@ -1,6 +1,7 @@
 export enum UserRole {
   Regular = 'REGULAR',
-  Admin = 'ADMIN'
+  Admin = 'ADMIN',
+  Premium = 'PREMIUM'
 }
 
 export enum AuthMethod {
@@ -35,6 +36,7 @@ export interface IUser {
   isTwoFactorEnabled: boolean
   method: AuthMethod
   accounts: IAccount[]
+  maxUploadLimit: number
 }
 
 export type AuthProvider = 'google' | 'yandex'

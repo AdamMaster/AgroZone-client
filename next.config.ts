@@ -10,11 +10,9 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: 'lh3.googleusercontent.com'
-      },
-      {
-        protocol: 'https',
-        hostname: 'avatars.yandex.net'
+        hostname: 's3.twcstorage.ru',
+        port: '',
+        pathname: '/**'
       }
     ]
   }

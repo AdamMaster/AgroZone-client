@@ -17,7 +17,7 @@ export default function MainLayout({
           <div className='rounded-xl'>
             <SettingsNav />
           </div>
-          <div className='relative w-full rounded-xl border p-8'>{children}</div>
+          <div className='relative w-full'>{children}</div>
         </div>
       </Container>
     </div>
