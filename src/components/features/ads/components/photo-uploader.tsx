@@ -8,6 +8,7 @@ import { toast } from 'sonner'
 
 import { Label } from '@/components/ui'
 
+import { MAX_IMAGE_SIZE } from '../constants/ads.constants'
 import { TypeCreateAdSchema } from '../schemes'
 
 interface PhotoUploaderProps {
@@ -23,14 +24,24 @@ export const PhotoUploader = ({ control, name, maxFiles, isPremium }: PhotoUploa
     control
   })
   const inputRef = useRef<HTMLInputElement>(null)
-  const currentFiles: File[] = field.value ?? []
+  const currentFiles = field.value ?? []
   const count = currentFiles.length
 
   const isLimitReached = count >= maxFiles
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     const newFiles = Array.from(e.target.files || [])
-    const currentFiles: File[] = field.value ?? []
+    const currentFiles = field.value ?? []
+
+    const oversizedFile = newFiles.find(file => file.size > MAX_IMAGE_SIZE)
+
+    if (oversizedFile) {
+      toast.error('Размер изображения не должен превышать 10 МБ')
+
+      if (inputRef.current) inputRef.current.value = ''
+
+      return
+    }
 
     if (currentFiles.length + newFiles.length > maxFiles) {
       toast.error(`Можно загрузить не более ${maxFiles} фото`)
@@ -58,11 +69,10 @@ export const PhotoUploader = ({ control, name, maxFiles, isPremium }: PhotoUploa
         {currentFiles.map((file: File, index: number) => (
           <div key={index} className='relative aspect-square overflow-hidden rounded-md border'>
             <Image
-              src={URL.createObjectURL(file)}
+              src={file instanceof File ? URL.createObjectURL(file) : file}
               alt='preview'
               className='h-full w-full object-cover'
-              width={200}
-              height={200}
+              fill
             />
             <button
               type='button'

@@ -124,18 +124,29 @@ export function MapAd({ value, error, onChange }: MapAdProps) {
         }
       })
 
-      navigator.geolocation?.getCurrentPosition(pos => {
-        const { latitude, longitude } = pos.coords
-
-        map.setCenter([longitude, latitude])
+      if (value.lat && value.lng) {
+        map.setCenter([value.lng, value.lat])
         map.setZoom(15)
 
         markerRef.current?.destroy()
 
         markerRef.current = new api.Marker(map, {
-          coordinates: [longitude, latitude]
+          coordinates: [value.lng, value.lat]
         })
-      })
+      } else {
+        navigator.geolocation?.getCurrentPosition(pos => {
+          const { latitude, longitude } = pos.coords
+
+          map.setCenter([longitude, latitude])
+          map.setZoom(15)
+
+          markerRef.current?.destroy()
+
+          markerRef.current = new api.Marker(map, {
+            coordinates: [longitude, latitude]
+          })
+        })
+      }
     }
 
     init()
@@ -153,10 +164,7 @@ export function MapAd({ value, error, onChange }: MapAdProps) {
   }, [])
 
   useEffect(() => {
-    if (query.trim().length < 3) {
-      setSuggestions([])
-      return
-    }
+    if (query.trim().length < 3) return
 
     const timeout = setTimeout(async () => {
       try {
@@ -209,15 +217,6 @@ export function MapAd({ value, error, onChange }: MapAdProps) {
     setIsOpen(false)
   }
 
-  // ----------------------------------
-  // RHF -> INPUT SYNC
-  // ----------------------------------
-  useEffect(() => {
-    if (value.address !== query) {
-      setQuery(value.address ?? '')
-    }
-  }, [value.address])
-
   return (
     <div className='space-y-2'>
       <Label>Выберите местоположение</Label>
@@ -229,6 +228,10 @@ export function MapAd({ value, error, onChange }: MapAdProps) {
           onValueChange={value => {
             setQuery(value)
             setIsOpen(true)
+
+            if (value.trim().length < 3) {
+              setSuggestions([])
+            }
 
             if (value.length === 0) {
               onChange({

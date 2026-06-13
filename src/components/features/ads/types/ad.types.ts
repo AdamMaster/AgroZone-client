@@ -19,9 +19,13 @@ export interface IAd {
   title: string
   description: string
   price: number | null
+  unit?: string
   address: string
   status: 'DRAFT' | 'PENDING' | 'PUBLISHED' | 'REJECTED' | 'ARCHIVED'
   images: string[]
+  lat: number
+  lng: number
+  features: IAvailableFeature
   createdAt: Date
   updatedAt: Date
   userId: string

@@ -7,24 +7,21 @@ import { Button, Heading, Tabs, TabsContent, TabsList, TabsTrigger } from '@/com
 
 import { cn } from '@/lib/utils'
 
+import { AdShortCard } from '../../ads/components'
 import { useMyAds } from '../../ads/hooks'
-import { IAd } from '../../ads/types/ad.types'
-import { AdShortCard } from './ad-short-card'
 
 export const ContentAds = () => {
   const { ads, isLoading } = useMyAds()
 
   if (isLoading) return <div>Загрузка...</div>
 
-  const publishedAds = ads.filter(ad => ad.status === 'PUBLISHED')
-  const pendingAds = ads.filter(ad => ad.status === 'PENDING')
+  const publishedAds = ads.filter(ad => ad.status === 'PUBLISHED' || ad.status === 'PENDING')
   const archivedAds = ads.filter(ad => ad.status === 'ARCHIVED')
   const draftAds = ads.filter(ad => ad.status === 'DRAFT')
   const rejectedAds = ads.filter(ad => ad.status === 'REJECTED')
 
   const tabs = [
     { value: 'published', label: 'Опубликованные', ads: publishedAds },
-    { value: 'pending', label: 'На модерации', ads: pendingAds },
     { value: 'archived', label: 'Архив', ads: archivedAds },
     { value: 'draft', label: 'Черновики', ads: draftAds },
     { value: 'rejected', label: 'Отклонённые', ads: rejectedAds }

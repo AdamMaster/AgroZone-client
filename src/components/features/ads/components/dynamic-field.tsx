@@ -23,7 +23,6 @@ interface DynamicFieldProps {
   control: Control<TypeCreateAdSchema> // Явное указание типа вместо any
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const DynamicField = ({ feature, control }: DynamicFieldProps) => {
   return (
     <Controller

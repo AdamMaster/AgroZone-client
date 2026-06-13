@@ -7,7 +7,6 @@ export interface IFlatCategory {
 }
 
 export const flattenCategories = (cats: ICategory[], parentPath: string[] = []): IFlatCategory[] => {
-  // <-- Добавили явный тип возвращаемого значения
   return cats.flatMap((cat): IFlatCategory[] => {
     const currentPath = [...parentPath, cat.name]
     const current: IFlatCategory = { id: cat.id, name: cat.name, path: currentPath }

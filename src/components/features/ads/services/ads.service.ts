@@ -10,6 +10,12 @@ class AdsService {
     return response
   }
 
+  async publish(id: string) {
+    const response = await api.patch(`${this.URL}/${id}/publish`)
+
+    return response
+  }
+
   async findAll() {
     const response = await api.get(this.URL)
     return response
@@ -20,9 +26,24 @@ class AdsService {
     return response
   }
 
+  async findOneForOwner(id: string): Promise<IAd> {
+    const response = await api.get<IAd>(`${this.URL}/my/${id}`)
+    return response
+  }
+
   async update(id: string, data: FormData) {
-    // Тоже убираем заголовки
     const response = await api.patch(`${this.URL}/${id}`, data)
+    return response
+  }
+
+  async remove(id: string) {
+    const response = await api.delete(`${this.URL}/${id}`)
+    return response
+  }
+
+  async reject(id: string, reason: string) {
+    const response = await api.patch(`${this.URL}/${id}/reject`, { reason })
+
     return response
   }
 }
