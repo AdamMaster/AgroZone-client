@@ -9,11 +9,16 @@ import { Button, Heading, Tooltip, TooltipContent, TooltipTrigger } from '@/comp
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 
 import { IAd } from '../../ads/types/ad.types'
-import { useRemoveAd } from '../hooks'
+import { useActivateAd, useDraftAd, useRemoveAd, useRepublishAd } from '../hooks'
+import { useArchiveAd } from '../hooks/use-archive-ad'
 
 export const AdShortCard = ({ ad }: { ad: IAd }) => {
   const router = useRouter()
   const { removeAd, isLoadingRemove } = useRemoveAd()
+  const { archiveAd, isLoadingArchive } = useArchiveAd()
+  const { activateAd, isLoadingActivate } = useActivateAd()
+  const { draftAd, isLoadingDraft } = useDraftAd()
+  const { republishAd, isLoadingRepublishAd } = useRepublishAd()
 
   const handleEdit = () => {
     router.push(`/ads/${ad.id}/edit`)
@@ -25,6 +30,22 @@ export const AdShortCard = ({ ad }: { ad: IAd }) => {
         router.push('/profile/settings/ads')
       }
     })
+  }
+
+  const handleArchive = () => {
+    archiveAd(ad.id)
+  }
+
+  const handleDraft = () => {
+    draftAd(ad.id)
+  }
+
+  const handlePublished = () => {
+    activateAd(ad.id)
+  }
+
+  const handleRepublish = () => {
+    republishAd({ id: ad.id })
   }
 
   return (
@@ -48,7 +69,22 @@ export const AdShortCard = ({ ad }: { ad: IAd }) => {
             </Link>
           </Heading>
           {ad.status === 'PENDING' && (
-            <span className='w-fit rounded-2xl bg-orange-200 px-2 py-0.5 text-xs'>На модерации</span>
+            <Tooltip>
+              <TooltipTrigger>
+                <span className='flex w-fit items-center rounded-2xl bg-orange-200 px-2 py-0.5 text-xs'>
+                  На модерации
+                </span>
+              </TooltipTrigger>
+              <TooltipContent>
+                Мы проверяем объявление на соответствие правилам площадки. Обычно модерация занимает около 15 минут, но
+                в отдельных случаях может занять до 24 часов.
+              </TooltipContent>
+            </Tooltip>
+          )}
+          {ad.status === 'EXPIRED' && (
+            <span className='flex w-fit items-center rounded-2xl bg-orange-200 px-2 py-0.5 text-xs'>
+              Срок действия истек
+            </span>
           )}
           {ad.status === 'REJECTED' && (
             <Tooltip>
@@ -64,8 +100,23 @@ export const AdShortCard = ({ ad }: { ad: IAd }) => {
       </div>
 
       <div className='flex w-48 flex-col gap-2'>
-        {ad.status === 'DRAFT' && <Button variant='outline'>Опубликовать</Button>}
+        {ad.status === 'DRAFT' ||
+          (ad.status === 'ARCHIVED' && (
+            <Button variant='outline' onClick={() => handlePublished()} disabled={isLoadingActivate}>
+              Опубликовать
+            </Button>
+          ))}
         {ad.status === 'PUBLISHED' && <Button variant='outline'>Поднять просмотры</Button>}
+        {ad.status === 'DRAFT' && (
+          <Button variant='outline' onClick={() => handlePublished()} disabled={isLoadingActivate}>
+            Опубликовать
+          </Button>
+        )}
+        {ad.status === 'EXPIRED' && (
+          <Button variant='outline' onClick={() => handleRepublish()} disabled={isLoadingRepublishAd}>
+            Опубликовать снова
+          </Button>
+        )}
         <div className='flex gap-1'>
           <Button className='grow' variant='outline' onClick={() => handleEdit()}>
             Редактировать
@@ -76,8 +127,12 @@ export const AdShortCard = ({ ad }: { ad: IAd }) => {
                 <Ellipsis className='size-5' />
               </DropdownMenuTrigger>
               <DropdownMenuContent className='w-40' align='end'>
-                <DropdownMenuItem>Снять с публикации</DropdownMenuItem>
-                <DropdownMenuItem className='text-red-500 hover:text-red-500!' onClick={() => handleRemove()}>
+                <DropdownMenuItem onClick={() => handleArchive()}>Снять с публикации</DropdownMenuItem>
+                <DropdownMenuItem
+                  className='text-red-500 hover:text-red-500!'
+                  disabled={isLoadingRemove}
+                  onClick={() => handleRemove()}
+                >
                   Удалить
                 </DropdownMenuItem>
               </DropdownMenuContent>
@@ -89,7 +144,9 @@ export const AdShortCard = ({ ad }: { ad: IAd }) => {
                 <Ellipsis className='size-5' />
               </DropdownMenuTrigger>
               <DropdownMenuContent className='w-40' align='end'>
-                <DropdownMenuItem>Уже не актуально</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleArchive()} disabled={isLoadingArchive}>
+                  Уже не актуально
+                </DropdownMenuItem>
                 <DropdownMenuItem className='text-red-500 hover:text-red-500!' onClick={() => handleRemove()}>
                   Удалить
                 </DropdownMenuItem>
@@ -102,7 +159,33 @@ export const AdShortCard = ({ ad }: { ad: IAd }) => {
                 <Ellipsis className='size-5' />
               </DropdownMenuTrigger>
               <DropdownMenuContent className='w-40' align='end'>
-                <DropdownMenuItem>В черновик</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleDraft()} disabled={isLoadingDraft}>
+                  В черновик
+                </DropdownMenuItem>
+                <DropdownMenuItem className='text-red-500 hover:text-red-500!' onClick={() => handleRemove()}>
+                  Удалить
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
+          {ad.status === 'ARCHIVED' && (
+            <DropdownMenu>
+              <DropdownMenuTrigger className='bg-background! hover:bg-muted! hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground dark:border-input dark:bg-input/30 dark:hover:bg-input/50 flex w-10 items-center justify-center rounded-lg border!'>
+                <Ellipsis className='size-5' />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className='w-40' align='end'>
+                <DropdownMenuItem className='text-red-500 hover:text-red-500!' onClick={() => handleRemove()}>
+                  Удалить
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
+          {ad.status === 'DRAFT' && (
+            <DropdownMenu>
+              <DropdownMenuTrigger className='bg-background! hover:bg-muted! hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground dark:border-input dark:bg-input/30 dark:hover:bg-input/50 flex w-10 items-center justify-center rounded-lg border!'>
+                <Ellipsis className='size-5' />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className='w-40' align='end'>
                 <DropdownMenuItem className='text-red-500 hover:text-red-500!' onClick={() => handleRemove()}>
                   Удалить
                 </DropdownMenuItem>

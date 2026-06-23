@@ -1,6 +1,7 @@
 import { api } from '@/shared/api'
 
 import { IAd } from '../types/ad.types'
+import { UpdateAdDto } from './../../../../../../server/src/ads/dto/update-ad.dto'
 
 class AdsService {
   private URL = 'ads'
@@ -16,8 +17,31 @@ class AdsService {
     return response
   }
 
-  async findAll() {
-    const response = await api.get(this.URL)
+  async archive(id: string) {
+    const response = await api.patch(`${this.URL}/${id}/archive`)
+
+    return response
+  }
+
+  async activate(id: string) {
+    const response = await api.patch(`${this.URL}/${id}/activate`)
+
+    return response
+  }
+
+  async republish(id: string, data?: UpdateAdDto) {
+    const response = await api.patch(`${this.URL}/${id}/republish`, data || {})
+    return response
+  }
+
+  async draft(id: string) {
+    const response = await api.patch(`${this.URL}/${id}/draft`)
+
+    return response
+  }
+
+  async findAll(): Promise<IAd[]> {
+    const response = await api.get<IAd[]>(this.URL)
     return response
   }
 
@@ -34,6 +58,10 @@ class AdsService {
   async update(id: string, data: FormData) {
     const response = await api.patch(`${this.URL}/${id}`, data)
     return response
+  }
+
+  async publishDraft(id: string) {
+    return api.patch(`${this.URL}/${id}/publish-draft`)
   }
 
   async remove(id: string) {

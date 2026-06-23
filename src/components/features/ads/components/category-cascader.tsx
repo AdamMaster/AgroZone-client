@@ -77,7 +77,7 @@ export const CategoryCascader = ({ categories, form, onCategorySelect }: Categor
 
   return (
     <div>
-      <Command className={cn('overflow-initial relative mb-3 rounded-md border', open ? 'focus-input' : 'border')}>
+      <Command className={cn('overflow-initial relative mb-3 rounded-lg border', open ? 'focus-input' : 'border')}>
         <CommandInput
           className='p-0 placeholder:text-gray-500'
           placeholder='Поиск категории...'
@@ -132,7 +132,7 @@ export const CategoryCascader = ({ categories, form, onCategorySelect }: Categor
                       handleCategorySelect(cat.id)
                     }}
                     className={cn(
-                      'relative flex w-full items-center justify-between rounded-md px-4 py-3 text-left transition-colors hover:bg-gray-50',
+                      'relative flex w-full items-center justify-between rounded-lg px-4 py-3 text-left transition-colors hover:bg-gray-50',
                       isSelected && 'bg-gray-100'
                     )}
                   >

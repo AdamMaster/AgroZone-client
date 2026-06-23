@@ -54,5 +54,13 @@ export const AdEdit = ({ id, categories }: AdEditProps) => {
     updateAd(formData)
   }
 
-  return <AdForm categories={categories} initialData={initialData} onSubmit={onSubmit} isSubmitting={isLoadingUpdate} />
+  return (
+    <AdForm
+      categories={categories}
+      initialData={initialData}
+      isSubmitting={isLoadingUpdate}
+      rejectionReason={ad.rejectionReason}
+      onSubmit={onSubmit}
+    />
+  )
 }

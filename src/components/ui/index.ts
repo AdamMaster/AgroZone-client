@@ -1,4 +1,5 @@
 export * from './button'
+export * from './button-back'
 export { Logo } from './logo'
 export { Heading } from './heading'
 export * from './command'

@@ -40,7 +40,7 @@ export const DynamicField = ({ feature, control }: DynamicFieldProps) => {
                 }}
                 value={field.value ? String(field.value) : null}
               >
-                <SelectTrigger>
+                <SelectTrigger className='h-13! px-4'>
                   <SelectValue placeholder='Не выбрано' />
                 </SelectTrigger>
                 <SelectContent>
@@ -58,6 +58,7 @@ export const DynamicField = ({ feature, control }: DynamicFieldProps) => {
               </div>
             ) : (
               <Input
+                className='h-13'
                 {...field}
                 type={feature.type === 'number' ? 'number' : 'text'}
                 placeholder={feature.label}

@@ -3,28 +3,44 @@
 import Image from 'next/image'
 import Link from 'next/link'
 
-import { Button, Heading, Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui'
+import { Heading, Skeleton, Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui'
 
 import { cn } from '@/lib/utils'
 
-import { AdShortCard } from '../../ads/components'
+import { AdShortCard, AdShortCardSkeleton } from '../../ads/components'
 import { useMyAds } from '../../ads/hooks'
 
 export const ContentAds = () => {
   const { ads, isLoading } = useMyAds()
 
-  if (isLoading) return <div>Загрузка...</div>
+  if (isLoading)
+    return (
+      <div className='m max-w-[800px]'>
+        <div className='mb-4 flex gap-2'>
+          <Skeleton className='h-10 w-[150px] rounded-lg' />
+          <Skeleton className='h-10 w-[150px] rounded-lg' />
+          <Skeleton className='h-10 w-[150px] rounded-lg' />
+        </div>
+        <div className='grid grid-cols-1 gap-6'>
+          <AdShortCardSkeleton />
+          <AdShortCardSkeleton />
+          <AdShortCardSkeleton />
+        </div>
+      </div>
+    )
 
   const publishedAds = ads.filter(ad => ad.status === 'PUBLISHED' || ad.status === 'PENDING')
   const archivedAds = ads.filter(ad => ad.status === 'ARCHIVED')
   const draftAds = ads.filter(ad => ad.status === 'DRAFT')
   const rejectedAds = ads.filter(ad => ad.status === 'REJECTED')
+  const expiresAt = ads.filter(ad => ad.status === 'EXPIRED')
 
   const tabs = [
     { value: 'published', label: 'Опубликованные', ads: publishedAds },
     { value: 'archived', label: 'Архив', ads: archivedAds },
     { value: 'draft', label: 'Черновики', ads: draftAds },
-    { value: 'rejected', label: 'Отклонённые', ads: rejectedAds }
+    { value: 'rejected', label: 'Отклонённые', ads: rejectedAds },
+    { value: 'expires', label: 'Завершенные', ads: expiresAt }
   ].filter(tab => tab.ads.length > 0)
 
   if (!ads?.length) {
@@ -59,6 +75,7 @@ export const ContentAds = () => {
             </TabsTrigger>
           ))}
         </TabsList>
+
         {tabs.map(tab => (
           <TabsContent className='grid grid-cols-1 gap-6' key={tab.value} value={tab.value}>
             {tab.ads.map(ad => (

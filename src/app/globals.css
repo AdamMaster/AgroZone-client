@@ -151,3 +151,7 @@ button {
 .focus-input {
   border-color: #5ea50057;
 }
+
+.custom-shadow {
+  box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
+}

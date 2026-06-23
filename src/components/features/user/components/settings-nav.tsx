@@ -29,7 +29,7 @@ export const SettingsNav = () => {
               <Link
                 href={item.href}
                 className={cn(
-                  'hover:text-primary flex items-center gap-2 rounded-md px-4 py-2 text-gray-900',
+                  'hover:text-primary flex items-center gap-2 rounded-lg px-4 py-2 text-gray-900',
                   isActive && 'text-primary bg-gray-50'
                 )}
               >

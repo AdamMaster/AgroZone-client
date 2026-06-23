@@ -2,10 +2,23 @@
 
 import { useAdStore } from '@/store'
 import { zodResolver } from '@hookform/resolvers/zod'
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 
-import { Button, Field, FieldError, FieldGroup, Heading, Input, InputGroup, Label, Loading } from '@/components/ui'
+import {
+  Button,
+  ButtonBack,
+  Field,
+  FieldError,
+  FieldGroup,
+  Heading,
+  Input,
+  InputGroup,
+  Label,
+  Loading
+} from '@/components/ui'
 import { Textarea } from '@/components/ui/textarea'
 
 import { useProfile } from '@/shared/hooks'
@@ -19,20 +32,23 @@ import { CategoryCascader } from './category-cascader'
 import { DynamicField } from './dynamic-field'
 import { MapAd } from './map-ad'
 import { PhotoUploader } from './photo-uploader'
+import { RejectionReason } from './rejection-reason'
 
 interface AdFormProps {
   categories: ICategory[]
   initialData?: TypeCreateAdSchema // Сюда будем передавать данные для редактирования
-  onSubmit: (values: TypeCreateAdSchema) => void
   isSubmitting?: boolean
+  rejectionReason?: string
+  onSubmit: (values: TypeCreateAdSchema) => void
 }
 
-export const AdForm = ({ categories, initialData, onSubmit, isSubmitting }: AdFormProps) => {
+export const AdForm = ({ categories, initialData, isSubmitting, rejectionReason, onSubmit }: AdFormProps) => {
   const isEdit = !!initialData
   const [features, setFeatures] = useState<IAvailableFeature[]>([])
   const [step, setStep] = useState(isEdit ? 2 : 1)
   const { user } = useProfile()
   const setCategoryPath = useAdStore(state => state.setCategoryPath)
+  const router = useRouter()
   const title = isEdit ? 'Редактирование объявления' : 'Новое объявление'
   const submitButtonText = isEdit ? 'Сохранить изменения' : 'Опубликовать'
   const isPremium = user?.role === 'PREMIUM'
@@ -92,9 +108,24 @@ export const AdForm = ({ categories, initialData, onSubmit, isSubmitting }: AdFo
 
   return (
     <div className='relative'>
-      <div className='mb-6'>
+      {step > 1 && (
+        <div className='absolute top-0 -left-18 h-full'>
+          <ButtonBack
+            className='sticky top-4'
+            onClick={() => {
+              if (isEdit) {
+                return router.push('/profile/settings/ads')
+              }
+              return handleBack()
+            }}
+          />
+        </div>
+      )}
+
+      <div className='mb-6 flex flex-col gap-2'>
         <Heading level={1}>{title}</Heading>
         {step > 1 && <CategoryBreadcrumbs />}
+        {rejectionReason && <RejectionReason className='mt-2' text={rejectionReason} />}
       </div>
 
       <form onSubmit={form.handleSubmit(handleSubmitForm)} className='space-y-5'>
@@ -115,7 +146,7 @@ export const AdForm = ({ categories, initialData, onSubmit, isSubmitting }: AdFo
                   <Field data-invalid={fieldState.invalid} isInvalid={fieldState.invalid}>
                     <InputGroup>
                       <Label>Название объявления</Label>
-                      <Input {...field} />
+                      <Input className='h-13' {...field} />
                     </InputGroup>
                     {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                   </Field>
@@ -128,7 +159,7 @@ export const AdForm = ({ categories, initialData, onSubmit, isSubmitting }: AdFo
                   <Field data-invalid={fieldState.invalid} isInvalid={fieldState.invalid}>
                     <InputGroup>
                       <Label>Цена</Label>
-                      <Input {...field} value={field.value ?? ''} type='number' placeholder='₽' />
+                      <Input className='h-13' {...field} value={field.value ?? ''} type='number' placeholder='₽' />
                     </InputGroup>
                     {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                   </Field>
@@ -141,7 +172,7 @@ export const AdForm = ({ categories, initialData, onSubmit, isSubmitting }: AdFo
                   <Field data-invalid={fieldState.invalid} isInvalid={fieldState.invalid}>
                     <InputGroup>
                       <Label>Описание</Label>
-                      <Textarea {...field} className='w-full rounded-md border p-2' />
+                      <Textarea {...field} className='w-full border p-4' />
                     </InputGroup>
                     {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                   </Field>
@@ -198,9 +229,18 @@ export const AdForm = ({ categories, initialData, onSubmit, isSubmitting }: AdFo
             </Button>
           )}
           {step === 2 && (
-            <Button className='h-13 px-5' variant='secondary' size='lg' type='submit'>
-              {submitButtonText}
-            </Button>
+            <div className='flex gap-1'>
+              <Button className='h-13 px-5' variant='secondary' size='lg' type='submit' disabled={isSubmitting}>
+                {submitButtonText}
+              </Button>
+              {isEdit && (
+                <Button className='h-13 px-5' variant='outline'>
+                  <Link className='flex h-full items-center justify-center' href='/profile/settings/ads'>
+                    Отмена
+                  </Link>
+                </Button>
+              )}
+            </div>
           )}
         </div>
       </form>

@@ -54,7 +54,7 @@ export const ContentSecurity = () => {
           {isLoading ? (
             <Skeleton className='rounded-1 h-17 w-full' />
           ) : (
-            <Field className='group mt-4 rounded-md border bg-gray-50 px-4 py-4'>
+            <Field className='group mt-4 rounded-lg border bg-gray-50 px-4 py-4'>
               <div className='flex items-center justify-between'>
                 <div className='space-y-0.5'>
                   <Label>Двухфакторная аутентификация</Label>

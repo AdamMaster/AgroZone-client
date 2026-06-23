@@ -21,8 +21,10 @@ export interface IAd {
   price: number | null
   unit?: string
   address: string
-  status: 'DRAFT' | 'PENDING' | 'PUBLISHED' | 'REJECTED' | 'ARCHIVED'
   images: string[]
+  status: 'DRAFT' | 'PENDING' | 'PUBLISHED' | 'REJECTED' | 'ARCHIVED' | 'EXPIRED'
+  expiresAt: Date | null
+  publishedAt: Date | null
   lat: number
   lng: number
   features: IAvailableFeature
@@ -36,3 +38,18 @@ export interface IAd {
   }
   rejectionReason?: string
 }
+
+export interface IUpdateAdDto {
+  title?: string
+  description?: string
+  price?: number
+  unit?: string
+  address?: string
+  images?: string[]
+  lat?: number
+  lng?: number
+  features?: Record<string, unknown>
+  categoryId?: string
+}
+
+export type AdCardData = Pick<IAd, 'id' | 'title' | 'price' | 'images' | 'address' | 'createdAt'>

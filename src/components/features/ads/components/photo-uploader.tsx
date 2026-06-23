@@ -67,7 +67,7 @@ export const PhotoUploader = ({ control, name, maxFiles, isPremium }: PhotoUploa
       </Label>
       <div className='grid grid-cols-5 gap-4'>
         {currentFiles.map((file: File, index: number) => (
-          <div key={index} className='relative aspect-square overflow-hidden rounded-md border'>
+          <div key={index} className='relative aspect-square overflow-hidden rounded-lg border'>
             <Image
               src={file instanceof File ? URL.createObjectURL(file) : file}
               alt='preview'
@@ -88,7 +88,7 @@ export const PhotoUploader = ({ control, name, maxFiles, isPremium }: PhotoUploa
           <button
             type='button'
             onClick={() => inputRef.current?.click()}
-            className='hover:border-primary flex aspect-square flex-col items-center justify-center rounded-md border-2 border-dashed text-sm text-gray-500 transition-colors'
+            className='hover:border-primary flex aspect-square flex-col items-center justify-center rounded-lg border-2 border-dashed text-sm text-gray-500 transition-colors'
           >
             <ImagePlus className='text-gray-900' />
           </button>
@@ -97,7 +97,7 @@ export const PhotoUploader = ({ control, name, maxFiles, isPremium }: PhotoUploa
         <input ref={inputRef} type='file' multiple accept='image/*' className='hidden' onChange={handleFileChange} />
       </div>
       {!isPremium && isLimitReached && (
-        <div className='mt-3 rounded-md border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800'>
+        <div className='mt-3 rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800'>
           Вы достигли лимита в {maxFiles} фото. Приобретите
           <button type='button' className='ml-1 font-semibold underline hover:text-amber-900'>
             Premium аккаунт

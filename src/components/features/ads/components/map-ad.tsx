@@ -221,7 +221,7 @@ export function MapAd({ value, error, onChange }: MapAdProps) {
     <div className='space-y-2'>
       <Label>Выберите местоположение</Label>
 
-      <Command shouldFilter={false} className='rounded-md border'>
+      <Command shouldFilter={false} className='rounded-lg border'>
         <CommandInput
           value={query}
           placeholder='Введите адрес...'
@@ -262,7 +262,7 @@ export function MapAd({ value, error, onChange }: MapAdProps) {
         )}
       </Command>
       {error && <FieldError className='relative mt-1.5'>{error}</FieldError>}
-      <div ref={containerRef} className='h-[400px] w-full overflow-hidden rounded-md border' />
+      <div ref={containerRef} className='h-[400px] w-full overflow-hidden rounded-lg border' />
     </div>
   )
 }
