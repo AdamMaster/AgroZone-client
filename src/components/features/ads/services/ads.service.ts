@@ -34,6 +34,12 @@ class AdsService {
     return response
   }
 
+  async saveDraft(data: FormData, id?: string) {
+    const url = id ? `${this.URL}/draft?id=${id}` : `${this.URL}/draft`
+    const response = await api.post(url, data)
+    return response
+  }
+
   async draft(id: string) {
     const response = await api.patch(`${this.URL}/${id}/draft`)
 

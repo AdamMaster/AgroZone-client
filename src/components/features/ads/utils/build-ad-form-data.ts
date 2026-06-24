@@ -1,20 +1,24 @@
 import { TypeCreateAdSchema } from '../schemes'
 
-export const buildAdFormData = (values: TypeCreateAdSchema) => {
+export const buildAdFormData = (values: Partial<TypeCreateAdSchema>) => {
   const formData = new FormData()
 
-  formData.append('title', values.title)
-  formData.append('description', values.description)
+  if (values.title) formData.append('title', values.title)
+  if (values.description) formData.append('description', values.description)
 
-  if (values.price?.trim()) {
-    formData.append('price', values.price)
+  if (values.price !== undefined && values.price !== null && String(values.price).trim() !== '') {
+    formData.append('price', String(values.price))
   }
 
-  formData.append('categoryId', values.categoryId)
-  formData.append('address', values.address ?? '')
-  formData.append('lat', values.lat.toString())
-  formData.append('lng', values.lng.toString())
-  formData.append('features', JSON.stringify(values.features))
+  if (values.categoryId) formData.append('categoryId', values.categoryId)
+  if (values.address) formData.append('address', values.address)
+
+  if (values.lat !== undefined) formData.append('lat', String(values.lat))
+  if (values.lng !== undefined) formData.append('lng', String(values.lng))
+
+  if (values.features) {
+    formData.append('features', JSON.stringify(values.features))
+  }
 
   return formData
 }

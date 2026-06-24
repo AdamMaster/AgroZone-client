@@ -20,9 +20,23 @@ export const UserButton = ({ className, user }: UserButtonProps) => {
 
   if (!user) return null
 
-  const onSettingsClick = () => {
+  const onPersonalDataClick = () => {
     router.push('/profile/settings/general')
   }
+
+  const onSecurityClick = () => {
+    router.push('/profile/settings/security')
+  }
+
+  const onMyAdsClick = () => {
+    router.push('/profile/settings/ads')
+  }
+
+  const list = [
+    { id: 'general', text: 'Личные данные', onClick: () => onPersonalDataClick() },
+    { id: 'security', text: 'Безопасность', onClick: () => onSecurityClick() },
+    { id: 'ads', text: 'Мои объявления', onClick: () => onMyAdsClick() }
+  ]
 
   return (
     <DropdownMenu>
@@ -33,12 +47,12 @@ export const UserButton = ({ className, user }: UserButtonProps) => {
         </Avatar>
       </DropdownMenuTrigger>
       <DropdownMenuContent className='w-40' align='end'>
-        <DropdownMenuItem disabled={isLoadingLogout} onClick={() => onSettingsClick()}>
-          <Settings className='mr-2 size-4' />
-          Настройки
-        </DropdownMenuItem>
-        <DropdownMenuItem disabled={isLoadingLogout} onClick={() => logout()}>
-          <LogOut className='mr-2 size-4' />
+        {list.map(item => (
+          <DropdownMenuItem disabled={isLoadingLogout} onClick={item.onClick} key={item.id}>
+            {item.text}
+          </DropdownMenuItem>
+        ))}
+        <DropdownMenuItem disabled={isLoadingLogout} onClick={() => logout()} className='text-gray-500'>
           Выйти
         </DropdownMenuItem>
       </DropdownMenuContent>

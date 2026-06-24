@@ -1,6 +1,6 @@
 'use client'
 import { useAuthModal } from '@/store'
-import { Lock, Plus } from 'lucide-react'
+import { Bell, Heart, Layers, Lock, Plus } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import React, { PropsWithChildren, ReactNode, useEffect, useState } from 'react'
@@ -53,6 +53,16 @@ export const HeaderActions: React.FC<Props> = () => {
             <Plus className='h-4 w-4' />
             Разместить объявление
           </ActionButton>
+          <ActionButton isLink={true} href='/profile/settings/ads'>
+            <Layers className='h-4 w-4' />
+            Мои объявления
+          </ActionButton>
+          <button className='px-2 py-1'>
+            <Heart className='size-6 fill-gray-300 text-gray-300' />
+          </button>
+          <button className='px-2 py-1'>
+            <Bell className='size-6 fill-gray-300 text-gray-300' />
+          </button>
           <UserButton className='ml-2' user={user} />
         </div>
       )}

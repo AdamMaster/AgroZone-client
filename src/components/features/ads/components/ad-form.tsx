@@ -38,11 +38,21 @@ interface AdFormProps {
   categories: ICategory[]
   initialData?: TypeCreateAdSchema // Сюда будем передавать данные для редактирования
   isSubmitting?: boolean
+  isSaveDrafting?: boolean
   rejectionReason?: string
   onSubmit: (values: TypeCreateAdSchema) => void
+  onSaveDraft: (values: Partial<TypeCreateAdSchema>) => void
 }
 
-export const AdForm = ({ categories, initialData, isSubmitting, rejectionReason, onSubmit }: AdFormProps) => {
+export const AdForm = ({
+  categories,
+  initialData,
+  isSubmitting,
+  isSaveDrafting,
+  rejectionReason,
+  onSubmit,
+  onSaveDraft
+}: AdFormProps) => {
   const isEdit = !!initialData
   const [features, setFeatures] = useState<IAvailableFeature[]>([])
   const [step, setStep] = useState(isEdit ? 2 : 1)
@@ -50,7 +60,7 @@ export const AdForm = ({ categories, initialData, isSubmitting, rejectionReason,
   const setCategoryPath = useAdStore(state => state.setCategoryPath)
   const router = useRouter()
   const title = isEdit ? 'Редактирование объявления' : 'Новое объявление'
-  const submitButtonText = isEdit ? 'Сохранить изменения' : 'Опубликовать'
+  const submitButtonText = isEdit ? 'Сохранить' : 'Опубликовать'
   const isPremium = user?.role === 'PREMIUM'
 
   const form = useForm<TypeCreateAdSchema>({
@@ -67,10 +77,6 @@ export const AdForm = ({ categories, initialData, isSubmitting, rejectionReason,
       features: {}
     }
   })
-
-  const handleSubmitForm = (values: TypeCreateAdSchema) => {
-    onSubmit(values)
-  }
 
   const handleBack = () => {
     setStep(1)
@@ -128,7 +134,7 @@ export const AdForm = ({ categories, initialData, isSubmitting, rejectionReason,
         {rejectionReason && <RejectionReason className='mt-2' text={rejectionReason} />}
       </div>
 
-      <form onSubmit={form.handleSubmit(handleSubmitForm)} className='space-y-5'>
+      <form className='space-y-5'>
         {step === 1 && (
           <CategoryCascader
             categories={categories}
@@ -230,14 +236,33 @@ export const AdForm = ({ categories, initialData, isSubmitting, rejectionReason,
           )}
           {step === 2 && (
             <div className='flex gap-1'>
-              <Button className='h-13 px-5' variant='secondary' size='lg' type='submit' disabled={isSubmitting}>
-                {submitButtonText}
-              </Button>
               {isEdit && (
                 <Button className='h-13 px-5' variant='outline'>
                   <Link className='flex h-full items-center justify-center' href='/profile/settings/ads'>
                     Отмена
                   </Link>
+                </Button>
+              )}
+              <Button
+                className='h-13 px-5'
+                variant='secondary'
+                size='lg'
+                type='button'
+                disabled={isSubmitting}
+                onClick={form.handleSubmit(onSubmit)}
+              >
+                {submitButtonText}
+              </Button>
+              {!isEdit && (
+                <Button
+                  className='h-13 px-5'
+                  variant='outline'
+                  size='lg'
+                  type='button'
+                  disabled={isSaveDrafting}
+                  onClick={form.handleSubmit(onSaveDraft)}
+                >
+                  Сохранить черновик
                 </Button>
               )}
             </div>
