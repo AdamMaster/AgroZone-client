@@ -5,8 +5,6 @@ import Link from 'next/link'
 
 import { Heading, Skeleton, Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui'
 
-import { cn } from '@/lib/utils'
-
 import { AdShortCard, AdShortCardSkeleton } from '../../ads/components'
 import { useMyAds } from '../../ads/hooks'
 

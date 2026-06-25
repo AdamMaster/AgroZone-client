@@ -1,16 +1,24 @@
+'use client'
+
 import { Heart, ImageIcon } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 
 import { Heading } from '@/components/ui'
 
+import { useToggleFavorite } from '../hooks/use-toggle-favorite'
 import { type AdCardData } from '../types/ad.types'
+import { FavoriteButton } from './favorite-button'
 
 interface AdCardProps {
   ad: AdCardData
 }
 
 export const AdCard = ({ ad }: AdCardProps) => {
+  const { toggleFavorite, isLoadingToggle } = useToggleFavorite()
+
+  console.log('Данные объявления в карточке:', ad)
+
   return (
     <article className='flex flex-col gap-2'>
       <Link href='#' className='relative block overflow-hidden rounded-xl bg-gray-100 pt-[100%]'>
@@ -31,9 +39,7 @@ export const AdCard = ({ ad }: AdCardProps) => {
           <strong>{ad.price ? ad.price + '₽' : 'Цена договорная'}</strong>
         </p>
         <address className='text-[13px] leading-4 not-italic'>{ad.address}</address>
-        <button className='absolute top-0 right-0 transition-colors hover:text-red-500'>
-          <Heart size={20} className='' />
-        </button>
+        <FavoriteButton onClick={() => toggleFavorite(ad.id)} isFavorite={ad.isFavorite} isLoading={isLoadingToggle} />
       </div>
     </article>
   )

@@ -46,8 +46,9 @@ class AdsService {
     return response
   }
 
-  async findAll(): Promise<IAd[]> {
-    const response = await api.get<IAd[]>(this.URL)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  async findAll(params?: Record<string, any>): Promise<IAd[]> {
+    const response = await api.get<IAd[]>(this.URL, { params })
     return response
   }
 
@@ -68,6 +69,11 @@ class AdsService {
 
   async publishDraft(id: string) {
     return api.patch(`${this.URL}/${id}/publish-draft`)
+  }
+
+  async toggleFavorite(id: string): Promise<{ isFavorite: boolean }> {
+    const response = await api.post<{ isFavorite: boolean }>(`${this.URL}/${id}/favorite`)
+    return response
   }
 
   async remove(id: string) {

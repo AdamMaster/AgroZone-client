@@ -37,6 +37,7 @@ export interface IAd {
     name: string
   }
   rejectionReason?: string
+  isFavorite?: boolean
 }
 
 export interface IUpdateAdDto {
@@ -52,4 +53,4 @@ export interface IUpdateAdDto {
   categoryId?: string
 }
 
-export type AdCardData = Pick<IAd, 'id' | 'title' | 'price' | 'images' | 'address' | 'createdAt'>
+export type AdCardData = Pick<IAd, 'id' | 'title' | 'price' | 'images' | 'address' | 'createdAt' | 'isFavorite'>

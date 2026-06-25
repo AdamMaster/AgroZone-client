@@ -41,7 +41,7 @@ interface AdFormProps {
   isSaveDrafting?: boolean
   rejectionReason?: string
   onSubmit: (values: TypeCreateAdSchema) => void
-  onSaveDraft: (values: Partial<TypeCreateAdSchema>) => void
+  onSaveDraft?: (values: Partial<TypeCreateAdSchema>) => void
 }
 
 export const AdForm = ({
@@ -260,7 +260,7 @@ export const AdForm = ({
                   size='lg'
                   type='button'
                   disabled={isSaveDrafting}
-                  onClick={form.handleSubmit(onSaveDraft)}
+                  onClick={onSaveDraft && form.handleSubmit(onSaveDraft)}
                 >
                   Сохранить черновик
                 </Button>

@@ -9,6 +9,7 @@ export interface IAvailableFeature {
 export interface ICategory {
   id: string
   name: string
+  slug: string
   parentId: string | null
   children?: ICategory[]
   availableFeatures?: IAvailableFeature[]
