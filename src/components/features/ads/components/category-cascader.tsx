@@ -4,18 +4,9 @@ import { useAdStore } from '@/store'
 import { CommandItem } from 'cmdk'
 import { ChevronRight } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { Controller, UseFormReturn } from 'react-hook-form'
+import { UseFormReturn } from 'react-hook-form'
 
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandList,
-  FieldError,
-  Heading,
-  ScrollArea
-} from '@/components/ui'
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandList, ScrollArea } from '@/components/ui'
 
 import { findCategoryById, flattenCategories, getPathToCategory } from '@/shared/utils'
 

@@ -10,6 +10,7 @@ export interface ICategory {
   id: string
   name: string
   slug: string
+  iconId?: string
   parentId: string | null
   children?: ICategory[]
   availableFeatures?: IAvailableFeature[]

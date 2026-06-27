@@ -1,6 +1,7 @@
 'use client'
 
 import { usePathname } from 'next/navigation'
+import { useMemo } from 'react'
 
 import { Container } from '@/components/layout'
 
@@ -17,22 +18,21 @@ interface CategoryGridProps {
 export const CategoryGrid = ({ categories, className }: CategoryGridProps) => {
   const pathname = usePathname()
 
-  const isVisible = pathname === '/' || pathname.startsWith('/catalog')
+  const isVisible = useMemo(() => {
+    if (!pathname) return false
+    return pathname === '/' || pathname.startsWith('/catalog')
+  }, [pathname])
 
   if (!isVisible) return null
 
-  console.log(categories)
+  if (!categories?.length) return null
 
   return (
     <Container>
       <div className={cn('flex flex-wrap gap-1', className)}>
-        {categories.map(category => {
-          console.log('Кнопка рендерится:', {
-            id_из_объекта: category.id,
-            весь_объект: category
-          })
-          return <CategoryItem key={category.id} category={category} />
-        })}
+        {categories.map(category => (
+          <CategoryItem key={category.id} category={category} />
+        ))}
       </div>
     </Container>
   )

@@ -1,0 +1,25 @@
+'use client'
+
+import { Menu } from 'lucide-react'
+
+import { useCategoryMenuStore } from '../store'
+
+export const CategoryMenuButton = () => {
+  const { toggle, isOpen, open, close } = useCategoryMenuStore()
+
+  const handleClick = () => {
+    if (isOpen) close()
+    else open()
+  }
+
+  return (
+    <button
+      className='bg-secondary hover:bg-secondary-foreground! focus:bg-secondary-foreground! flex h-12 items-center gap-2 rounded-lg px-4 text-sm text-white'
+      data-category-toggle
+      onClick={handleClick}
+    >
+      <Menu className='size-6' />
+      Категории
+    </button>
+  )
+}

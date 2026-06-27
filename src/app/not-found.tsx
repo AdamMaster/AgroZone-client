@@ -7,7 +7,7 @@ export default function NotFound() {
     <div className='flex min-h-screen flex-col items-center justify-center'>
       <Heading level={1}>404</Heading>
       <p className='text-muted-foreground mb-4'>Страница не найдена</p>
-      <Button>
+      <Button variant='secondary'>
         <Link href='/'>На главную</Link>
       </Button>
     </div>

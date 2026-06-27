@@ -1,6 +1,6 @@
 'use client'
 
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useParams, useRouter } from 'next/navigation'
 
 import { cn } from '@/lib/utils'
 
@@ -12,16 +12,17 @@ interface CategoryItemProps {
 
 export const CategoryItem = ({ category }: CategoryItemProps) => {
   const router = useRouter()
-  const searchParams = useSearchParams()
+  const params = useParams()
 
-  const currentCategorySlug = searchParams.get('category')
+  const currentCategorySlug = Array.isArray(params.slug) ? params.slug.join('/') : params.slug || null
+
   const isSelected = currentCategorySlug === category.slug
 
   const onClick = () => {
     if (isSelected) {
-      router.push('/catalog', { scroll: false }) // Сброс фильтра
+      router.push('/catalog', { scroll: false })
     } else {
-      router.push(`/catalog/${category.slug}`, { scroll: false }) // Переход на ЧПУ
+      router.push(`/catalog/${category.slug}`, { scroll: false })
     }
   }
 

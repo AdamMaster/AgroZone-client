@@ -1,6 +1,7 @@
 'use client'
 
 import { useSearchParams } from 'next/navigation'
+import { useMemo } from 'react'
 
 import { AdCard } from '@/components/features/ads/components'
 import { Skeleton } from '@/components/ui'
@@ -9,40 +10,63 @@ import { useCategories } from '../../categories/hooks/use-categories'
 import { ICategory } from '../../categories/types'
 import { useAds } from '../hooks'
 
-const findIdBySlug = (categories: ICategory[], slug: string | null | undefined): string | undefined => {
-  if (!slug || !categories) return undefined
+const SKELETON_COUNT = 10
 
-  for (const cat of categories) {
-    if (cat.slug === slug) return cat.id
-    if (cat.children && cat.children.length > 0) {
-      const foundId = findIdBySlug(cat.children, slug)
-      if (foundId) return foundId
+const findIdBySlug = (categories: ICategory[], slug?: string | null): string | undefined => {
+  if (!slug) return
+
+  for (const category of categories) {
+    if (category.slug === slug || category.slug.endsWith(`/${slug}`)) {
+      return category.id
+    }
+
+    if (category.children?.length) {
+      const found = findIdBySlug(category.children, slug)
+      if (found) return found
     }
   }
-  return undefined
+
+  return
 }
 
 interface AdsClientProps {
-  serverSlug?: string
+  serverSlug?: string | null
 }
 
 export function AdsClient({ serverSlug }: AdsClientProps) {
   const searchParams = useSearchParams()
+
   const { categories, isLoadingCategories } = useCategories()
-  const slug = serverSlug || searchParams.get('category')
-  const categoryId = findIdBySlug(categories, slug)
+
+  const slug = serverSlug?.split('/').at(-1) ?? searchParams.get('category') ?? undefined
+
+  const categoryId = useMemo(() => {
+    if (!slug) return undefined
+
+    return findIdBySlug(categories, slug)
+  }, [categories, slug])
+
   const { ads, isLoadingAds } = useAds({ categoryId })
-  const isComponentsLoading = isLoadingCategories || isLoadingAds
+
+  if (isLoadingCategories || isLoadingAds) {
+    return (
+      <div className='grid grid-cols-5 gap-6'>
+        {Array.from({ length: SKELETON_COUNT }).map((_, index) => (
+          <Skeleton key={index} className='h-82 rounded-lg' />
+        ))}
+      </div>
+    )
+  }
+
+  if (!ads.length) {
+    return <div className='py-10 text-center text-gray-500'>В этой категории пока нет объявлений</div>
+  }
 
   return (
     <div className='grid grid-cols-5 gap-6'>
-      {isComponentsLoading ? (
-        Array.from({ length: 10 }, (_, i) => <Skeleton key={i} className='h-82 rounded-lg' />)
-      ) : ads.length === 0 ? (
-        <div className='col-span-5 py-10 text-center text-gray-500'>В этой категории пока нет объявлений</div>
-      ) : (
-        ads.map(ad => <AdCard key={ad.id} ad={ad} />)
-      )}
+      {ads.map(ad => (
+        <AdCard key={ad.id} ad={ad} />
+      ))}
     </div>
   )
 }

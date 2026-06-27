@@ -24,7 +24,6 @@ import { Textarea } from '@/components/ui/textarea'
 import { useProfile } from '@/shared/hooks'
 import { findCategoryById, getPathToCategory } from '@/shared/utils'
 
-import { useCreateAd } from '../hooks'
 import { CreateAdSchema, TypeCreateAdSchema } from '../schemes'
 import { IAvailableFeature, ICategory } from '../types/ad.types'
 import { CategoryBreadcrumbs } from './category-breadcrumbs'
