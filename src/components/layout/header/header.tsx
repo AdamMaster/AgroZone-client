@@ -19,9 +19,9 @@ export const Header = () => {
         <Container>
           <div className='flex items-center gap-10'>
             <Logo />
-            <div className='flex items-center gap-2'>
+            <div className='flex w-full items-center gap-2'>
               <CategoryMenuButton />
-              {/* <SearchBar /> */}
+              <SearchBar className='grow' />
             </div>
           </div>
         </Container>

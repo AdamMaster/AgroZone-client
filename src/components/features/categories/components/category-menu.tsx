@@ -1,6 +1,8 @@
 'use client'
 
-import { Apple, Box, ChevronRight, Factory, FlaskConical, Truck, Wheat, Wrench } from 'lucide-react'
+import { ChevronRight } from 'lucide-react'
+import * as Icons from 'lucide-react'
+import { Folder, type LucideIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
@@ -13,6 +15,11 @@ import { useClickOutside } from '@/shared/hooks'
 import { useCategories } from '../hooks/use-categories'
 import { useCategoryMenuStore } from '../store'
 import { ICategory } from '../types'
+
+interface CategoryIconProps {
+  name: string | null
+  className?: string
+}
 
 function useActiveCategory(categories?: ICategory[]) {
   const initialId = categories?.[0]?.id ?? null
@@ -33,6 +40,12 @@ function useActiveCategory(categories?: ICategory[]) {
   }
 }
 
+const CategoryIcon = ({ name, className }: CategoryIconProps) => {
+  const Icon = name && name in Icons ? (Icons[name as keyof typeof Icons] as LucideIcon) : Folder
+
+  return <Icon className={className} />
+}
+
 export const CategoryMenu = () => {
   const { isOpen, close } = useCategoryMenuStore()
   const { categories, isLoadingCategories } = useCategories()
@@ -41,7 +54,6 @@ export const CategoryMenu = () => {
 
   const { activeCategoryId, setActiveCategoryId, activeCategory } = useActiveCategory(categories)
 
-  // header height → CSS variable (stable effect)
   useLayoutEffect(() => {
     const header = document.querySelector('header')
     if (!header) return
@@ -73,7 +85,6 @@ export const CategoryMenu = () => {
       <div className='custom-shadow h-full bg-white'>
         <Container>
           <div className='mx-[-16px] grid h-full max-w-7xl grid-cols-[300px_1fr] overflow-hidden'>
-            {/* LEFT: categories */}
             <div className='relative flex flex-col overflow-y-auto py-6'>
               {isLoadingCategories ? (
                 <Loading />
@@ -90,10 +101,10 @@ export const CategoryMenu = () => {
                         isActive ? 'bg-gray-100' : ''
                       ].join(' ')}
                     >
-                      <Factory className='text-primary size-5' />
+                      <CategoryIcon name={category.iconId ? category.iconId : ''} className='text-primary size-5' />
                       <span>{category.name}</span>
 
-                      <ChevronRight className='absolute top-3.5 right-2 h-4 w-4' />
+                      <ChevronRight className='absolute top-3.5 right-2 size-4' />
                     </button>
                   )
                 })

@@ -18,7 +18,8 @@ function getSlugPath(slug?: string[]) {
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const slugPath = getSlugPath(params.slug)
+  const { slug } = await params
+  const slugPath = getSlugPath(slug)
 
   try {
     const categories = await categoriesService.findAll()
