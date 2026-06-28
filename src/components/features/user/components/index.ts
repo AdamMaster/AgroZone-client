@@ -1,6 +1,7 @@
 export * from './content-ads'
 export * from './content-general'
 export * from './content-security'
+export * from './content-favorites'
 export * from './email-change-confirm'
 export * from './form-email-change'
 export * from './form-password-change'

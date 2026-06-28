@@ -29,6 +29,9 @@ export const ContentSecurity = () => {
 
   return (
     <div className=''>
+      <Heading level={2} className='mb-6'>
+        Безопасность
+      </Heading>
       <div className='relative flex flex-col gap-8'>
         <div>
           <Heading level={5} className='mb-4'>

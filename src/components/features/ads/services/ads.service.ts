@@ -71,8 +71,19 @@ class AdsService {
     return api.patch(`${this.URL}/${id}/publish-draft`)
   }
 
-  async toggleFavorite(id: string): Promise<{ isFavorite: boolean }> {
-    const response = await api.post<{ isFavorite: boolean }>(`${this.URL}/${id}/favorite`)
+  async addFavorite(id: string): Promise<void> {
+    await api.post(`${this.URL}/${id}/favorite`)
+  }
+
+  async removeFavorite(id: string): Promise<void> {
+    await api.delete(`${this.URL}/${id}/favorite`)
+  }
+
+  async getFavorites(params?: { page?: number; limit?: number }): Promise<IAd[]> {
+    const response = await api.get<IAd[]>(`${this.URL}/me/favorites`, {
+      params
+    })
+
     return response
   }
 

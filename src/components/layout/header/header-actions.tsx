@@ -57,11 +57,11 @@ export const HeaderActions: React.FC<Props> = () => {
             <Layers className='h-4 w-4' />
             Мои объявления
           </ActionButton>
+          <Link href='/profile/settings/favorites' className='px-2 py-1'>
+            <Heart className='size-6 fill-gray-300 text-gray-300 hover:fill-gray-400 hover:text-gray-400' />
+          </Link>
           <button className='px-2 py-1'>
-            <Heart className='size-6 fill-gray-300 text-gray-300' />
-          </button>
-          <button className='px-2 py-1'>
-            <Bell className='size-6 fill-gray-300 text-gray-300' />
+            <Bell className='size-6 fill-gray-300 text-gray-300 hover:fill-gray-400 hover:text-gray-400' />
           </button>
           <UserButton className='ml-2' user={user} />
         </div>

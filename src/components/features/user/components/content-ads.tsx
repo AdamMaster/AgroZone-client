@@ -14,6 +14,9 @@ export const ContentAds = () => {
   if (isLoading)
     return (
       <div className='m max-w-[800px]'>
+        <Heading level={2} className='mb-4'>
+          Мои объявления
+        </Heading>
         <div className='mb-4 flex gap-2'>
           <Skeleton className='h-10 w-[150px] rounded-lg' />
           <Skeleton className='h-10 w-[150px] rounded-lg' />
@@ -64,6 +67,9 @@ export const ContentAds = () => {
 
   return (
     <div className='m max-w-[800px]'>
+      <Heading level={2} className='mb-4'>
+        Мои объявления
+      </Heading>
       <Tabs defaultValue='published'>
         <TabsList className='mb-4' variant='line'>
           {tabs.map(tab => (

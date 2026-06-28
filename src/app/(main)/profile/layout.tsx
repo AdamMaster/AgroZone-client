@@ -10,9 +10,6 @@ export default function MainLayout({
   return (
     <div className='pt-10'>
       <Container>
-        <Heading level={2} className='mb-8'>
-          Настройки профиля
-        </Heading>
         <div className='grid grid-cols-[280px_1fr] gap-6'>
           <div className='rounded-xl'>
             <SettingsNav />

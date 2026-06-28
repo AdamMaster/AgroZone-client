@@ -1,6 +1,6 @@
 'use client'
 
-import { Bell, Building2, Layers, Shield, User } from 'lucide-react'
+import { Bell, Building2, Heart, Layers, Shield, User } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
@@ -10,6 +10,7 @@ const items = [
   { label: 'Личные данные', icon: User, id: 'general', href: '/profile/settings/general' },
   { label: 'Безопасность', icon: Shield, id: 'security', href: '/profile/settings/security' },
   { label: 'Мои объявления', icon: Layers, id: 'ads', href: '/profile/settings/ads' },
+  { label: 'Избранное', icon: Heart, id: 'favorites', href: '/profile/settings/favorites' },
   { label: 'Организация', icon: Building2, id: 'company', href: '/profile/settings/company' },
   { label: 'Уведомления', icon: Bell, id: 'notifications', href: '/profile/settings/notifications' }
 ]

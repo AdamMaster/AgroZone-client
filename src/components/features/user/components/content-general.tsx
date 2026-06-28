@@ -16,6 +16,7 @@ import {
   FieldDescription,
   FieldError,
   FieldGroup,
+  Heading,
   Input,
   Label,
   Loading,
@@ -60,6 +61,9 @@ export const ContentGeneral = () => {
 
   return (
     <div className='relative'>
+      <Heading level={2} className='mb-6'>
+        Личные данные
+      </Heading>
       <div className='mb-6 flex flex-row items-center justify-between'>
         {isLoading ? (
           <>

@@ -1,12 +1,13 @@
 'use client'
 
-import { Heart, ImageIcon } from 'lucide-react'
+import { ImageIcon } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 
 import { Heading } from '@/components/ui'
 
-import { useToggleFavorite } from '../hooks/use-toggle-favorite'
+import { useAddFavorite } from '../hooks/use-add-favorite'
+import { useRemoveFavorite } from '../hooks/use-remove-favorite'
 import { type AdCardData } from '../types/ad.types'
 import { FavoriteButton } from './favorite-button'
 
@@ -15,9 +16,16 @@ interface AdCardProps {
 }
 
 export const AdCard = ({ ad }: AdCardProps) => {
-  const { toggleFavorite, isLoadingToggle } = useToggleFavorite()
+  const { addFavorite, isAddingFavorite } = useAddFavorite()
+  const { removeFavorite, isRemovingFavorite } = useRemoveFavorite()
 
-  console.log('Данные объявления в карточке:', ad)
+  const onClickFavorite = (adId: string, isFavorite: boolean) => {
+    if (isFavorite) {
+      removeFavorite(adId)
+    } else {
+      addFavorite(adId)
+    }
+  }
 
   return (
     <article className='flex flex-col gap-2'>
@@ -39,7 +47,11 @@ export const AdCard = ({ ad }: AdCardProps) => {
           <strong>{ad.price ? ad.price + '₽' : 'Цена договорная'}</strong>
         </p>
         <address className='text-[13px] leading-4 not-italic'>{ad.address}</address>
-        <FavoriteButton onClick={() => toggleFavorite(ad.id)} isFavorite={ad.isFavorite} isLoading={isLoadingToggle} />
+        <FavoriteButton
+          onClick={() => onClickFavorite(ad.id, !!ad.isFavorite)}
+          isFavorite={ad.isFavorite}
+          isLoading={isAddingFavorite || isRemovingFavorite}
+        />
       </div>
     </article>
   )
