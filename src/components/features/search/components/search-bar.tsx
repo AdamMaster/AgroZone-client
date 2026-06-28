@@ -8,45 +8,39 @@ import { Button, Input } from '@/components/ui'
 
 import { cn } from '@/lib/utils'
 
+import { useSearch } from '../hooks/use-search'
+
 interface SearchBarProps {
   className?: string
 }
-
-const MOCK_SUGGESTIONS = [
-  { id: '1', name: 'Трактор МТЗ-82', type: 'ad' },
-  { id: '2', name: 'Семена подсолнечника', type: 'ad' },
-  { id: '3', name: 'В категории: Агрохимия', type: 'category' }
-]
 
 export const SearchBar = ({ className }: SearchBarProps) => {
   const router = useRouter()
   const searchParams = useSearchParams()
 
-  const [searchQuery, setSearchQuery] = useState<string>(searchParams.get('q') || '')
   const [isFocus, setIsFocus] = useState<boolean>(false)
 
-  const [suggestions, setSuggestions] = useState<typeof MOCK_SUGGESTIONS>([])
+  const { query, setQuery, onSearch, suggestions } = useSearch()
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
-    if (!searchQuery.trim()) {
+
+    if (!query.trim()) {
       router.push('/')
       return
     }
-    router.push(`/?q=${encodeURIComponent(searchQuery.trim())}`)
+
+    router.push(`/?q=${encodeURIComponent(query.trim())}`)
+
     setIsFocus(false)
+
     const activeElement = document.activeElement as HTMLElement
     activeElement?.blur()
   }
 
   const handleInputChange = (value: string) => {
-    setSearchQuery(value)
-
-    if (value.trim().length > 2) {
-      setSuggestions(MOCK_SUGGESTIONS)
-    } else {
-      setSuggestions([])
-    }
+    setQuery(value)
+    onSearch(value)
   }
 
   return (
@@ -58,12 +52,14 @@ export const SearchBar = ({ className }: SearchBarProps) => {
         onBlur={() => setTimeout(() => setIsFocus(false), 200)}
       >
         <Search className={cn('absolute top-[50%] left-6 size-5 translate-[-50%] text-gray-400')} />
+
         <Input
-          value={searchQuery}
+          value={query}
           placeholder='Поиск по объявлениям'
           onChange={e => handleInputChange(e.target.value)}
           className='h-12 pl-10 focus-visible:border-transparent'
         />
+
         <Button
           type='submit'
           variant='default'
@@ -71,6 +67,7 @@ export const SearchBar = ({ className }: SearchBarProps) => {
         >
           Найти
         </Button>
+
         {isFocus && suggestions.length > 0 && (
           <div className='custom-shadow absolute top-[calc(100%+4px)] left-0 z-100 max-h-64 w-full overflow-hidden overflow-y-auto rounded-lg bg-white'>
             <div className='py-2'>
@@ -78,12 +75,18 @@ export const SearchBar = ({ className }: SearchBarProps) => {
                 <div
                   key={item.id}
                   onClick={() => {
-                    setSearchQuery(item.name)
-                    router.push(`/?q=${encodeURIComponent(item.name)}`)
+                    setQuery(item.name)
+                    setIsFocus(false)
+
+                    const activeElement = document.activeElement as HTMLElement
+                    activeElement?.blur()
+
+                    router.push(item.url)
                   }}
                   className='flex cursor-pointer items-center px-6 py-3 text-sm transition-colors hover:bg-gray-50'
                 >
                   <Search className='mr-3 size-4 shrink-0 text-gray-400' />
+
                   <span className={item.type === 'category' ? 'font-medium text-green-600' : ''}>{item.name}</span>
                 </div>
               ))}
@@ -91,7 +94,8 @@ export const SearchBar = ({ className }: SearchBarProps) => {
           </div>
         )}
       </form>
-      {isFocus && <div className='fixed inset-0 z-50 h-full w-full bg-black/20'></div>}
+
+      {isFocus && <div className='fixed inset-0 z-50 h-full w-full bg-black/20' />}
     </div>
   )
 }
