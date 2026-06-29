@@ -1,7 +1,7 @@
 'use client'
 
 import { Search } from 'lucide-react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
 import { Button, Input } from '@/components/ui'
@@ -16,7 +16,6 @@ interface SearchBarProps {
 
 export const SearchBar = ({ className }: SearchBarProps) => {
   const router = useRouter()
-  const searchParams = useSearchParams()
 
   const [isFocus, setIsFocus] = useState<boolean>(false)
 
@@ -25,20 +24,27 @@ export const SearchBar = ({ className }: SearchBarProps) => {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
 
-    if (!query.trim()) {
+    const trimmed = query.trim()
+
+    if (!trimmed) {
       router.push('/')
       return
     }
 
-    router.push(`/?q=${encodeURIComponent(query.trim())}`)
+    const exact = suggestions.find(s => s.name.toLowerCase() === trimmed.toLowerCase())
+
+    if (exact?.url) {
+      router.push(exact.url)
+    } else {
+      router.push(`/search?q=${encodeURIComponent(trimmed)}`)
+    }
 
     setIsFocus(false)
-
-    const activeElement = document.activeElement as HTMLElement
-    activeElement?.blur()
+    ;(document.activeElement as HTMLElement)?.blur()
   }
 
   const handleInputChange = (value: string) => {
+    console.log('INPUT:', value)
     setQuery(value)
     onSearch(value)
   }
@@ -51,7 +57,7 @@ export const SearchBar = ({ className }: SearchBarProps) => {
         onFocus={() => setIsFocus(true)}
         onBlur={() => setTimeout(() => setIsFocus(false), 200)}
       >
-        <Search className={cn('absolute top-[50%] left-6 size-5 translate-[-50%] text-gray-400')} />
+        <Search className={cn('absolute top-[50%] left-6 size-4 translate-[-50%] text-gray-400')} />
 
         <Input
           value={query}
@@ -63,7 +69,7 @@ export const SearchBar = ({ className }: SearchBarProps) => {
         <Button
           type='submit'
           variant='default'
-          className='text-md absolute top-[50%] right-[2px] h-11 translate-y-[-50%] px-5 font-normal active:translate-y-[-50%]!'
+          className='text-md absolute top-[50%] right-[4px] h-10 translate-y-[-50%] px-5 font-normal text-white active:translate-y-[-50%]!'
         >
           Найти
         </Button>
@@ -72,7 +78,7 @@ export const SearchBar = ({ className }: SearchBarProps) => {
           <div className='custom-shadow absolute top-[calc(100%+4px)] left-0 z-100 max-h-64 w-full overflow-hidden overflow-y-auto rounded-lg bg-white'>
             <div className='py-2'>
               {suggestions.map(item => (
-                <div
+                <ul
                   key={item.id}
                   onClick={() => {
                     setQuery(item.name)
@@ -83,12 +89,19 @@ export const SearchBar = ({ className }: SearchBarProps) => {
 
                     router.push(item.url)
                   }}
-                  className='flex cursor-pointer items-center px-6 py-3 text-sm transition-colors hover:bg-gray-50'
+                  className='flex cursor-pointer items-center px-4 py-3 text-sm transition-colors hover:bg-gray-100'
                 >
-                  <Search className='mr-3 size-4 shrink-0 text-gray-400' />
-
-                  <span className={item.type === 'category' ? 'font-medium text-green-600' : ''}>{item.name}</span>
-                </div>
+                  {item.type === 'category' ? (
+                    <li>
+                      <span className='text-gray-500'>Категория: </span>
+                      {item.name}
+                    </li>
+                  ) : (
+                    <li>
+                      <span>{item.name}</span>
+                    </li>
+                  )}
+                </ul>
               ))}
             </div>
           </div>

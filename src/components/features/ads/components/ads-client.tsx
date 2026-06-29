@@ -38,6 +38,8 @@ export function AdsClient({ serverSlug }: AdsClientProps) {
 
   const { categories, isLoadingCategories } = useCategories()
 
+  const searchQuery = searchParams.get('search') ?? undefined
+
   const slug = serverSlug?.split('/').at(-1) ?? searchParams.get('category') ?? undefined
 
   const categoryId = useMemo(() => {
@@ -46,7 +48,7 @@ export function AdsClient({ serverSlug }: AdsClientProps) {
     return findIdBySlug(categories, slug)
   }, [categories, slug])
 
-  const { ads, isLoadingAds } = useAds({ categoryId })
+  const { ads, isLoadingAds } = useAds(useMemo(() => ({ categoryId, search: searchQuery }), [categoryId, searchQuery]))
 
   if (isLoadingCategories || isLoadingAds) {
     return (
