@@ -1,6 +1,6 @@
 'use client'
 
-import { Search } from 'lucide-react'
+import { ChevronRight, Search } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
@@ -24,27 +24,24 @@ export const SearchBar = ({ className }: SearchBarProps) => {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
 
-    const trimmed = query.trim()
-
-    if (!trimmed) {
-      router.push('/')
+    if (!query.trim()) {
+      router.push('/catalog')
       return
     }
 
-    const exact = suggestions.find(s => s.name.toLowerCase() === trimmed.toLowerCase())
+    const currentPath = window.location.pathname
 
-    if (exact?.url) {
-      router.push(exact.url)
-    } else {
-      router.push(`/search?q=${encodeURIComponent(trimmed)}`)
-    }
+    const basePath = currentPath.startsWith('/catalog') ? currentPath : '/catalog'
+
+    router.push(`${basePath}?search=${encodeURIComponent(query.trim())}`)
 
     setIsFocus(false)
-    ;(document.activeElement as HTMLElement)?.blur()
+
+    const activeElement = document.activeElement as HTMLElement
+    activeElement?.blur()
   }
 
   const handleInputChange = (value: string) => {
-    console.log('INPUT:', value)
     setQuery(value)
     onSearch(value)
   }
@@ -57,28 +54,34 @@ export const SearchBar = ({ className }: SearchBarProps) => {
         onFocus={() => setIsFocus(true)}
         onBlur={() => setTimeout(() => setIsFocus(false), 200)}
       >
-        <Search className={cn('absolute top-[50%] left-6 size-4 translate-[-50%] text-gray-400')} />
+        <Search
+          className={cn(
+            'absolute top-[50%] left-6 size-5 translate-[-50%] text-gray-400',
+            query.length > 0 && 'text-gray-900'
+          )}
+        />
 
         <Input
           value={query}
           placeholder='Поиск по объявлениям'
           onChange={e => handleInputChange(e.target.value)}
           className='h-12 pl-10 focus-visible:border-transparent'
+          autoComplete='off'
         />
 
         <Button
           type='submit'
           variant='default'
-          className='text-md absolute top-[50%] right-[4px] h-10 translate-y-[-50%] px-5 font-normal text-white active:translate-y-[-50%]!'
+          className='text-md absolute top-[50%] right-[2px] h-11 translate-y-[-50%] px-5 font-normal active:translate-y-[-50%]!'
         >
           Найти
         </Button>
 
         {isFocus && suggestions.length > 0 && (
           <div className='custom-shadow absolute top-[calc(100%+4px)] left-0 z-100 max-h-64 w-full overflow-hidden overflow-y-auto rounded-lg bg-white'>
-            <div className='py-2'>
+            <ul className='py-2'>
               {suggestions.map(item => (
-                <ul
+                <li
                   key={item.id}
                   onClick={() => {
                     setQuery(item.name)
@@ -89,21 +92,18 @@ export const SearchBar = ({ className }: SearchBarProps) => {
 
                     router.push(item.url)
                   }}
-                  className='flex cursor-pointer items-center px-4 py-3 text-sm transition-colors hover:bg-gray-100'
+                  className='flex cursor-pointer items-center px-4 py-3 text-sm transition-colors hover:bg-gray-50'
                 >
                   {item.type === 'category' ? (
-                    <li>
-                      <span className='text-gray-500'>Категория: </span>
-                      {item.name}
-                    </li>
+                    <ChevronRight className='mr-3 size-5 shrink-0' />
                   ) : (
-                    <li>
-                      <span>{item.name}</span>
-                    </li>
+                    <Search className='mr-3 size-4 shrink-0' />
                   )}
-                </ul>
+
+                  <span>{item.name}</span>
+                </li>
               ))}
-            </div>
+            </ul>
           </div>
         )}
       </form>

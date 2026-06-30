@@ -5,14 +5,14 @@ import { SearchSuggestion } from '../types'
 class SearchService {
   private URL = 'search'
 
-  async getSuggestions(q: string) {
-    if (!q || q.trim().length < 2) return []
+  async getSuggestions(q: string): Promise<SearchSuggestion[]> {
+    const query = q?.trim()
 
-    const response = await api.get<SearchSuggestion[]>(`${this.URL}/suggestions`, {
-      params: { q: q.trim() }
+    if (!query || query.length < 2) return []
+
+    return api.get<SearchSuggestion[]>(`${this.URL}/suggestions`, {
+      params: { q: query }
     })
-
-    return response
   }
 }
 

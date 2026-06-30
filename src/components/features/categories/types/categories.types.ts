@@ -14,4 +14,5 @@ export interface ICategory {
   parentId: string | null
   children?: ICategory[]
   availableFeatures?: IAvailableFeature[]
+  fullPath: string
 }

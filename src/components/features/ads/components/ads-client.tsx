@@ -12,16 +12,16 @@ import { useAds } from '../hooks'
 
 const SKELETON_COUNT = 10
 
-const findIdBySlug = (categories: ICategory[], slug?: string | null): string | undefined => {
-  if (!slug) return
+const findIdByFullPath = (categories: ICategory[], fullPath?: string | null): string | undefined => {
+  if (!fullPath) return
 
   for (const category of categories) {
-    if (category.slug === slug || category.slug.endsWith(`/${slug}`)) {
+    if (category.fullPath === fullPath) {
       return category.id
     }
 
     if (category.children?.length) {
-      const found = findIdBySlug(category.children, slug)
+      const found = findIdByFullPath(category.children, fullPath)
       if (found) return found
     }
   }
@@ -29,32 +29,30 @@ const findIdBySlug = (categories: ICategory[], slug?: string | null): string | u
   return
 }
 
-interface AdsClientProps {
-  serverSlug?: string | null
-}
-
-export function AdsClient({ serverSlug }: AdsClientProps) {
+export function AdsClient({ serverSlug }: { serverSlug?: string | null }) {
   const searchParams = useSearchParams()
+
+  const currentPath = serverSlug ?? searchParams.get('category') ?? undefined
 
   const { categories, isLoadingCategories } = useCategories()
 
   const searchQuery = searchParams.get('search') ?? undefined
 
-  const slug = serverSlug?.split('/').at(-1) ?? searchParams.get('category') ?? undefined
-
   const categoryId = useMemo(() => {
-    if (!slug) return undefined
+    if (!currentPath) return undefined
+    return findIdByFullPath(categories, currentPath)
+  }, [categories, currentPath])
 
-    return findIdBySlug(categories, slug)
-  }, [categories, slug])
-
-  const { ads, isLoadingAds } = useAds(useMemo(() => ({ categoryId, search: searchQuery }), [categoryId, searchQuery]))
+  const { ads, isLoadingAds } = useAds({
+    categoryId,
+    search: searchQuery
+  })
 
   if (isLoadingCategories || isLoadingAds) {
     return (
       <div className='grid grid-cols-5 gap-6'>
-        {Array.from({ length: SKELETON_COUNT }).map((_, index) => (
-          <Skeleton key={index} className='h-82 rounded-lg' />
+        {Array.from({ length: SKELETON_COUNT }).map((_, i) => (
+          <Skeleton key={i} className='h-82 rounded-lg' />
         ))}
       </div>
     )

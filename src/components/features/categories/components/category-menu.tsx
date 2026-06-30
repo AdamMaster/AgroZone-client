@@ -123,7 +123,7 @@ export const CategoryMenu = () => {
                       {activeCategory.children.map(child => (
                         <Link
                           key={child.id}
-                          href={`/catalog/${child.slug}`}
+                          href={`/catalog/${child.fullPath}`}
                           onClick={close}
                           className='hover:text-primary block py-2 text-[15px] transition-colors'
                         >
