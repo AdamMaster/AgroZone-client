@@ -12,16 +12,16 @@ import { useAds } from '../hooks'
 
 const SKELETON_COUNT = 10
 
-const findIdByFullPath = (categories: ICategory[], fullPath?: string | null): string | undefined => {
-  if (!fullPath) return
+const findIdBySlug = (categories: ICategory[], slug?: string | null): string | undefined => {
+  if (!slug) return
 
   for (const category of categories) {
-    if (category.fullPath === fullPath) {
+    if (category.slug === slug) {
       return category.id
     }
 
     if (category.children?.length) {
-      const found = findIdByFullPath(category.children, fullPath)
+      const found = findIdBySlug(category.children, slug)
       if (found) return found
     }
   }
@@ -32,16 +32,16 @@ const findIdByFullPath = (categories: ICategory[], fullPath?: string | null): st
 export function AdsClient({ serverSlug }: { serverSlug?: string | null }) {
   const searchParams = useSearchParams()
 
-  const currentPath = serverSlug ?? searchParams.get('category') ?? undefined
-
   const { categories, isLoadingCategories } = useCategories()
 
   const searchQuery = searchParams.get('search') ?? undefined
 
+  const slug = serverSlug?.split('/').at(-1) ?? searchParams.get('category') ?? undefined
+
   const categoryId = useMemo(() => {
-    if (!currentPath) return undefined
-    return findIdByFullPath(categories, currentPath)
-  }, [categories, currentPath])
+    if (!slug) return undefined
+    return findIdBySlug(categories, slug)
+  }, [categories, slug])
 
   const { ads, isLoadingAds } = useAds({
     categoryId,

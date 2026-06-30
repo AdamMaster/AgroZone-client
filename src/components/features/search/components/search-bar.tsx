@@ -1,7 +1,7 @@
 'use client'
 
-import { ChevronRight, Search } from 'lucide-react'
-import { useRouter } from 'next/navigation'
+import { ChevronRight, Search, X } from 'lucide-react'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { useState } from 'react'
 
 import { Button, Input } from '@/components/ui'
@@ -16,6 +16,8 @@ interface SearchBarProps {
 
 export const SearchBar = ({ className }: SearchBarProps) => {
   const router = useRouter()
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
 
   const [isFocus, setIsFocus] = useState<boolean>(false)
 
@@ -24,16 +26,14 @@ export const SearchBar = ({ className }: SearchBarProps) => {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
 
-    if (!query.trim()) {
+    const trimmedQuery = query.trim()
+
+    if (!trimmedQuery) {
       router.push('/catalog')
       return
     }
 
-    const currentPath = window.location.pathname
-
-    const basePath = currentPath.startsWith('/catalog') ? currentPath : '/catalog'
-
-    router.push(`${basePath}?search=${encodeURIComponent(query.trim())}`)
+    router.push(`/catalog?search=${encodeURIComponent(trimmedQuery)}`)
 
     setIsFocus(false)
 
@@ -46,6 +46,15 @@ export const SearchBar = ({ className }: SearchBarProps) => {
     onSearch(value)
   }
 
+  const onClear = () => {
+    setQuery('')
+
+    const params = new URLSearchParams(searchParams.toString())
+    params.delete('search')
+
+    router.push(`${pathname}?${params.toString()}`)
+  }
+
   return (
     <div className={cn(className)}>
       <form
@@ -56,8 +65,8 @@ export const SearchBar = ({ className }: SearchBarProps) => {
       >
         <Search
           className={cn(
-            'absolute top-[50%] left-6 size-5 translate-[-50%] text-gray-400',
-            query.length > 0 && 'text-gray-900'
+            'absolute top-[50%] left-7 size-5 translate-[-50%] text-gray-400',
+            query.length > 0 && 'text-inherit'
           )}
         />
 
@@ -65,17 +74,20 @@ export const SearchBar = ({ className }: SearchBarProps) => {
           value={query}
           placeholder='Поиск по объявлениям'
           onChange={e => handleInputChange(e.target.value)}
-          className='h-12 pl-10 focus-visible:border-transparent'
+          className='h-12 pl-12 focus-visible:border-transparent'
           autoComplete='off'
         />
 
-        <Button
-          type='submit'
-          variant='default'
-          className='text-md absolute top-[50%] right-[2px] h-11 translate-y-[-50%] px-5 font-normal active:translate-y-[-50%]!'
-        >
-          Найти
-        </Button>
+        <div className='absolute top-0 right-0 flex h-full items-center gap-4 p-[3px]'>
+          {query.length > 0 && (
+            <button type='button' onClick={() => onClear()}>
+              <X className='size-5 text-gray-400 hover:text-inherit' />
+            </button>
+          )}
+          <Button type='submit' variant='default' className='text-md h-full px-5 font-normal'>
+            Найти
+          </Button>
+        </div>
 
         {isFocus && suggestions.length > 0 && (
           <div className='custom-shadow absolute top-[calc(100%+4px)] left-0 z-100 max-h-64 w-full overflow-hidden overflow-y-auto rounded-lg bg-white'>
@@ -92,12 +104,12 @@ export const SearchBar = ({ className }: SearchBarProps) => {
 
                     router.push(item.url)
                   }}
-                  className='flex cursor-pointer items-center px-4 py-3 text-sm transition-colors hover:bg-gray-50'
+                  className='flex cursor-pointer items-center gap-3 px-4 py-3 text-sm transition-colors hover:bg-gray-50'
                 >
                   {item.type === 'category' ? (
-                    <ChevronRight className='mr-3 size-5 shrink-0' />
+                    <ChevronRight className='size-5 shrink-0' />
                   ) : (
-                    <Search className='mr-3 size-4 shrink-0' />
+                    <Search className='size-4 shrink-0' />
                   )}
 
                   <span>{item.name}</span>
