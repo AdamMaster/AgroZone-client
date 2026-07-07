@@ -39,6 +39,8 @@ export const SearchBar = ({ className }: SearchBarProps) => {
 
     const activeElement = document.activeElement as HTMLElement
     activeElement?.blur()
+
+    setIsFocus(false)
   }
 
   const handleInputChange = (value: string) => {
@@ -55,14 +57,17 @@ export const SearchBar = ({ className }: SearchBarProps) => {
     router.push(`${pathname}?${params.toString()}`)
   }
 
+  const onClickButton = () => {
+    setIsFocus(false)
+  }
+
+  const onClickInput = () => {
+    setIsFocus(true)
+  }
+
   return (
     <div className={cn(className)}>
-      <form
-        className='relative z-100'
-        onSubmit={handleSearch}
-        onFocus={() => setIsFocus(true)}
-        onBlur={() => setTimeout(() => setIsFocus(false), 200)}
-      >
+      <form className='relative z-100' onSubmit={handleSearch}>
         <Search
           className={cn(
             'absolute top-[50%] left-7 size-5 translate-[-50%] text-gray-400',
@@ -74,6 +79,7 @@ export const SearchBar = ({ className }: SearchBarProps) => {
           value={query}
           placeholder='Поиск по объявлениям'
           onChange={e => handleInputChange(e.target.value)}
+          onClick={() => onClickInput()}
           className='h-12 pl-12 focus-visible:border-transparent'
           autoComplete='off'
         />
@@ -84,7 +90,12 @@ export const SearchBar = ({ className }: SearchBarProps) => {
               <X className='size-5 text-gray-400 hover:text-inherit' />
             </button>
           )}
-          <Button type='submit' variant='default' className='text-md h-full px-5 font-normal'>
+          <Button
+            type='submit'
+            variant='default'
+            className='text-md h-full px-5 font-normal'
+            onClick={() => onClickButton()}
+          >
             Найти
           </Button>
         </div>
@@ -120,7 +131,7 @@ export const SearchBar = ({ className }: SearchBarProps) => {
         )}
       </form>
 
-      {isFocus && <div className='fixed inset-0 z-50 h-full w-full bg-black/20' />}
+      {isFocus && <div className='fixed inset-0 z-50 h-full w-full bg-black/20' onClick={() => setIsFocus(false)} />}
     </div>
   )
 }
