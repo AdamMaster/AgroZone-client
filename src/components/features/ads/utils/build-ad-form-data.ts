@@ -16,8 +16,8 @@ export const buildAdFormData = (values: Partial<TypeCreateAdSchema>) => {
   if (values.lat !== undefined) formData.append('lat', String(values.lat))
   if (values.lng !== undefined) formData.append('lng', String(values.lng))
 
-  if (values.features) {
-    formData.append('features', JSON.stringify(values.features))
+  if (values.categoryFeatures) {
+    formData.append('features', JSON.stringify(values.categoryFeatures))
   }
 
   return formData

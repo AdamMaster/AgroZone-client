@@ -12,7 +12,7 @@ export default async function MainLayout({
   return (
     <>
       <Header />
-      <CategoryGrid categories={categories} className='mb-6 pt-4' />
+      <CategoryGrid categories={categories} className='mb-8 pt-4' />
       <CategoryMenu />
       <main className='flex-1'>{children}</main>
     </>

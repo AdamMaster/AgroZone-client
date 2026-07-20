@@ -1,17 +1,27 @@
-export interface IAvailableFeature {
+export interface ICategoryFeature {
+  id: string
+  categoryId: string
   name: string
   label: string
-  type: 'select' | 'text' | 'number' | 'boolean'
-  required: boolean
+  type: 'TEXT' | 'NUMBER' | 'SELECT' | 'BOOLEAN'
   options?: string[]
+  createdAt: Date
+  updatedAt: Date
 }
 
 export interface ICategory {
   id: string
   name: string
+  slug: string
+  code: string
+  iconId: string | null
   parentId: string | null
+  level: number
+  sortOrder: number
+  path: string[]
+  fullPath: string
+  categoryFeatures: ICategoryFeature[]
   children?: ICategory[]
-  availableFeatures?: IAvailableFeature[]
 }
 
 export interface IAd {
@@ -27,7 +37,7 @@ export interface IAd {
   publishedAt: Date | null
   lat: number
   lng: number
-  features: IAvailableFeature
+  features: ICategoryFeature
   createdAt: Date
   updatedAt: Date
   userId: string

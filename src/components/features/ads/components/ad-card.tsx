@@ -31,7 +31,7 @@ export const AdCard = ({ ad }: AdCardProps) => {
     <article className='flex flex-col gap-2'>
       <Link href='#' className='relative block overflow-hidden rounded-xl bg-gray-100 pt-[100%]'>
         {ad.images.length > 0 ? (
-          <Image src={ad.images[0]} alt={ad.title} className='h-full w-full object-cover' fill />
+          <Image src={ad.images[0]} alt={ad.title} className='h-full w-full object-cover mix-blend-darken' fill />
         ) : (
           <ImageIcon size={50} className='absolute top-[50%] left-[50%] translate-[-50%] text-gray-500' />
         )}
@@ -39,7 +39,7 @@ export const AdCard = ({ ad }: AdCardProps) => {
       <div className='relative'>
         <Heading
           level={2}
-          className='hover:text-primary mb-0.5 w-fit text-[15px] leading-5 font-medium transition-colors'
+          className='hover:text-primary mb-0.5 line-clamp-2 w-fit text-[15px] leading-5 font-medium transition-colors'
         >
           <Link href='#'>{ad.title}</Link>
         </Heading>

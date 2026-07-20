@@ -8,6 +8,7 @@ import { useEffect, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 
 import {
+  AddressInput,
   Button,
   ButtonBack,
   Field,
@@ -25,7 +26,7 @@ import { useProfile } from '@/shared/hooks'
 import { findCategoryById, getPathToCategory } from '@/shared/utils'
 
 import { CreateAdSchema, TypeCreateAdSchema } from '../schemes'
-import { IAvailableFeature, ICategory } from '../types/ad.types'
+import { ICategory, ICategoryFeature } from '../types/ad.types'
 import { CategoryBreadcrumbs } from './category-breadcrumbs'
 import { CategoryCascader } from './category-cascader'
 import { DynamicField } from './dynamic-field'
@@ -35,7 +36,7 @@ import { RejectionReason } from './rejection-reason'
 
 interface AdFormProps {
   categories: ICategory[]
-  initialData?: TypeCreateAdSchema // Сюда будем передавать данные для редактирования
+  initialData?: TypeCreateAdSchema
   isSubmitting?: boolean
   isSaveDrafting?: boolean
   rejectionReason?: string
@@ -53,7 +54,7 @@ export const AdForm = ({
   onSaveDraft
 }: AdFormProps) => {
   const isEdit = !!initialData
-  const [features, setFeatures] = useState<IAvailableFeature[]>([])
+  const [features, setFeatures] = useState<ICategoryFeature[]>([])
   const [step, setStep] = useState(isEdit ? 2 : 1)
   const { user } = useProfile()
   const setCategoryPath = useAdStore(state => state.setCategoryPath)
@@ -73,14 +74,14 @@ export const AdForm = ({
       lng: 0,
       description: '',
       categoryId: '',
-      features: {}
+      categoryFeatures: {}
     }
   })
 
   const handleBack = () => {
     setStep(1)
     form.setValue('categoryId', '')
-    form.setValue('features', {})
+    form.setValue('categoryFeatures', {})
   }
 
   useEffect(() => {
@@ -99,8 +100,8 @@ export const AdForm = ({
 
       const category = findCategory(categories)
 
-      if (category?.availableFeatures) {
-        setFeatures(category.availableFeatures)
+      if (category?.categoryFeatures) {
+        setFeatures(category.categoryFeatures)
       }
 
       const path = getPathToCategory(categories, initialData.categoryId)
@@ -193,18 +194,27 @@ export const AdForm = ({
                 name='address'
                 control={form.control}
                 render={({ field, fieldState }) => (
-                  <MapAd
-                    value={{
-                      address: field.value,
-                      lat: form.watch('lat'),
-                      lng: form.watch('lng')
-                    }}
-                    onChange={v => {
-                      form.setValue('lat', v.lat ?? 0)
-                      form.setValue('lng', v.lng ?? 0)
-                      field.onChange(v.address)
-                    }}
+                  // <MapAd
+                  //   value={{
+                  //     address: field.value,
+                  //     lat: form.watch('lat'),
+                  //     lng: form.watch('lng')
+                  //   }}
+                  //   onChange={v => {
+                  //     form.setValue('lat', v.lat ?? 0)
+                  //     form.setValue('lng', v.lng ?? 0)
+                  //     field.onChange(v.address)
+                  //   }}
+                  //   error={fieldState.error?.message}
+                  // />
+                  <AddressInput
+                    value={field.value}
                     error={fieldState.error?.message}
+                    onChange={geoData => {
+                      field.onChange(geoData.address)
+                      form.setValue('lat', geoData.lat)
+                      form.setValue('lng', geoData.lng)
+                    }}
                   />
                 )}
               />

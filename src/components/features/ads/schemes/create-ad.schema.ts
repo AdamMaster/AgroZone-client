@@ -10,7 +10,7 @@ export const CreateAdSchema = z.object({
   address: z.string().min(5, 'Укажите адрес'),
   lat: z.number().min(-90, 'Выберите местоположение'),
   lng: z.number().min(-180, 'Выберите местоположение'),
-  features: z.record(z.string(), z.any()).optional().default({})
+  categoryFeatures: z.record(z.string(), z.any()).optional().default({})
 })
 
 export type TypeCreateAdSchema = z.input<typeof CreateAdSchema>

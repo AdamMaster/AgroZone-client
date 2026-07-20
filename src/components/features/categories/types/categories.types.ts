@@ -1,18 +1,26 @@
-export interface IAvailableFeature {
+export interface ICategoryFeature {
+  id: string
+  categoryId: string
   name: string
   label: string
-  type: 'select' | 'text' | 'number' | 'boolean'
-  required: boolean
+  type: 'TEXT' | 'NUMBER' | 'SELECT' | 'BOOLEAN'
   options?: string[]
+  createdAt: Date
+  updatedAt: Date
 }
 
 export interface ICategory {
   id: string
   name: string
   slug: string
-  iconId?: string
+  code: string
+  iconId: string | null
   parentId: string | null
-  children?: ICategory[]
-  availableFeatures?: IAvailableFeature[]
+  level: number
+  sortOrder: number
+  path: string[]
   fullPath: string
+  categoryFeatures: ICategoryFeature[]
+  children?: ICategory[]
+  isBack?: boolean
 }

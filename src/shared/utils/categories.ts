@@ -1,15 +1,22 @@
-import { ICategory } from '@/components/features/ads/types/ad.types'
+import { ICategory, ICategoryFeature } from '@/components/features/ads/types/ad.types'
 
 export interface IFlatCategory {
   id: string
   name: string
   path: string[]
+  categoryFeatures: ICategoryFeature[]
 }
 
 export const flattenCategories = (cats: ICategory[], parentPath: string[] = []): IFlatCategory[] => {
   return cats.flatMap((cat): IFlatCategory[] => {
     const currentPath = [...parentPath, cat.name]
-    const current: IFlatCategory = { id: cat.id, name: cat.name, path: currentPath }
+
+    const current: IFlatCategory = {
+      id: cat.id,
+      name: cat.name,
+      path: currentPath,
+      categoryFeatures: cat.categoryFeatures || []
+    }
 
     const children = cat.children ? flattenCategories(cat.children, currentPath) : []
 

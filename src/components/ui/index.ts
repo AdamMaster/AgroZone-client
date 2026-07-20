@@ -1,3 +1,4 @@
+export * from './addres-input'
 export * from './button'
 export * from './button-back'
 export { Logo } from './logo'

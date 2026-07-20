@@ -156,3 +156,21 @@ button {
 .custom-shadow {
   box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
 }
+
+.react-dadata__suggestions {
+  border: 1px solid var(--color-gray-200);
+  border-radius: .625rem;
+  background: #fff;
+  box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
+}
+
+.react-dadata__suggestion {
+  padding-inline: calc(var(--spacing) * 4);
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.react-dadata__suggestion:hover {
+  background: var(--color-gray-50);
+
+}

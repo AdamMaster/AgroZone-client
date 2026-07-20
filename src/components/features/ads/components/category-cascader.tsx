@@ -13,12 +13,12 @@ import { findCategoryById, flattenCategories, getPathToCategory } from '@/shared
 import { cn } from '@/lib/utils'
 
 import { TypeCreateAdSchema } from '../schemes'
-import { IAvailableFeature, ICategory } from '../types/ad.types'
+import { ICategory, ICategoryFeature } from '../types/ad.types'
 
 interface CategoryCascaderProps {
   categories: ICategory[]
   form: UseFormReturn<TypeCreateAdSchema>
-  onCategorySelect: (features: IAvailableFeature[]) => void
+  onCategorySelect: (features: ICategoryFeature[]) => void
 }
 
 export const CategoryCascader = ({ categories, form, onCategorySelect }: CategoryCascaderProps) => {
@@ -49,12 +49,12 @@ export const CategoryCascader = ({ categories, form, onCategorySelect }: Categor
 
     if (fullCategory && (!fullCategory.children || fullCategory.children.length === 0)) {
       form.setValue('categoryId', catId, { shouldValidate: true })
-      onCategorySelect(fullCategory.availableFeatures || [])
+      onCategorySelect(fullCategory.categoryFeatures || [])
       const pathNames = path.map(id => findCategoryById(categories, id)?.name).filter(Boolean) as string[]
       setCategoryPath(pathNames)
     } else {
       form.setValue('categoryId', '', { shouldValidate: true })
-      form.setValue('features', {})
+      form.setValue('categoryFeatures', {})
       onCategorySelect([])
     }
     setOpen(false)

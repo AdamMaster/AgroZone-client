@@ -4,7 +4,7 @@ import { Loading } from '@/components/ui'
 
 import { useMyAd, useUpdateAd } from '../hooks'
 import { TypeCreateAdSchema } from '../schemes'
-import { IAvailableFeature, ICategory } from '../types/ad.types'
+import { ICategory, ICategoryFeature } from '../types/ad.types'
 import { buildAdFormData } from '../utils/build-ad-form-data'
 import { AdForm } from './ad-form'
 
@@ -28,7 +28,7 @@ export const AdEdit = ({ id, categories }: AdEditProps) => {
     lat: ad.lat,
     lng: ad.lng,
     images: ad.images,
-    features: (ad.features as IAvailableFeature) || {}
+    categoryFeatures: (ad.features as ICategoryFeature) || {}
   }
 
   type AdImage = File | string

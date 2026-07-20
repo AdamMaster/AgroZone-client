@@ -1,4 +1,3 @@
-// components/DynamicField.tsx
 import { Control, Controller } from 'react-hook-form'
 
 import {
@@ -16,24 +15,24 @@ import {
 } from '@/components/ui'
 
 import { TypeCreateAdSchema } from '../schemes'
-import { IAvailableFeature } from '../types/ad.types'
+import { ICategoryFeature } from '../types/ad.types'
 
 interface DynamicFieldProps {
-  feature: IAvailableFeature
-  control: Control<TypeCreateAdSchema> // Явное указание типа вместо any
+  feature: ICategoryFeature
+  control: Control<TypeCreateAdSchema>
 }
 
 export const DynamicField = ({ feature, control }: DynamicFieldProps) => {
   return (
     <Controller
-      name={`features.${feature.name}`}
+      name={`categoryFeatures.${feature.name}`}
       control={control}
       render={({ field, fieldState }) => (
         <Field data-invalid={fieldState.invalid} className='group mb-4' isInvalid={fieldState.invalid}>
           <InputGroup>
             <Label>{feature.label}</Label>
 
-            {feature.type === 'select' ? (
+            {feature.type === 'SELECT' ? (
               <Select
                 onValueChange={val => {
                   field.onChange(val === 'none' ? null : val)
@@ -43,15 +42,15 @@ export const DynamicField = ({ feature, control }: DynamicFieldProps) => {
                 <SelectTrigger className='h-13! px-4'>
                   <SelectValue placeholder='Не выбрано' />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent alignItemWithTrigger={false} align='start'>
                   {feature.options?.map((opt: string) => (
-                    <SelectItem key={opt} value={String(opt)}>
+                    <SelectItem key={opt} value={String(opt)} className='rounded-none px-4'>
                       {opt}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
-            ) : feature.type === 'boolean' ? (
+            ) : feature.type === 'BOOLEAN' ? (
               <div className='flex items-center gap-2'>
                 <Checkbox checked={!!field.value} onCheckedChange={field.onChange} />
                 <label className='text-sm'>{feature.label}</label>
@@ -60,12 +59,12 @@ export const DynamicField = ({ feature, control }: DynamicFieldProps) => {
               <Input
                 className='h-13'
                 {...field}
-                type={feature.type === 'number' ? 'number' : 'text'}
+                type={feature.type === 'NUMBER' ? 'number' : 'text'}
                 placeholder={feature.label}
                 value={field.value === null || field.value === undefined ? '' : String(field.value)}
                 onChange={e => {
                   const val = e.target.value
-                  field.onChange(val === '' ? null : feature.type === 'number' ? Number(val) : val)
+                  field.onChange(val === '' ? null : feature.type === 'NUMBER' ? Number(val) : val)
                 }}
               />
             )}

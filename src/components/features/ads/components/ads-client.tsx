@@ -6,6 +6,7 @@ import { useMemo } from 'react'
 import { AdCard } from '@/components/features/ads/components'
 import { Skeleton } from '@/components/ui'
 
+import { CategoryTitle } from '../../categories/components/category-title'
 import { useCategories } from '../../categories/hooks/use-categories'
 import { ICategory } from '../../categories/types'
 import { useAds } from '../hooks'
@@ -63,10 +64,13 @@ export function AdsClient({ serverSlug }: { serverSlug?: string | null }) {
   }
 
   return (
-    <div className='grid grid-cols-5 gap-6'>
-      {ads.map(ad => (
-        <AdCard key={ad.id} ad={ad} />
-      ))}
+    <div>
+      <CategoryTitle categories={categories} className='mt-4 mb-6' />
+      <div className='grid grid-cols-5 gap-6'>
+        {ads.map(ad => (
+          <AdCard key={ad.id} ad={ad} />
+        ))}
+      </div>
     </div>
   )
 }

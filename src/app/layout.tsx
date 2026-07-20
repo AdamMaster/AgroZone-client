@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 
 import { AuthModal } from '@/components/modals/auth'
+import { CategoriesModal } from '@/components/modals/categories'
 import { MainProvider } from '@/components/providers'
 
 import { cn } from '@/lib/utils'
@@ -39,6 +40,7 @@ export default function RootLayout({
         <MainProvider>
           {children}
           <AuthModal />
+          <CategoriesModal />
         </MainProvider>
       </body>
     </html>
