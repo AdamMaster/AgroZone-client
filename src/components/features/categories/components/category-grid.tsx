@@ -3,13 +3,14 @@
 import { useCategoriesModal } from '@/store'
 import { ChevronRight } from 'lucide-react'
 import { useParams, usePathname } from 'next/navigation'
-import { useLayoutEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 
 import { Container } from '@/components/layout'
 
 import { cn } from '@/lib/utils'
 
 import { ICategory } from '../types/categories.types'
+import { buildCategoryMap } from '../utils/category-utils'
 import { CategoryItem } from './category-item'
 
 interface CategoryGridProps {
@@ -19,50 +20,61 @@ interface CategoryGridProps {
 
 export const CategoryGrid = ({ categories, className }: CategoryGridProps) => {
   const pathname = usePathname()
-  const params = useParams()
-
+  const params = useParams<{ slug?: string[] }>()
   const measureRef = useRef<HTMLDivElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
-
   const { isOpen, onOpen } = useCategoriesModal()
-
   const [visibleCount, setVisibleCount] = useState<number | null>(null)
+  const isCatalog = pathname.startsWith('/catalog')
+  const categoryMap = useMemo(() => buildCategoryMap(categories), [categories])
+
+  const getCategoryHref = (category: ICategory & { isParent?: boolean }) => {
+    if (!category.isParent) {
+      return `/catalog/${category.fullPath}`
+    }
+
+    const currentPath = params.slug?.join('/')
+
+    const currentCategory = currentPath ? categoryMap.get(currentPath) : null
+
+    return currentCategory?.parent ? `/catalog/${currentCategory.parent.fullPath}` : '/catalog'
+  }
 
   const itemsToRender = useMemo(() => {
     if (!categories?.length) return []
 
-    const slugArray = params?.slug as string[] | undefined
+    const fullPath = params.slug?.join('/')
 
-    if (pathname.startsWith('/catalog') && slugArray?.length) {
-      const currentSlug = slugArray[slugArray.length - 1]
+    if (isCatalog && fullPath) {
+      const result = categoryMap.get(fullPath)
 
-      const category = categories.find(item => item.slug === currentSlug)
+      if (result) {
+        const { category, parent } = result
 
-      if (category?.children?.length) {
-        return [
-          {
-            ...category,
-            isParent: true
-          },
-          ...category.children
-        ]
-      }
+        if (category.children?.length) {
+          return [
+            {
+              ...category,
+              isParent: true
+            },
+            ...category.children
+          ]
+        }
 
-      const parent = categories.find(item => item.children?.some(child => child.slug === currentSlug))
-
-      if (parent?.children?.length) {
-        return [
-          {
-            ...parent,
-            isParent: true
-          },
-          ...parent.children
-        ]
+        if (parent?.children?.length) {
+          return [
+            {
+              ...parent,
+              isParent: true
+            },
+            ...parent.children
+          ]
+        }
       }
     }
 
     return categories.filter(item => !item.parentId)
-  }, [categories, pathname, params])
+  }, [categories, params.slug, categoryMap, isCatalog])
 
   useLayoutEffect(() => {
     const measureContainer = measureRef.current
@@ -141,49 +153,63 @@ export const CategoryGrid = ({ categories, className }: CategoryGridProps) => {
     return () => observer.disconnect()
   }, [itemsToRender])
 
-  if (!pathname || !(pathname === '/' || pathname.startsWith('/catalog')) || !itemsToRender.length) {
+  if (!pathname || !(pathname === '/' || isCatalog) || !itemsToRender.length) {
     return null
   }
 
   const isCalculated = visibleCount !== null
 
-  const visibleItems = isCalculated ? itemsToRender.slice(0, visibleCount!) : itemsToRender
+  const visibleItems = visibleCount === null ? itemsToRender : itemsToRender.slice(0, visibleCount)
 
   const hiddenCount = itemsToRender.length - visibleItems.length
 
   return (
-    <Container className={className}>
-      <div ref={measureRef} className='pointer-events-none invisible absolute flex flex-wrap gap-2'>
-        {itemsToRender.map(item => (
-          <div key={item.id}>
-            <CategoryItem category={item} />
-          </div>
-        ))}
-      </div>
+    <div className={className}>
+      <Container>
+        <div ref={measureRef} className='pointer-events-none invisible absolute flex flex-wrap gap-2'>
+          {itemsToRender.map(item => (
+            <div key={item.id}>
+              <CategoryItem
+                category={{
+                  ...item,
+                  isSelected: item.fullPath === params.slug?.join('/')
+                }}
+                href={getCategoryHref(item)}
+              />
+            </div>
+          ))}
+        </div>
 
-      <div
-        ref={containerRef}
-        className={cn(
-          'flex w-full flex-wrap gap-2 transition-opacity duration-150',
-          !isCalculated ? 'opacity-0' : 'opacity-100'
-        )}
-      >
-        {visibleItems.map(item => (
-          <div key={item.id}>
-            <CategoryItem category={item} />
-          </div>
-        ))}
+        <div
+          ref={containerRef}
+          className={cn(
+            'flex w-full flex-wrap gap-2 transition-opacity duration-150',
+            !isCalculated ? 'opacity-0' : 'opacity-100'
+          )}
+        >
+          {visibleItems.map(item => (
+            <div key={item.id}>
+              <CategoryItem
+                category={{
+                  ...item,
+                  isSelected: item.fullPath === params.slug?.join('/')
+                }}
+                href={getCategoryHref(item)}
+              />
+            </div>
+          ))}
 
-        {hiddenCount > 0 && (
-          <button
-            onClick={() => onOpen()}
-            className='hover:text-primary flex items-center gap-1 px-2.5 py-2 text-sm transition-colors'
-          >
-            Все категории
-            <ChevronRight size={15} />
-          </button>
-        )}
-      </div>
-    </Container>
+          {hiddenCount > 0 && (
+            <button
+              onClick={() => onOpen()}
+              className='hover:text-primary flex items-center gap-1 px-2.5 py-2 text-sm transition-colors'
+            >
+              Все категории
+              <ChevronRight size={15} />
+            </button>
+          )}
+        </div>
+      </Container>
+    </div>
   )
 }

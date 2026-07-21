@@ -6,6 +6,8 @@ import { useMemo } from 'react'
 import { AdCard } from '@/components/features/ads/components'
 import { Skeleton } from '@/components/ui'
 
+import { cn } from '@/lib/utils'
+
 import { CategoryTitle } from '../../categories/components/category-title'
 import { useCategories } from '../../categories/hooks/use-categories'
 import { ICategory } from '../../categories/types'
@@ -30,7 +32,12 @@ const findIdBySlug = (categories: ICategory[], slug?: string | null): string | u
   return
 }
 
-export function AdsClient({ serverSlug }: { serverSlug?: string | null }) {
+interface AdsClientProps {
+  serverSlug?: string | null
+  className?: string
+}
+
+export function AdsClient({ serverSlug, className }: AdsClientProps) {
   const searchParams = useSearchParams()
 
   const { categories, isLoadingCategories } = useCategories()
@@ -51,7 +58,7 @@ export function AdsClient({ serverSlug }: { serverSlug?: string | null }) {
 
   if (isLoadingCategories || isLoadingAds) {
     return (
-      <div className='grid grid-cols-5 gap-6'>
+      <div className={cn(className, 'grid grid-cols-5 gap-6')}>
         {Array.from({ length: SKELETON_COUNT }).map((_, i) => (
           <Skeleton key={i} className='h-82 rounded-lg' />
         ))}
@@ -66,7 +73,7 @@ export function AdsClient({ serverSlug }: { serverSlug?: string | null }) {
   return (
     <div>
       <CategoryTitle categories={categories} className='mt-4 mb-6' />
-      <div className='grid grid-cols-5 gap-6'>
+      <div className={cn('grid grid-cols-5 gap-6', className)}>
         {ads.map(ad => (
           <AdCard key={ad.id} ad={ad} />
         ))}

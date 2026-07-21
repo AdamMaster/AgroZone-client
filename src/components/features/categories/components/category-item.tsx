@@ -1,7 +1,7 @@
 'use client'
 
 import { ChevronLeft } from 'lucide-react'
-import { useParams, useRouter } from 'next/navigation'
+import Link from 'next/link'
 
 import { cn } from '@/lib/utils'
 
@@ -10,41 +10,25 @@ import { ICategory } from '../types/categories.types'
 interface CategoryItemProps {
   category: ICategory & {
     isParent?: boolean
+    isSelected?: boolean
   }
+  href: string
+  onClick?: () => void
 }
 
-export const CategoryItem = ({ category }: CategoryItemProps) => {
-  const router = useRouter()
-  const params = useParams()
-
-  const currentCategorySlug = Array.isArray(params.slug) ? params.slug.join('/') : params.slug || null
-
-  const isSelected = currentCategorySlug === category.slug
-
-  const onClick = () => {
-    if (category.isParent) {
-      router.push('/catalog', { scroll: false })
-      return
-    }
-
-    if (isSelected) {
-      router.push('/catalog', { scroll: false })
-    } else {
-      router.push(`/catalog/${category.slug}`, { scroll: false })
-    }
-  }
-
+export const CategoryItem = ({ category, href, onClick }: CategoryItemProps) => {
   return (
-    <button
-      className={cn(
-        'flex items-center gap-1 rounded-lg px-2.5 py-2 text-sm transition-colors',
-        isSelected ? 'bg-secondary border-secondary! text-white' : 'bg-gray-100 hover:bg-gray-200',
-        category.isParent && 'border-primary hover:bg-primary-foreground bg-primary text-white'
-      )}
+    <Link
+      href={href}
       onClick={onClick}
+      className={cn(
+        'flex items-center gap-1 rounded-lg bg-gray-100 px-2.5 py-2 text-sm transition-colors hover:bg-gray-200',
+        category.isSelected && 'bg-secondary text-white',
+        category.isParent && 'bg-primary hover:bg-primary-foreground text-white'
+      )}
     >
       {category.isParent && <ChevronLeft size={16} />}
       {category.name}
-    </button>
+    </Link>
   )
 }

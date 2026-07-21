@@ -1,10 +1,9 @@
 'use client'
 
 import { useCategoriesModal } from '@/store'
-import { ChevronRight } from 'lucide-react'
 import Link from 'next/link'
-import { useParams, usePathname } from 'next/navigation'
-import { useEffect, useMemo, useState } from 'react'
+import { useParams } from 'next/navigation'
+import { useMemo, useState } from 'react'
 
 import { Heading } from '@/components/ui'
 
@@ -12,125 +11,113 @@ import { cn } from '@/lib/utils'
 
 import { useCategories } from '../hooks/use-categories'
 import { ICategory } from '../types'
+import { buildCategoryMap } from '../utils/category-utils'
 
 export const CategoryList = () => {
   const { categories } = useCategories()
   const { onClose } = useCategoriesModal()
 
-  const pathname = usePathname()
-  const params = useParams()
+  const [expandedCategories, setExpandedCategories] = useState<(string | number)[]>([])
 
-  const parentCategory = useMemo(() => {
-    if (!categories?.length) return null
+  const params = useParams<{
+    slug?: string[]
+  }>()
 
-    const slugArray = params?.slug as string[] | undefined
+  const categoryMap = useMemo(() => {
+    if (!categories?.length) return new Map()
 
-    if (!slugArray?.length) return null
+    return buildCategoryMap(categories)
+  }, [categories])
 
-    const currentSlug = slugArray[slugArray.length - 1]
+  const currentCategoryData = useMemo(() => {
+    const fullPath = params.slug?.join('/')
 
-    const currentCategory = categories.find(item => item.slug === currentSlug)
+    if (!fullPath) return null
 
-    if (currentCategory && !currentCategory.parentId) {
-      return currentCategory
+    return categoryMap.get(fullPath) ?? null
+  }, [categoryMap, params.slug])
+
+  const targetCategoryData = useMemo(() => {
+    if (!currentCategoryData) return null
+
+    const { category, parent } = currentCategoryData
+
+    if (category.children?.length) {
+      return category
     }
 
-    // если текущая категория второго/третьего уровня
-    return categories.find(item => item.children?.some(child => child.slug === currentSlug)) ?? null
-  }, [categories, params])
+    // Если нет детей, фоллбэчимся на родителя
+    return parent ?? category
+  }, [currentCategoryData])
 
-  const items = useMemo(() => {
-    if (!categories?.length) return []
+  const currentCategory = currentCategoryData?.category
 
-    const slugArray = params?.slug as string[] | undefined
-
-    if (pathname.startsWith('/catalog') && slugArray?.length) {
-      const currentSlug = slugArray[slugArray.length - 1]
-
-      const category = categories.find(item => item.slug === currentSlug)
-
-      if (category?.children?.length) {
-        return category.children
-      }
-
-      const parent = categories.find(item => item.children?.some(child => child.slug === currentSlug))
-
-      if (parent?.children?.length) {
-        return parent.children
-      }
+  const items = useMemo<ICategory[]>(() => {
+    if (targetCategoryData) {
+      return targetCategoryData.children ?? []
     }
 
-    return categories.filter(item => !item.parentId)
-  }, [categories, pathname, params, parent])
+    return categories.filter(category => !category.parentId)
+  }, [categories, targetCategoryData])
 
-  const [activeCategoryId, setActiveCategoryId] = useState<string | number | null>(null)
+  const toggleExpanded = (id: string | number) => {
+    setExpandedCategories(prev => (prev.includes(id) ? prev.filter(categoryId => categoryId !== id) : [...prev, id]))
+  }
 
-  const activeCategory = useMemo(() => {
-    return items.find(item => item.id === activeCategoryId) ?? items[0]
-  }, [items, activeCategoryId])
-
-  const onClickArrow = (item: ICategory) => {}
+  const handleClose = () => {
+    onClose()
+  }
 
   return (
-    <div className='flex h-full max-h-[75vh] flex-col'>
-      <Heading level={2} className='mb-4 text-xl font-bold'>
-        {parentCategory?.name}
+    <div className='flex h-full flex-col'>
+      <Heading level={2} className='mb-6 text-xl font-bold'>
+        {targetCategoryData?.name ?? 'Все категории'}
       </Heading>
 
-      <div className='mx-[-16px] grid grid-cols-[380px_1fr] gap-6 overflow-hidden'>
-        <div className='custom-scrollbar max-h-[60vh] space-y-1 overflow-y-auto pr-2'>
-          {items.map(item => {
-            const isActive = item.id === activeCategory?.id
-            const hasChildren = item.children && item.children.length > 0
+      <div className='custom-scrollbar flex-1 columns-3 overflow-y-auto pr-3'>
+        {items.map(category => {
+          const children = category.children ?? []
 
-            return (
-              <div key={item.id} onMouseEnter={() => setActiveCategoryId(item.id)} className={cn('relative')}>
-                <Link
-                  href={`/catalog/${item.slug}`}
-                  className={cn(
-                    'relative flex w-full gap-3 rounded-lg px-4 py-3 pr-8 text-left text-[15px] font-medium transition-colors',
-                    isActive ? 'bg-gray-100' : ''
-                  )}
-                  onClick={() => onClose()}
-                >
-                  {item.name}
-                </Link>
-                {hasChildren && (
-                  <button className='absolute top-3.5 right-2' onClick={() => setActiveCategoryId(item.id)}>
-                    <ChevronRight className='size-4' />
+          const isExpanded = expandedCategories.includes(category.id)
+
+          const visibleChildren = isExpanded ? children : children.slice(0, 5)
+
+          return (
+            <div key={category.id} className='flex break-inside-avoid-column flex-col pb-4'>
+              <Link
+                href={`/catalog/${category.fullPath}`}
+                onClick={handleClose}
+                className={cn('hover:text-primary text-[15px]', !targetCategoryData && 'pb-0.5 font-bold')}
+              >
+                {category.name}
+                &nbsp;&nbsp;›
+              </Link>
+
+              <div>
+                {visibleChildren.map(child => (
+                  <Link
+                    key={child.id}
+                    href={`/catalog/${child.fullPath}`}
+                    onClick={handleClose}
+                    className='hover:text-primary block py-1 text-[13px]'
+                  >
+                    {child.name}
+                  </Link>
+                ))}
+
+                {children.length > 5 && (
+                  <button
+                    type='button'
+                    onClick={() => toggleExpanded(category.id)}
+                    className='hover:text-primary block text-[13px] text-gray-500 transition-colors'
+                  >
+                    {isExpanded ? 'Скрыть' : `Ещё ${children.length - 5}`}
                   </button>
                 )}
               </div>
-            )
-          })}
-        </div>
-
-        <div className='custom-scrollbar max-h-[60vh] overflow-y-auto border-gray-100'>
-          {activeCategory && (
-            <div className='space-y-4'>
-              <Heading level={5} className='font-bold'>
-                {activeCategory.name}
-              </Heading>
-
-              {activeCategory.children && activeCategory.children.length > 0 ? (
-                <div className='columns-2'>
-                  {activeCategory.children.map(child => (
-                    <Link
-                      key={child.id}
-                      href={`/catalog/${child.slug}`}
-                      className='hover:text-primary block border-b border-transparent py-1.5 text-[15px] text-gray-600 transition-colors'
-                      onClick={() => onClose()}
-                    >
-                      {child.name}
-                    </Link>
-                  ))}
-                </div>
-              ) : (
-                <div className='text-[15px] text-gray-500'>В этой категории нет подкатегорий</div>
-              )}
             </div>
-          )}
-        </div>
+          )
+        })}
       </div>
     </div>
   )
