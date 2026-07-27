@@ -1,6 +1,6 @@
 'use client'
 
-import { ChevronRight, Search, X } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Search, X } from 'lucide-react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { useState } from 'react'
 
@@ -117,13 +117,15 @@ export const SearchBar = ({ className }: SearchBarProps) => {
                   }}
                   className='flex cursor-pointer items-center gap-3 px-4 py-3 text-sm transition-colors hover:bg-gray-50'
                 >
-                  {item.type === 'category' ? (
-                    <ChevronRight className='size-5 shrink-0' />
-                  ) : (
-                    <Search className='size-4 shrink-0' />
-                  )}
+                  {item.type !== 'category' && <Search className='size-4 shrink-0' />}
 
-                  <span>{item.name}</span>
+                  <div className='flex items-center gap-1'>
+                    <span className='font-medium'>{item.name}</span>
+                    <ChevronRight className='size-4 shrink-0 text-gray-500' />
+                    {item.type === 'category' && item.parentName && (
+                      <span className='text-gray-500'>{item.parentName}</span>
+                    )}
+                  </div>
                 </li>
               ))}
             </ul>

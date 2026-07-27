@@ -23,7 +23,7 @@ export const CategoryItem = ({ category, href, onClick }: CategoryItemProps) => 
       onClick={onClick}
       className={cn(
         'flex items-center gap-1 rounded-lg bg-gray-100 px-2.5 py-2 text-sm transition-colors hover:bg-gray-200',
-        category.isSelected && 'bg-secondary text-white',
+        category.isSelected && 'bg-secondary hover:bg-secondary-foreground text-white',
         category.isParent && 'bg-primary hover:bg-primary-foreground text-white'
       )}
     >

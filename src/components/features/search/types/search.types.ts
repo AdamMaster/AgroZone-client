@@ -5,5 +5,6 @@ export interface SearchSuggestion {
   type: SearchSuggestionType
   rawName: string
   name: string
+  parentName: string
   url: string
 }

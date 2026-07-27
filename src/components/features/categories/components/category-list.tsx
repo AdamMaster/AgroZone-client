@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import { useMemo, useState } from 'react'
 
-import { Heading } from '@/components/ui'
+import { Heading, ScrollArea } from '@/components/ui'
 
 import { cn } from '@/lib/utils'
 
@@ -68,57 +68,64 @@ export const CategoryList = () => {
     onClose()
   }
 
+  const hasAnyChildren = useMemo(() => {
+    return items.some(category => category.children && category.children.length > 0)
+  }, [items])
+
   return (
     <div className='flex h-full flex-col'>
       <Heading level={2} className='mb-6 text-xl font-bold'>
         {targetCategoryData?.name ?? 'Все категории'}
       </Heading>
 
-      <div className='custom-scrollbar flex-1 columns-3 overflow-y-auto pr-3'>
-        {items.map(category => {
-          const children = category.children ?? []
+      <ScrollArea>
+        <div className='flex-1 columns-3'>
+          {items.map(category => {
+            const children = category.children ?? []
+            const isExpanded = expandedCategories.includes(category.id)
+            const visibleChildren = isExpanded ? children : children.slice(0, 5)
 
-          const isExpanded = expandedCategories.includes(category.id)
-
-          const visibleChildren = isExpanded ? children : children.slice(0, 5)
-
-          return (
-            <div key={category.id} className='flex break-inside-avoid-column flex-col pb-4'>
-              <Link
-                href={`/catalog/${category.fullPath}`}
-                onClick={handleClose}
-                className={cn('hover:text-primary text-[15px]', !targetCategoryData && 'pb-0.5 font-bold')}
+            return (
+              <div
+                key={category.id}
+                className={cn('flex break-inside-avoid-column flex-col', hasAnyChildren ? 'pb-4' : 'pb-3')}
               >
-                {category.name}
-                &nbsp;&nbsp;›
-              </Link>
+                <Link
+                  href={`/catalog/${category.fullPath}`}
+                  onClick={handleClose}
+                  className={cn('hover:text-primary text-[15px]', hasAnyChildren ? 'pb-0.5 font-bold' : '')}
+                >
+                  {category.name}
+                  &nbsp;&nbsp;›
+                </Link>
 
-              <div>
-                {visibleChildren.map(child => (
-                  <Link
-                    key={child.id}
-                    href={`/catalog/${child.fullPath}`}
-                    onClick={handleClose}
-                    className='hover:text-primary block py-1 text-[13px]'
-                  >
-                    {child.name}
-                  </Link>
-                ))}
+                <div>
+                  {visibleChildren.map(child => (
+                    <Link
+                      key={child.id}
+                      href={`/catalog/${child.fullPath}`}
+                      onClick={handleClose}
+                      className='hover:text-primary block py-1 text-[13px]'
+                    >
+                      {child.name}
+                    </Link>
+                  ))}
 
-                {children.length > 5 && (
-                  <button
-                    type='button'
-                    onClick={() => toggleExpanded(category.id)}
-                    className='hover:text-primary block text-[13px] text-gray-500 transition-colors'
-                  >
-                    {isExpanded ? 'Скрыть' : `Ещё ${children.length - 5}`}
-                  </button>
-                )}
+                  {children.length > 5 && (
+                    <button
+                      type='button'
+                      onClick={() => toggleExpanded(category.id)}
+                      className='hover:text-primary block text-[13px] text-gray-500 transition-colors'
+                    >
+                      {isExpanded ? 'Скрыть' : `Ещё ${children.length - 5}`}
+                    </button>
+                  )}
+                </div>
               </div>
-            </div>
-          )
-        })}
-      </div>
+            )
+          })}
+        </div>
+      </ScrollArea>
     </div>
   )
 }
