@@ -84,7 +84,7 @@ export const CategoryMenu = () => {
     <div ref={menuRef} className='fixed top-[var(--header-height)] left-0 z-50 w-full pb-6'>
       <div className='custom-shadow h-full bg-white'>
         <Container>
-          <div className='mx-[-16px] grid h-full max-w-7xl grid-cols-[300px_1fr] overflow-hidden'>
+          <div className='mx-[-16px] grid h-full max-w-7xl grid-cols-[340px_1fr] overflow-hidden'>
             <div className='relative flex flex-col overflow-y-auto py-6'>
               {isLoadingCategories ? (
                 <Loading />
@@ -97,11 +97,14 @@ export const CategoryMenu = () => {
                       key={category.id}
                       onMouseEnter={() => setActiveCategoryId(category.id)}
                       className={[
-                        'relative flex w-full gap-3 rounded-lg px-4 py-3 pr-8 text-left text-[15px] font-medium transition-colors',
+                        'relative flex w-full gap-3 rounded-lg px-4 py-3 pr-8 text-left text-[15px] font-medium',
                         isActive ? 'bg-gray-100' : ''
                       ].join(' ')}
                     >
-                      <CategoryIcon name={category.iconId ? category.iconId : ''} className='text-primary size-5' />
+                      <CategoryIcon
+                        name={category.iconId ? category.iconId : ''}
+                        className='text-primary size-5 min-w-5'
+                      />
                       <span>{category.name}</span>
 
                       <ChevronRight className='absolute top-3.5 right-2 size-4' />

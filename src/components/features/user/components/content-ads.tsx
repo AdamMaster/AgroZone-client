@@ -14,13 +14,13 @@ export const ContentAds = () => {
   if (isLoading)
     return (
       <div className='m max-w-[800px]'>
-        <Heading level={2} className='mb-4'>
+        <Heading level={2} className='mb-6'>
           Мои объявления
         </Heading>
         <div className='mb-4 flex gap-2'>
-          <Skeleton className='h-10 w-[150px] rounded-lg' />
-          <Skeleton className='h-10 w-[150px] rounded-lg' />
-          <Skeleton className='h-10 w-[150px] rounded-lg' />
+          <Skeleton className='h-12 w-[150px] rounded-lg' />
+          <Skeleton className='h-12 w-[150px] rounded-lg' />
+          <Skeleton className='h-12 w-[150px] rounded-lg' />
         </div>
         <div className='grid grid-cols-1 gap-6'>
           <AdShortCardSkeleton />

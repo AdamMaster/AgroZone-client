@@ -1,6 +1,6 @@
 'use client'
 
-import { useAuthModal } from '@/store'
+import { useAppModal } from '@/store'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Eye, EyeOff, OctagonAlert } from 'lucide-react'
 import { useState } from 'react'
@@ -20,7 +20,7 @@ import { UserFormWrapper } from './user-form-wrapper'
 export const FormEmailChange = () => {
   const { user } = useProfile()
   const [showPassword, setShowPassword] = useState(false)
-  const { onOpen, onClose, setView } = useAuthModal()
+  const { onOpen, onClose, setView } = useAppModal()
 
   const form = useForm<TypeEmailChangeShema>({
     resolver: zodResolver(EmailChangeShema),

@@ -1,6 +1,6 @@
 'use client'
 
-import { useAuthModal } from '@/store'
+import { useAppModal } from '@/store'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Eye, EyeOff } from 'lucide-react'
 import { useRouter } from 'next/navigation'
@@ -27,7 +27,7 @@ import {
 import { AuthFormWrapper } from './auth-form-wrapper'
 
 export const FormRegisterSms = () => {
-  const { setView, onOpen, onClose } = useAuthModal()
+  const { setView, onOpen, onClose } = useAppModal()
   const [step, setStep] = useState(1)
   const [regData, setRegData] = useState({ phone: '', code: '' })
   const [showPassword, setShowPassword] = useState(false)

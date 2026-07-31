@@ -15,6 +15,7 @@ export const AdCreate = ({ categories }: { categories: ICategory[] }) => {
   const router = useRouter()
 
   const onSubmit = (values: TypeCreateAdSchema) => {
+    console.log('✅ Данные валидны, отправка:', values)
     const formData = buildAdFormData(values)
 
     values.images?.forEach(file => {

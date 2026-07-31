@@ -1,6 +1,6 @@
 import { Metadata } from 'next'
 
-import { AdsClient } from '@/components/features/ads/components'
+import { AdsClient, CatalogContent } from '@/components/features/ads/components'
 import { categoriesService } from '@/components/features/categories/services'
 import { ICategory } from '@/components/features/categories/types/categories.types'
 import { Container } from '@/components/layout'
@@ -50,7 +50,7 @@ export default async function CatalogPage({ params }: Props) {
 
   return (
     <Container>
-      <AdsClient serverSlug={slugPath} />
+      <CatalogContent serverSlug={slugPath} />
     </Container>
   )
 }

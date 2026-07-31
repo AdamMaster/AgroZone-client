@@ -1,6 +1,6 @@
 'use client'
 
-import { useAuthModal } from '@/store'
+import { useAppModal } from '@/store'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Eye, EyeOff } from 'lucide-react'
 import { useState } from 'react'
@@ -43,7 +43,7 @@ export const NewPasswordForm = () => {
     }
   }
 
-  const { onOpen } = useAuthModal()
+  const { onOpen } = useAppModal()
 
   const [showPassword, setShowPassword] = useState(false)
 

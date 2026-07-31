@@ -30,7 +30,7 @@ export const DynamicField = ({ feature, control }: DynamicFieldProps) => {
       render={({ field, fieldState }) => (
         <Field data-invalid={fieldState.invalid} className='group mb-4' isInvalid={fieldState.invalid}>
           <InputGroup>
-            <Label>{feature.label}</Label>
+            {feature.type !== 'BOOLEAN' && <Label>{feature.label}</Label>}
 
             {feature.type === 'SELECT' ? (
               <Select
@@ -50,17 +50,44 @@ export const DynamicField = ({ feature, control }: DynamicFieldProps) => {
                   ))}
                 </SelectContent>
               </Select>
-            ) : feature.type === 'BOOLEAN' ? (
-              <div className='flex items-center gap-2'>
-                <Checkbox checked={!!field.value} onCheckedChange={field.onChange} />
-                <label className='text-sm'>{feature.label}</label>
+            ) : feature.type === 'MULTI_SELECT' ? (
+              <div className='flex flex-wrap gap-2'>
+                {feature.options?.map(option => {
+                  const values: string[] = field.value ?? []
+                  const checked = values.includes(option)
+
+                  return (
+                    <button
+                      key={option}
+                      type='button'
+                      onClick={() => {
+                        if (checked) {
+                          field.onChange(values.filter(v => v !== option))
+                        } else {
+                          field.onChange([...values, option])
+                        }
+                      }}
+                      className={`rounded-full border px-4 py-2 text-sm transition-colors ${
+                        checked
+                          ? 'border-secondary bg-secondary text-white'
+                          : 'border-border bg-background hover:bg-muted'
+                      }`}
+                    >
+                      {option}
+                    </button>
+                  )
+                })}
               </div>
+            ) : feature.type === 'BOOLEAN' ? (
+              <label className='flex items-center gap-2'>
+                <Checkbox checked={!!field.value} onCheckedChange={field.onChange} className='size-5' />
+                <span className='text-sm'>{feature.label}</span>
+              </label>
             ) : (
               <Input
                 className='h-13'
                 {...field}
                 type={feature.type === 'NUMBER' ? 'number' : 'text'}
-                placeholder={feature.label}
                 value={field.value === null || field.value === undefined ? '' : String(field.value)}
                 onChange={e => {
                   const val = e.target.value

@@ -1,6 +1,6 @@
 'use client'
 
-import { useAuthModal } from '@/store'
+import { useAppModal } from '@/store'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useState } from 'react'
 import { useGoogleReCaptcha } from 'react-google-recaptcha-v3'
@@ -17,7 +17,7 @@ import { AuthFormWrapper } from './auth-form-wrapper'
 
 export const FormResetPassword = () => {
   const { executeRecaptcha } = useGoogleReCaptcha()
-  const { onOpen, setView } = useAuthModal()
+  const { onOpen, setView } = useAppModal()
 
   const form = useForm<TypeResetPasswordSchema>({
     resolver: zodResolver(ResetPasswordSchema),

@@ -2,9 +2,8 @@
 
 import { useAppModal } from '@/store'
 import { zodResolver } from '@hookform/resolvers/zod'
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
-import { toast } from 'sonner'
 
 import { Button, Field, FieldError, Input, Loading } from '@/components/ui'
 
@@ -13,43 +12,53 @@ import { formatPhoneNumber } from '@/shared/utils'
 import { cn } from '@/lib/utils'
 
 import { AuthFormWrapper } from '../../auth/components'
-import { usePhoneChangeMutation } from '../hooks'
-import { ChangePhoneCodeSchema, ChangePhoneSchema, TypeChangePhoneCodeSchema, TypeChangePhoneSchema } from '../schemes'
+import { useAddPhoneMutation } from '../../user/hooks'
+import { AddPhoneSchema, PhoneCodeSchema, TypeAddPhoneSchema, TypePhoneCodeSchema } from '../schemes'
 
-export const FormPhoneChange = ({ onSuccessComplete }: { onSuccessComplete?: () => void }) => {
+interface FormAddPhoneProps {
+  onSuccessComplete?: (phone: string) => void
+}
+
+export const FormAddPhone = ({ onSuccessComplete }: FormAddPhoneProps) => {
+  const { onClose } = useAppModal()
+
   const [step, setStep] = useState(1)
-  const [phoneData, setPhoneData] = useState({ phone: '' })
-  const { setView, onClose } = useAppModal()
+  const [phone, setPhone] = useState('')
 
-  const { requestPhone, isRequesting, confirmPhone, isConfirming } = usePhoneChangeMutation()
+  const { requestPhone, confirmPhone, isRequesting, isConfirming } = useAddPhoneMutation()
 
-  const formPhone = useForm<TypeChangePhoneSchema>({
-    resolver: zodResolver(ChangePhoneSchema),
-    defaultValues: { phone: '' }
+  const formPhone = useForm<TypeAddPhoneSchema>({
+    resolver: zodResolver(AddPhoneSchema),
+    defaultValues: {
+      phone: ''
+    }
   })
 
-  const formCode = useForm<TypeChangePhoneCodeSchema>({
-    resolver: zodResolver(ChangePhoneCodeSchema),
-    defaultValues: { code: '' }
+  const formCode = useForm<TypePhoneCodeSchema>({
+    resolver: zodResolver(PhoneCodeSchema),
+    defaultValues: {
+      code: ''
+    }
   })
 
-  const onPhoneSubmit = (data: TypeChangePhoneSchema) => {
+  const onPhoneSubmit = (data: TypeAddPhoneSchema) => {
     const cleanPhone = data.phone.replace(/\D/g, '')
 
     requestPhone(cleanPhone, {
       onSuccess: () => {
-        setPhoneData({ phone: cleanPhone })
+        setPhone(cleanPhone)
         setStep(2)
       }
     })
   }
 
-  const onCodeSubmit = (data: TypeChangePhoneCodeSchema) => {
+  const onCodeSubmit = (data: TypePhoneCodeSchema) => {
     confirmPhone(data.code, {
       onSuccess: () => {
+        onSuccessComplete?.(phone)
+
         formPhone.reset()
         formCode.reset()
-        if (onSuccessComplete) onSuccessComplete()
 
         onClose()
       }
@@ -59,13 +68,9 @@ export const FormPhoneChange = ({ onSuccessComplete }: { onSuccessComplete?: () 
   return (
     <AuthFormWrapper
       className='mx-auto w-full max-w-md'
-      heading='Смена номера'
+      heading='Добавление номера'
       isShowSocial={false}
-      description={
-        step === 1
-          ? 'Введите новый номер телефона для подтверждения'
-          : 'Введите 4-значный код, отправленный на новый номер'
-      }
+      description={step === 1 ? 'Укажите номер телефона для связи' : 'Введите код подтверждения из СМС'}
     >
       {step === 1 && (
         <form onSubmit={formPhone.handleSubmit(onPhoneSubmit)}>
@@ -81,14 +86,15 @@ export const FormPhoneChange = ({ onSuccessComplete }: { onSuccessComplete?: () 
                   placeholder='+7 (999) 999-99-99'
                   maxLength={18}
                   onChange={e => {
-                    const formatted = formatPhoneNumber(e.target.value)
-                    onChange(formatted)
+                    onChange(formatPhoneNumber(e.target.value))
                   }}
                 />
+
                 {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
               </Field>
             )}
           />
+
           <Button variant='secondary' size='lg' type='submit' className='mt-6 w-full' disabled={isRequesting}>
             {isRequesting ? 'Отправка...' : 'Получить код'}
           </Button>
@@ -102,15 +108,18 @@ export const FormPhoneChange = ({ onSuccessComplete }: { onSuccessComplete?: () 
             control={formCode.control}
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid} className={cn(fieldState.invalid && 'pb-5', 'group')}>
-                <Input {...field} placeholder='Код из СМС' maxLength={4} />
+                <Input {...field} maxLength={4} placeholder='Код из СМС' />
+
                 {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
               </Field>
             )}
           />
+
           <div className='mt-6 flex gap-3'>
             <Button variant='outline' size='lg' type='button' onClick={() => setStep(1)} disabled={isConfirming}>
               Назад
             </Button>
+
             <Button variant='secondary' size='lg' type='submit' className='flex-1' disabled={isConfirming}>
               {isConfirming ? 'Проверка...' : 'Подтвердить'}
             </Button>

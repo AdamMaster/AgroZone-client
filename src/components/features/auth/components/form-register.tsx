@@ -1,6 +1,6 @@
 'use client'
 
-import { useAuthModal } from '@/store'
+import { useAppModal } from '@/store'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Eye, EyeOff } from 'lucide-react'
 import React, { useState } from 'react'
@@ -17,7 +17,7 @@ import { RegisterSchema, TypeRegisterSchema } from '../schemes'
 import { AuthFormWrapper } from './auth-form-wrapper'
 
 export const FormRegister = () => {
-  const { onOpen, setView } = useAuthModal()
+  const { onOpen, setView } = useAppModal()
 
   const { executeRecaptcha } = useGoogleReCaptcha()
 

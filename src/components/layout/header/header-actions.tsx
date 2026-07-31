@@ -1,5 +1,6 @@
 'use client'
-import { useAuthModal } from '@/store'
+
+import { useAppModal } from '@/store'
 import { Bell, Heart, Layers, Lock, Plus } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
@@ -7,7 +8,6 @@ import React, { PropsWithChildren, ReactNode, useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
 import { UserButton } from '@/components/features/user/components'
-import { AuthModal } from '@/components/modals/auth'
 
 import { useProfile } from '@/shared/hooks'
 
@@ -16,7 +16,7 @@ interface Props {
 }
 
 export const HeaderActions: React.FC<Props> = () => {
-  const { onOpen } = useAuthModal()
+  const { onOpen } = useAppModal()
   const { user, isLoading } = useProfile()
 
   const searchParams = useSearchParams()

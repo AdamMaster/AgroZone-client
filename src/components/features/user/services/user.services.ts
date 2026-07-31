@@ -56,6 +56,30 @@ class UserServices {
 
     return response
   }
+
+  async addPhone(phone: string) {
+    const response = await api.post<{ success: boolean }>('users/profile/phones', {
+      phone
+    })
+
+    return response
+  }
+
+  async requestAddPhone(phone: string) {
+    const response = await api.post<{ success: boolean }>('users/profile/phones/request', {
+      newPhone: phone
+    })
+
+    return response
+  }
+
+  async confirmAddPhone(code: string) {
+    const response = await api.patch<{ success: boolean }>('users/profile/phones/confirm', {
+      code
+    })
+
+    return response
+  }
 }
 
 export const userServices = new UserServices()

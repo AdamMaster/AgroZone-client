@@ -71,7 +71,7 @@ export const CategoryCascader = ({ categories, form, onCategorySelect }: Categor
       <Command className={cn('overflow-initial relative mb-3 rounded-lg border', open ? 'focus-input' : 'border')}>
         <CommandInput
           className='p-0 placeholder:text-gray-500'
-          placeholder='Поиск категории...'
+          placeholder='Начните вводить название товара, например "Яблоки"'
           onFocus={() => setOpen(true)}
           onBlur={() => setTimeout(() => setOpen(false), 200)}
           onValueChange={val => {

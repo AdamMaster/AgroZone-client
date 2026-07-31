@@ -1,7 +1,8 @@
 'use client'
 
-import { useAuthModal } from '@/store'
+import { useAppModal } from '@/store'
 
+import { FormAddPhone } from '@/components/features/ads/components'
 import { StatusMessage } from '@/components/ui'
 import { Dialog, DialogContent } from '@/components/ui/dialog'
 
@@ -15,8 +16,8 @@ import {
   FormResetPassword
 } from '../../features'
 
-export const AuthModal = () => {
-  const { isOpen, view, onClose } = useAuthModal()
+export const AppModal = () => {
+  const { isOpen, view, props, onClose } = useAppModal()
 
   const renderContent = () => {
     switch (view) {
@@ -36,6 +37,8 @@ export const AuthModal = () => {
         return <FormEmailChange />
       case 'change-phone':
         return <FormPhoneChange />
+      case 'add-phone':
+        return <FormAddPhone {...props} />
       case 'code-message':
         return (
           <StatusMessage heading='Проверьте почту' text='На вашу почту была отправлена ссылка для подтверждения.' />

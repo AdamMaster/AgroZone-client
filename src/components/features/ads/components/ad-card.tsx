@@ -56,3 +56,7 @@ export const AdCard = ({ ad }: AdCardProps) => {
     </article>
   )
 }
+
+AdCard.Skeleton = function AdCardSkeleton() {
+  return <div></div>
+}

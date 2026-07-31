@@ -27,7 +27,8 @@ export interface IUser {
   createdAt: string
   updatedAt: string
   email?: string
-  phone?: string
+  phones: IUserPhone[]
+  primaryPhone?: string | null
   password: string
   displayName?: string
   picture?: string
@@ -37,6 +38,15 @@ export interface IUser {
   method: AuthMethod
   accounts: IAccount[]
   maxUploadLimit: number
+}
+
+export interface IUserPhone {
+  id: string
+  phone: string
+  isPrimary: boolean
+  isVerified: boolean
+  createdAt?: string
+  updatedAt?: string
 }
 
 export type AuthProvider = 'google' | 'yandex'

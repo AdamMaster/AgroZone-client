@@ -42,7 +42,11 @@ export const CategoryTitle = ({ categories, className }: CategoryTitleProps) => 
   }, [categories, params])
 
   if (!currentCategory) {
-    return null
+    return (
+      <Heading level={2} className={className}>
+        Объявления
+      </Heading>
+    )
   }
 
   return (

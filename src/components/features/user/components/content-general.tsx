@@ -1,6 +1,6 @@
 'use client'
 
-import { useAuthModal } from '@/store'
+import { useAppModal } from '@/store'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { CameraIcon } from 'lucide-react'
 import { ChangeEvent } from 'react'
@@ -25,6 +25,7 @@ import {
 } from '@/components/ui'
 
 import { useProfile } from '@/shared/hooks'
+import { formatPhoneNumber, getPrimaryPhone } from '@/shared/utils'
 
 import { cn } from '@/lib/utils'
 
@@ -34,14 +35,12 @@ import { SettingsSchema, TypeSettingsSchema } from '../schemes'
 
 export const ContentGeneral = () => {
   const { user, isLoading } = useProfile()
-  const { onOpen } = useAuthModal()
+  const { onOpen } = useAppModal()
 
   const form = useForm<TypeSettingsSchema>({
     resolver: zodResolver(SettingsSchema),
     values: {
-      name: user?.displayName || '',
-      email: user?.email || '',
-      phone: user?.phone || ''
+      name: user?.displayName || ''
     }
   })
 
@@ -106,67 +105,63 @@ export const ContentGeneral = () => {
       <div className='relative'>
         <form id='form-rhf-demo' onSubmit={form.handleSubmit(onSubmit)}>
           <FieldGroup className='flex flex-col gap-5'>
-            <Controller
-              name='name'
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid} className={cn(fieldState.invalid && 'pb-5', 'group')}>
-                  <Label>Имя</Label>
-                  {isLoading ? (
-                    <Skeleton className='rounded-1 h-10 w-full' />
-                  ) : (
-                    <Input {...field} type='name' placeholder='Имя' />
-                  )}
-                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                </Field>
-              )}
-            />
-            <Controller
-              name='email'
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid} className={cn(fieldState.invalid && 'pb-5', 'group')}>
-                  <Label>Почта</Label>
-                  {isLoading ? (
-                    <Skeleton className='rounded-1 h-10 w-full' />
-                  ) : (
-                    <div className='relative'>
-                      <Input {...field} type='email' placeholder='Почта' readOnly />
+            <div className='mb-4 flex items-end gap-3'>
+              <Controller
+                name='name'
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid} className={cn('group')}>
+                    <Label>Имя</Label>
+                    {isLoading ? (
+                      <Skeleton className='rounded-1 h-10 w-full' />
+                    ) : (
+                      <Input {...field} type='name' placeholder='Имя' />
+                    )}
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} className='absolute -bottom-5 left-0' />
+                    )}
+                  </Field>
+                )}
+              />
+              <Button variant='secondary' size='lg' type='submit' className='h-10 w-fit'>
+                Сохранить
+              </Button>
+            </div>
+            <Field>
+              <Label>Почта</Label>
+              {isLoading ? (
+                <Skeleton className='rounded-1 h-10 w-full' />
+              ) : (
+                <div className='relative'>
+                  <Input type='email' value={user?.email || ''} placeholder='Почта' readOnly />
 
-                      <FieldButton onClick={() => onOpen('change-email')}>
-                        {user?.email ? 'Изменить' : 'Добавить почту'}
-                      </FieldButton>
-                    </div>
-                  )}
-                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                </Field>
+                  <FieldButton onClick={() => onOpen('change-email')}>
+                    {user?.email ? 'Изменить' : 'Добавить почту'}
+                  </FieldButton>
+                </div>
               )}
-            />
-            <Controller
-              name='phone'
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid} className={cn(fieldState.invalid && 'pb-5', 'group')}>
-                  <Label>Номер телефона</Label>
-                  {isLoading ? (
-                    <Skeleton className='rounded-1 h-10 w-full' />
-                  ) : (
-                    <div className='relative'>
-                      <Input {...field} type='tel' placeholder='Номер телефона' readOnly />
-                      <FieldButton onClick={() => onOpen('change-phone')}>
-                        {user?.phone ? 'Изменить' : 'Добавить телефон'}
-                      </FieldButton>
-                    </div>
-                  )}
-                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                </Field>
+            </Field>
+            <Field>
+              <Label>Номер телефона</Label>
+
+              {isLoading ? (
+                <Skeleton className='rounded-1 h-10 w-full' />
+              ) : (
+                <div className='relative'>
+                  <Input
+                    type='tel'
+                    value={formatPhoneNumber(user?.primaryPhone || '')}
+                    placeholder='Номер телефона'
+                    readOnly
+                  />
+
+                  <FieldButton onClick={() => onOpen('change-phone')}>
+                    {user?.primaryPhone ? 'Изменить' : 'Добавить телефон'}
+                  </FieldButton>
+                </div>
               )}
-            />
+            </Field>
           </FieldGroup>
-          <Button variant='secondary' size='lg' type='submit' className='mt-8 w-full'>
-            Сохранить
-          </Button>
-          {/* {isLoadingRegister && <Loading />} */}
         </form>
         {isLoadingUpdate && <Loading />}
       </div>

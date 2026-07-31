@@ -3,7 +3,7 @@
 import { useCategoriesModal } from '@/store'
 import { ChevronRight } from 'lucide-react'
 import { useParams, usePathname } from 'next/navigation'
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import { useLayoutEffect, useMemo, useRef, useState } from 'react'
 
 import { Container } from '@/components/layout'
 
@@ -168,15 +168,14 @@ export const CategoryGrid = ({ categories, className }: CategoryGridProps) => {
       <Container>
         <div ref={measureRef} className='pointer-events-none invisible absolute flex flex-wrap gap-2'>
           {itemsToRender.map(item => (
-            <div key={item.id}>
-              <CategoryItem
-                category={{
-                  ...item,
-                  isSelected: item.fullPath === params.slug?.join('/')
-                }}
-                href={getCategoryHref(item)}
-              />
-            </div>
+            <CategoryItem
+              key={item.id}
+              category={{
+                ...item,
+                isSelected: item.fullPath === params.slug?.join('/')
+              }}
+              href={getCategoryHref(item)}
+            />
           ))}
         </div>
 
@@ -188,15 +187,14 @@ export const CategoryGrid = ({ categories, className }: CategoryGridProps) => {
           )}
         >
           {visibleItems.map(item => (
-            <div key={item.id}>
-              <CategoryItem
-                category={{
-                  ...item,
-                  isSelected: item.fullPath === params.slug?.join('/')
-                }}
-                href={getCategoryHref(item)}
-              />
-            </div>
+            <CategoryItem
+              key={item.id}
+              category={{
+                ...item,
+                isSelected: item.fullPath === params.slug?.join('/')
+              }}
+              href={getCategoryHref(item)}
+            />
           ))}
 
           {hiddenCount > 0 && (

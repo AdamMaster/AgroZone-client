@@ -1,6 +1,6 @@
 'use client'
 
-import { useAdStore } from '@/store'
+import { useAdStore, useAppModal } from '@/store'
 import { zodResolver } from '@hookform/resolvers/zod'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
@@ -12,6 +12,7 @@ import {
   Button,
   ButtonBack,
   Field,
+  FieldButton,
   FieldError,
   FieldGroup,
   Heading,
@@ -23,7 +24,7 @@ import {
 import { Textarea } from '@/components/ui/textarea'
 
 import { useProfile } from '@/shared/hooks'
-import { findCategoryById, getPathToCategory } from '@/shared/utils'
+import { findCategoryById, formatPhoneNumber, getPathToCategory } from '@/shared/utils'
 
 import { CreateAdSchema, TypeCreateAdSchema } from '../schemes'
 import { ICategory, ICategoryFeature } from '../types/ad.types'
@@ -62,21 +63,31 @@ export const AdForm = ({
   const title = isEdit ? 'Редактирование объявления' : 'Новое объявление'
   const submitButtonText = isEdit ? 'Сохранить' : 'Опубликовать'
   const isPremium = user?.role === 'PREMIUM'
+  const { onOpen } = useAppModal()
+  const [selectedPhone, setSelectedPhone] = useState<string | null>(null)
 
   const form = useForm<TypeCreateAdSchema>({
     resolver: zodResolver(CreateAdSchema),
-    defaultValues: initialData || {
+    defaultValues: {
       title: '',
       images: [],
       price: undefined,
       address: '',
       lat: 0,
       lng: 0,
+      phone: '',
       description: '',
       categoryId: '',
-      categoryFeatures: {}
+      categoryFeatures: {},
+      ...initialData
     }
   })
+
+  useEffect(() => {
+    if (!initialData?.phone && user?.primaryPhone && !form.getValues('phone')) {
+      form.setValue('phone', formatPhoneNumber(user.primaryPhone))
+    }
+  }, [user, initialData, form])
 
   const handleBack = () => {
     setStep(1)
@@ -111,6 +122,8 @@ export const AdForm = ({
       setCategoryPath(pathNames)
     }
   }, [isEdit, initialData, categories, setCategoryPath])
+
+  console.log(user?.phones)
 
   return (
     <div className='relative'>
@@ -216,6 +229,41 @@ export const AdForm = ({
                       form.setValue('lng', geoData.lng)
                     }}
                   />
+                )}
+              />
+              <Controller
+                name='phone'
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid} isInvalid={fieldState.invalid}>
+                    <InputGroup>
+                      <Label>Номер телефона</Label>
+
+                      <div className='relative w-full'>
+                        <Input
+                          className='h-13'
+                          {...field}
+                          value={field.value ?? ''}
+                          type='tel'
+                          readOnly
+                          placeholder='+7 (999) 999-99-99'
+                        />
+                        <FieldButton
+                          onClick={() =>
+                            onOpen('add-phone', {
+                              onSuccessComplete: (phone: string) => {
+                                form.setValue('phone', formatPhoneNumber(phone))
+                              }
+                            })
+                          }
+                        >
+                          {user?.primaryPhone && 'Использовать другой номер'}
+                        </FieldButton>
+                      </div>
+                    </InputGroup>
+
+                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                  </Field>
                 )}
               />
               {features.map(f => (

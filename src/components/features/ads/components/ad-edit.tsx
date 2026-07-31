@@ -2,6 +2,8 @@
 
 import { Loading } from '@/components/ui'
 
+import { formatPhoneNumber } from '@/shared/utils'
+
 import { useMyAd, useUpdateAd } from '../hooks'
 import { TypeCreateAdSchema } from '../schemes'
 import { ICategory, ICategoryFeature } from '../types/ad.types'
@@ -27,6 +29,7 @@ export const AdEdit = ({ id, categories }: AdEditProps) => {
     address: ad.address,
     lat: ad.lat,
     lng: ad.lng,
+    phone: formatPhoneNumber(ad.phone),
     images: ad.images,
     categoryFeatures: (ad.features as ICategoryFeature) || {}
   }

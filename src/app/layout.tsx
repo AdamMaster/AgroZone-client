@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 
-import { AuthModal } from '@/components/modals/auth'
+import { AppModal } from '@/components/modals/app'
 import { CategoriesModal } from '@/components/modals/categories'
 import { MainProvider } from '@/components/providers'
 
@@ -39,7 +39,7 @@ export default function RootLayout({
       <body className={cn('flex min-h-full flex-col font-sans text-gray-900')}>
         <MainProvider>
           {children}
-          <AuthModal />
+          <AppModal />
           <CategoriesModal />
         </MainProvider>
       </body>

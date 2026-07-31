@@ -1,6 +1,6 @@
 'use client'
 
-import { useAuthModal } from '@/store'
+import { useAppModal } from '@/store'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
@@ -20,7 +20,7 @@ export const FormPasswordChange = () => {
   const { user, isLoading } = useProfile()
   const isOAuthOnly = user?.password === null
   const [showPassword, setShowPassword] = useState(false)
-  const { setView } = useAuthModal()
+  const { setView } = useAppModal()
 
   const form = useForm<TypePasswordChangeSchema>({
     resolver: zodResolver(PasswordChangeSchema),

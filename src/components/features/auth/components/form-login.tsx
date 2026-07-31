@@ -1,6 +1,6 @@
 'use client'
 
-import { useAuthModal } from '@/store'
+import { useAppModal } from '@/store'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Eye, EyeOff } from 'lucide-react'
 import { useState } from 'react'
@@ -23,7 +23,7 @@ interface LoginFormProps {
 export const FormLogin = ({ isShowSocial = true }: LoginFormProps) => {
   const [showPassword, setShowPassword] = useState(false)
   const [isShowTwoFactor, setIsShowTwoFactor] = useState(false)
-  const { onOpen, onClose } = useAuthModal()
+  const { onOpen, onClose } = useAppModal()
 
   const { executeRecaptcha } = useGoogleReCaptcha()
 

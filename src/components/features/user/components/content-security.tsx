@@ -1,7 +1,6 @@
 'use client'
 
-import { useAuthModal } from '@/store'
-import { Controller } from 'react-hook-form'
+import { useAppModal } from '@/store'
 
 import {
   Button,
@@ -24,7 +23,7 @@ import { useTwoFactorMutation } from '../hooks/use-two-factor-mutation'
 
 export const ContentSecurity = () => {
   const { user, isLoading } = useProfile()
-  const { onOpen, onClose, setView } = useAuthModal()
+  const { onOpen, onClose, setView } = useAppModal()
   const { toggle2fa, isToggleLoading } = useTwoFactorMutation()
 
   return (

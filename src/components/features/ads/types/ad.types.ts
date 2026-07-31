@@ -3,7 +3,7 @@ export interface ICategoryFeature {
   categoryId: string
   name: string
   label: string
-  type: 'TEXT' | 'NUMBER' | 'SELECT' | 'BOOLEAN'
+  type: 'TEXT' | 'NUMBER' | 'SELECT' | 'MULTI_SELECT' | 'BOOLEAN'
   options?: string[]
   createdAt: Date
   updatedAt: Date
@@ -24,6 +24,12 @@ export interface ICategory {
   children?: ICategory[]
 }
 
+export interface IAdUser {
+  id: string
+  phone?: string | null
+  displayName: string
+}
+
 export interface IAd {
   id: string
   title: string
@@ -31,6 +37,7 @@ export interface IAd {
   price: number | null
   unit?: string
   address: string
+  phone: string
   images: string[]
   status: 'DRAFT' | 'PENDING' | 'PUBLISHED' | 'REJECTED' | 'ARCHIVED' | 'EXPIRED'
   expiresAt: Date | null
@@ -41,6 +48,7 @@ export interface IAd {
   createdAt: Date
   updatedAt: Date
   userId: string
+  user?: IAdUser
   categoryId: string
   category?: {
     id: string
@@ -64,3 +72,7 @@ export interface IUpdateAdDto {
 }
 
 export type AdCardData = Pick<IAd, 'id' | 'title' | 'price' | 'images' | 'address' | 'createdAt' | 'isFavorite'>
+export type AdCardListData = Pick<
+  IAd,
+  'id' | 'title' | 'description' | 'price' | 'images' | 'address' | 'createdAt' | 'isFavorite' | 'user'
+>
