@@ -123,8 +123,6 @@ export const AdForm = ({
     }
   }, [isEdit, initialData, categories, setCategoryPath])
 
-  console.log(user?.phones)
-
   return (
     <div className='relative'>
       {step > 1 && (
@@ -251,13 +249,14 @@ export const AdForm = ({
                         <FieldButton
                           onClick={() =>
                             onOpen('add-phone', {
+                              phones: user?.phones,
                               onSuccessComplete: (phone: string) => {
                                 form.setValue('phone', formatPhoneNumber(phone))
                               }
                             })
                           }
                         >
-                          {user?.primaryPhone && 'Использовать другой номер'}
+                          {user?.phones?.length ? 'Использовать другой номер' : 'Добавить номер'}
                         </FieldButton>
                       </div>
                     </InputGroup>
