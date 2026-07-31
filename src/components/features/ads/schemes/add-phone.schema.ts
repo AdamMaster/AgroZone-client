@@ -7,6 +7,6 @@ export const AddPhoneSchema = z.object({
 export type TypeAddPhoneSchema = z.infer<typeof AddPhoneSchema>
 
 export const PhoneCodeSchema = z.object({
-  code: z.string().length(4, { message: 'Код должен состоять из 4 цифр' })
+  code: z.string().length(6, { message: 'Код должен состоять из 6 цифр' })
 })
 export type TypePhoneCodeSchema = z.infer<typeof PhoneCodeSchema>

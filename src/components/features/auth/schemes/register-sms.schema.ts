@@ -8,7 +8,7 @@ export const RegisterSmsPhoneSchema = z.object({
     .regex(/^\+7 \(\d{3}\) \d{3}-\d{2}-\d{2}$/, 'Некорректный формат телефона')
 })
 export const RegisterSmsCodeSchema = z.object({
-  code: z.string().length(4, 'Код должен быть из 4 цифр')
+  code: z.string().length(6, 'Код должен быть из 6 цифр')
 })
 
 export const RegisterSmsFinalSchema = z
