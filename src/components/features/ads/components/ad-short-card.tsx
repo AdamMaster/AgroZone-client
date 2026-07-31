@@ -100,18 +100,16 @@ export const AdShortCard = ({ ad }: { ad: IAd }) => {
       </div>
 
       <div className='flex w-48 flex-col gap-2'>
-        {ad.status === 'DRAFT' ||
-          (ad.status === 'ARCHIVED' && (
-            <Button variant='outline' onClick={() => handlePublished()} disabled={isLoadingActivate}>
-              Опубликовать
-            </Button>
-          ))}
-        {ad.status === 'PUBLISHED' && <Button variant='outline'>Поднять просмотры</Button>}
-        {ad.status === 'DRAFT' && (
+        {/* Раньше здесь было `ad.status === 'DRAFT' || (ad.status === 'ARCHIVED' && <Button/>)` —
+            из-за приоритета операторов это схлопывалось в boolean и не рендерило кнопку для DRAFT
+            (она появлялась только благодаря отдельному дублирующему блоку ниже). Явное условие
+            для обоих статусов сразу — надёжнее и без дублирования. */}
+        {(ad.status === 'DRAFT' || ad.status === 'ARCHIVED') && (
           <Button variant='outline' onClick={() => handlePublished()} disabled={isLoadingActivate}>
             Опубликовать
           </Button>
         )}
+        {ad.status === 'PUBLISHED' && <Button variant='outline'>Поднять просмотры</Button>}
         {ad.status === 'EXPIRED' && (
           <Button variant='outline' onClick={() => handleRepublish()} disabled={isLoadingRepublishAd}>
             Опубликовать снова
