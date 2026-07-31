@@ -165,7 +165,7 @@ export const FormRegisterSms = () => {
             control={formCode.control}
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid} className={cn(fieldState.invalid && 'pb-5', 'group')}>
-                <Input {...field} placeholder='Код из СМС' maxLength={6} />
+                <Input {...field} placeholder='Код из СМС (6 цифр)' maxLength={6} />
                 {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
               </Field>
             )}

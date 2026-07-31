@@ -155,7 +155,14 @@ export const ContentGeneral = () => {
                     readOnly
                   />
 
-                  <FieldButton onClick={() => onOpen('change-phone')}>
+                  <FieldButton
+                    onClick={() =>
+                      onOpen('add-phone', {
+                        phones: user?.phones,
+                        mode: 'profile'
+                      })
+                    }
+                  >
                     {user?.primaryPhone ? 'Изменить' : 'Добавить телефон'}
                   </FieldButton>
                 </div>

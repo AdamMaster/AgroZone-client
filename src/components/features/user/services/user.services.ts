@@ -41,30 +41,6 @@ class UserServices {
     return response
   }
 
-  async requestPhoneChange(newPhone: string) {
-    const response = await api.post<{ success: boolean }>('users/profile/change-phone/request', {
-      newPhone
-    })
-
-    return response
-  }
-
-  async confirmPhoneChange(code: string) {
-    const response = await api.patch<{ success: boolean }>('users/profile/change-phone/confirm', {
-      code
-    })
-
-    return response
-  }
-
-  async addPhone(phone: string) {
-    const response = await api.post<{ success: boolean }>('users/profile/phones', {
-      phone
-    })
-
-    return response
-  }
-
   async requestAddPhone(phone: string) {
     const response = await api.post<{ success: boolean }>('users/profile/phones/request', {
       newPhone: phone
@@ -73,9 +49,20 @@ class UserServices {
     return response
   }
 
-  async confirmAddPhone(code: string) {
+  async confirmAddPhone(code: string, makePrimary?: boolean) {
     const response = await api.patch<{ success: boolean }>('users/profile/phones/confirm', {
-      code
+      code,
+      makePrimary
+    })
+
+    return response
+  }
+
+  // Переключение основного номера среди уже подтверждённых номеров
+  // аккаунта — без смс, номер уже подтверждён раньше.
+  async setPrimaryPhone(phone: string) {
+    const response = await api.patch<{ success: boolean }>('users/profile/phones/primary', {
+      phone
     })
 
     return response

@@ -33,11 +33,18 @@ interface FormAddPhoneProps {
   // выбрать один из них, а не сразу вести пользователя через ввод номера
   // и SMS-код (этот номер уже подтверждён, повторно подтверждать не нужно).
   phones?: IUserPhone[]
+  // 'ad' (по умолчанию) — выбор/добавление номера для конкретного
+  // объявления, ничего в аккаунте не меняется. 'profile' — эта же форма,
+  // открытая со страницы профиля: там выбор/добавление номера должно
+  // реально становиться основным номером аккаунта, иначе поле "Номер
+  // телефона" в профиле не обновится.
+  mode?: 'ad' | 'profile'
 }
 
-export const FormAddPhone = ({ onSuccessComplete, phones = [] }: FormAddPhoneProps) => {
+export const FormAddPhone = ({ onSuccessComplete, phones = [], mode = 'ad' }: FormAddPhoneProps) => {
   const { onClose } = useAppModal()
 
+  const isProfileMode = mode === 'profile'
   const hasExistingPhones = phones.length > 0
 
   // step 0 — выбор из уже привязанных номеров (только если они есть)
@@ -50,7 +57,8 @@ export const FormAddPhone = ({ onSuccessComplete, phones = [] }: FormAddPhonePro
     phones.find(p => p.isPrimary)?.phone ?? phones[0]?.phone ?? null
   )
 
-  const { requestPhone, confirmPhone, isRequesting, isConfirming } = useAddPhoneMutation()
+  const { requestPhone, confirmPhone, isRequesting, isConfirming, setPrimaryPhone, isSettingPrimary } =
+    useAddPhoneMutation()
 
   const formPhone = useForm<TypeAddPhoneSchema>({
     resolver: zodResolver(AddPhoneSchema),
@@ -69,9 +77,22 @@ export const FormAddPhone = ({ onSuccessComplete, phones = [] }: FormAddPhonePro
   const onUseExistingPhone = () => {
     if (!selectedPhone) return
 
-    // Уже подтверждённый номер — просто отдаём его наверх и закрываем
-    // модалку, без единого запроса к серверу. Основным он не становится:
-    // мы вообще не трогаем его статус, только используем для объявления.
+    if (isProfileMode) {
+      // Переключаем основной номер аккаунта на уже подтверждённый номер.
+      // Без смс — владение уже доказано при первом добавлении номера.
+      setPrimaryPhone(selectedPhone, {
+        onSuccess: () => {
+          onSuccessComplete?.(selectedPhone)
+          onClose()
+        }
+      })
+      return
+    }
+
+    // Контекст объявления: уже подтверждённый номер просто отдаём наверх
+    // и закрываем модалку, без единого запроса к серверу. Основным он не
+    // становится — мы вообще не трогаем его статус, только используем для
+    // объявления.
     onSuccessComplete?.(selectedPhone)
     onClose()
   }
@@ -88,19 +109,22 @@ export const FormAddPhone = ({ onSuccessComplete, phones = [] }: FormAddPhonePro
   }
 
   const onCodeSubmit = (data: TypePhoneCodeSchema) => {
-    confirmPhone(data.code, {
-      onSuccess: () => {
-        onSuccessComplete?.(phone)
+    confirmPhone(
+      { code: data.code, makePrimary: isProfileMode },
+      {
+        onSuccess: () => {
+          onSuccessComplete?.(phone)
 
-        formPhone.reset()
-        formCode.reset()
+          formPhone.reset()
+          formCode.reset()
 
-        onClose()
+          onClose()
+        }
       }
-    })
+    )
   }
 
-  const heading = step === 0 ? 'Номер для связи' : 'Добавление номера'
+  const heading = isProfileMode ? 'Смена номера' : step === 0 ? 'Номер для связи' : 'Добавление номера'
   const description =
     step === 0
       ? 'Выберите один из привязанных номеров или укажите новый'
@@ -108,26 +132,15 @@ export const FormAddPhone = ({ onSuccessComplete, phones = [] }: FormAddPhonePro
         ? 'Укажите номер телефона для связи'
         : 'Введите код подтверждения из СМС'
 
+  const isBusy = isRequesting || isConfirming || isSettingPrimary
+
   return (
     <AuthFormWrapper className='mx-auto w-full max-w-md' heading={heading} isShowSocial={false} description={description}>
       {step === 0 && (
         <div className='flex flex-col gap-4'>
           <Select value={selectedPhone} onValueChange={setSelectedPhone}>
             <SelectTrigger className='h-13! w-full px-4'>
-              {/* Select.Value по умолчанию показывает "сырое" value выбранного
-                  Item (у нас это чистые цифры номера из базы), а не его
-                  отформатированный текст (children) — из-за этого после
-                  выбора номера в триггере отображались нечитаемые цифры
-                  вместо "+7 (999) 999-99-99". Явно форматируем значение. */}
-              <SelectValue placeholder='Выберите номер'>
-                {(value: string | null) => {
-                  if (!value) return null
-
-                  const phone = phones.find(p => p.phone === value)
-
-                  return `${formatPhoneNumber(value)}${phone?.isPrimary ? ' (основной)' : ''}`
-                }}
-              </SelectValue>
+              <SelectValue placeholder='Выберите номер' />
             </SelectTrigger>
             <SelectContent alignItemWithTrigger={false} align='start'>
               {phones.map(p => (
@@ -144,10 +157,10 @@ export const FormAddPhone = ({ onSuccessComplete, phones = [] }: FormAddPhonePro
             size='lg'
             type='button'
             className='w-full'
-            disabled={!selectedPhone}
+            disabled={!selectedPhone || isBusy}
             onClick={onUseExistingPhone}
           >
-            Использовать этот номер
+            {isProfileMode ? 'Сделать основным' : 'Использовать этот номер'}
           </Button>
 
           <button
@@ -204,7 +217,7 @@ export const FormAddPhone = ({ onSuccessComplete, phones = [] }: FormAddPhonePro
             control={formCode.control}
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid} className={cn(fieldState.invalid && 'pb-5', 'group')}>
-                <Input {...field} maxLength={4} placeholder='Код из СМС' />
+                <Input {...field} maxLength={6} placeholder='Код из СМС' />
 
                 {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
               </Field>
@@ -223,7 +236,7 @@ export const FormAddPhone = ({ onSuccessComplete, phones = [] }: FormAddPhonePro
         </form>
       )}
 
-      {(isRequesting || isConfirming) && <Loading />}
+      {isBusy && <Loading />}
     </AuthFormWrapper>
   )
 }

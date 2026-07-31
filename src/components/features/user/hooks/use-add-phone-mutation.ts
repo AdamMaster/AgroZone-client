@@ -22,7 +22,8 @@ export function useAddPhoneMutation() {
   })
 
   const { mutate: confirmPhone, isPending: isConfirming } = useMutation({
-    mutationFn: (code: string) => userServices.confirmAddPhone(code),
+    mutationFn: ({ code, makePrimary }: { code: string; makePrimary?: boolean }) =>
+      userServices.confirmAddPhone(code, makePrimary),
 
     onSuccess: () => {
       toast.success('Номер телефона добавлен')
@@ -34,7 +35,33 @@ export function useAddPhoneMutation() {
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
-      const message = error.response?.data?.message || 'Неверный код подтверждения'
+      // FetchClient кидает FetchError с плоским полем message (текст из
+      // JSON-ответа сервера), а не error.response.data.message — из-за
+      // этой неверной проверки реальная причина ошибки (например,
+      // "Неверный код или срок его действия истек") подменялась общей
+      // заглушкой, и понять, что на самом деле не так, было невозможно.
+      const message = error.message || 'Неверный код подтверждения'
+
+      toast.error(message)
+    }
+  })
+
+  // Переключить основной номер аккаунта на уже подтверждённый номер —
+  // используется только при открытии этой же формы со страницы профиля.
+  const { mutate: setPrimaryPhone, isPending: isSettingPrimary } = useMutation({
+    mutationFn: (phone: string) => userServices.setPrimaryPhone(phone),
+
+    onSuccess: () => {
+      toast.success('Основной номер изменён')
+
+      queryClient.invalidateQueries({
+        queryKey: ['profile']
+      })
+    },
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    onError: (error: any) => {
+      const message = error.message || 'Не удалось изменить основной номер'
 
       toast.error(message)
     }
@@ -44,6 +71,8 @@ export function useAddPhoneMutation() {
     requestPhone,
     isRequesting,
     confirmPhone,
-    isConfirming
+    isConfirming,
+    setPrimaryPhone,
+    isSettingPrimary
   }
 }

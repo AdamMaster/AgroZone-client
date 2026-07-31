@@ -9,7 +9,6 @@ type ModalView =
   | 'code-message'
   | 'change-email'
   | 'change-email-message'
-  | 'change-phone'
   | 'add-phone'
   | 'register-message'
   | 'register-sms-message'

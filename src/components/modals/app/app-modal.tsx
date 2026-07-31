@@ -10,7 +10,6 @@ import {
   FormEmailChange,
   FormLogin,
   FormPasswordChange,
-  FormPhoneChange,
   FormRegister,
   FormRegisterSms,
   FormResetPassword
@@ -35,8 +34,6 @@ export const AppModal = () => {
         return <FormPasswordChange />
       case 'change-email':
         return <FormEmailChange />
-      case 'change-phone':
-        return <FormPhoneChange />
       case 'add-phone':
         return <FormAddPhone {...props} />
       case 'code-message':
