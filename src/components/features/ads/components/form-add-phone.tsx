@@ -22,22 +22,14 @@ import { formatPhoneNumber } from '@/shared/utils'
 
 import { cn } from '@/lib/utils'
 
-import { IUserPhone } from '../../auth/types'
 import { AuthFormWrapper } from '../../auth/components'
+import { IUserPhone } from '../../auth/types'
 import { useAddPhoneMutation } from '../../user/hooks'
 import { AddPhoneSchema, PhoneCodeSchema, TypeAddPhoneSchema, TypePhoneCodeSchema } from '../schemes'
 
 interface FormAddPhoneProps {
   onSuccessComplete?: (phone: string) => void
-  // Уже привязанные к аккаунту номера. Если они есть — сначала предлагаем
-  // выбрать один из них, а не сразу вести пользователя через ввод номера
-  // и SMS-код (этот номер уже подтверждён, повторно подтверждать не нужно).
   phones?: IUserPhone[]
-  // 'ad' (по умолчанию) — выбор/добавление номера для конкретного
-  // объявления, ничего в аккаунте не меняется. 'profile' — эта же форма,
-  // открытая со страницы профиля: там выбор/добавление номера должно
-  // реально становиться основным номером аккаунта, иначе поле "Номер
-  // телефона" в профиле не обновится.
   mode?: 'ad' | 'profile'
 }
 
@@ -47,9 +39,6 @@ export const FormAddPhone = ({ onSuccessComplete, phones = [], mode = 'ad' }: Fo
   const isProfileMode = mode === 'profile'
   const hasExistingPhones = phones.length > 0
 
-  // step 0 — выбор из уже привязанных номеров (только если они есть)
-  // step 1 — ввод нового номера
-  // step 2 — код подтверждения из SMS
   const [step, setStep] = useState(hasExistingPhones ? 0 : 1)
   const [phone, setPhone] = useState('')
 
@@ -78,8 +67,6 @@ export const FormAddPhone = ({ onSuccessComplete, phones = [], mode = 'ad' }: Fo
     if (!selectedPhone) return
 
     if (isProfileMode) {
-      // Переключаем основной номер аккаунта на уже подтверждённый номер.
-      // Без смс — владение уже доказано при первом добавлении номера.
       setPrimaryPhone(selectedPhone, {
         onSuccess: () => {
           onSuccessComplete?.(selectedPhone)
@@ -89,10 +76,6 @@ export const FormAddPhone = ({ onSuccessComplete, phones = [], mode = 'ad' }: Fo
       return
     }
 
-    // Контекст объявления: уже подтверждённый номер просто отдаём наверх
-    // и закрываем модалку, без единого запроса к серверу. Основным он не
-    // становится — мы вообще не трогаем его статус, только используем для
-    // объявления.
     onSuccessComplete?.(selectedPhone)
     onClose()
   }
@@ -124,7 +107,7 @@ export const FormAddPhone = ({ onSuccessComplete, phones = [], mode = 'ad' }: Fo
     )
   }
 
-  const heading = isProfileMode ? 'Смена номера' : step === 0 ? 'Номер для связи' : 'Добавление номера'
+  const heading = isProfileMode ? 'Изменить номер' : step === 0 ? 'Номер для связи' : 'Добавление номера'
   const description =
     step === 0
       ? 'Выберите один из привязанных номеров или укажите новый'
@@ -135,7 +118,12 @@ export const FormAddPhone = ({ onSuccessComplete, phones = [], mode = 'ad' }: Fo
   const isBusy = isRequesting || isConfirming || isSettingPrimary
 
   return (
-    <AuthFormWrapper className='mx-auto w-full max-w-md' heading={heading} isShowSocial={false} description={description}>
+    <AuthFormWrapper
+      className='mx-auto w-full max-w-md'
+      heading={heading}
+      isShowSocial={false}
+      description={description}
+    >
       {step === 0 && (
         <div className='flex flex-col gap-4'>
           <Select value={selectedPhone} onValueChange={setSelectedPhone}>

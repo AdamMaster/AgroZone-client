@@ -65,9 +65,20 @@ class UserServices {
     return response
   }
 
-  async confirmAddPhone(code: string) {
+  async confirmAddPhone(code: string, makePrimary?: boolean) {
     const response = await api.patch<{ success: boolean }>('users/profile/phones/confirm', {
-      code
+      code,
+      makePrimary
+    })
+
+    return response
+  }
+
+  // Сделать уже добавленный и подтверждённый номер основным — без SMS,
+  // повторного подтверждения не требуется.
+  async setPrimaryPhone(phone: string) {
+    const response = await api.patch<{ success: boolean }>('users/profile/phones/primary', {
+      phone
     })
 
     return response

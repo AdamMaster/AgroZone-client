@@ -152,12 +152,12 @@ export const ContentGeneral = () => {
                     // Без этого в триггере показывался бы сырой enum-value
                     // ('INDIVIDUAL') вместо 'Частное лицо'.
                     <Select items={USER_TYPE_LABELS} value={field.value} onValueChange={field.onChange}>
-                      <SelectTrigger className='w-full'>
+                      <SelectTrigger className='w-full px-4'>
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent alignItemWithTrigger={false} align='start'>
                         {USER_TYPE_OPTIONS.map(option => (
-                          <SelectItem key={option.value} value={option.value}>
+                          <SelectItem key={option.value} value={option.value} className='rounded-none px-4'>
                             {option.label}
                           </SelectItem>
                         ))}
@@ -196,14 +196,7 @@ export const ContentGeneral = () => {
                     readOnly
                   />
 
-                  <FieldButton
-                    onClick={() =>
-                      onOpen('add-phone', {
-                        phones: user?.phones,
-                        mode: 'profile'
-                      })
-                    }
-                  >
+                  <FieldButton onClick={() => onOpen('add-phone', { phones: user?.phones ?? [], mode: 'profile' })}>
                     {user?.primaryPhone ? 'Изменить' : 'Добавить телефон'}
                   </FieldButton>
                 </div>
