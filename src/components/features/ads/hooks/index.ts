@@ -1,6 +1,7 @@
 export * from './use-create-ad'
 export * from './use-my-ads'
 export * from './use-my-ad'
+export * from './use-ad'
 export * from './use-update-ad'
 export * from './use-remove-ad'
 export * from './use-reject-ad'

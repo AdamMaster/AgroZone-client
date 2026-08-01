@@ -1,15 +1,41 @@
-import { useAdStore } from '@/store'
 import { ChevronRight } from 'lucide-react'
+import Link from 'next/link'
 
-export const CategoryBreadcrumbs = () => {
-  const { categoryPath } = useAdStore()
+import { cn } from '@/lib/utils'
 
+// Универсальные хлебные крошки — принимают готовый массив пунктов, ничего
+// сами не знают про источник данных. Раньше был жёстко завязан на
+// useAdStore (стейт формы создания объявления), из-за чего его нельзя было
+// переиспользовать там, где категория приходит не из стора (например, на
+// публичной странице объявления).
+//
+// `href` у пункта опциональный: там, где кликать некуда или не нужно
+// (например, в форме создания объявления — крошки там просто показывают
+// текущий выбор, а не ведут по каталогу), можно передать пункты без href,
+// и они отрендерятся обычным текстом.
+export interface CategoryBreadcrumbItem {
+  name: string
+  href?: string
+}
+
+interface CategoryBreadcrumbsProps {
+  items: CategoryBreadcrumbItem[]
+  className?: string
+}
+
+export const CategoryBreadcrumbs = ({ items, className }: CategoryBreadcrumbsProps) => {
   return (
-    <div className='flex items-center text-sm text-gray-500'>
-      {categoryPath.map((item, index) => (
-        <div key={index} className='flex items-center gap-0.5'>
-          <span>{item}</span>
-          {index < categoryPath.length - 1 && <ChevronRight size={14} />}
+    <div className={cn('flex items-center text-sm text-gray-500', className)}>
+      {items.map((item, index) => (
+        <div key={index} className='flex items-center'>
+          {item.href ? (
+            <Link href={item.href} className='hover:text-primary'>
+              {item.name}
+            </Link>
+          ) : (
+            <span>{item.name}</span>
+          )}
+          {index < items.length - 1 && <ChevronRight size={14} />}
         </div>
       ))}
     </div>

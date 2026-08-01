@@ -58,6 +58,7 @@ export const AdForm = ({
   const [features, setFeatures] = useState<ICategoryFeature[]>([])
   const [step, setStep] = useState(isEdit ? 2 : 1)
   const { user } = useProfile()
+  const categoryPath = useAdStore(state => state.categoryPath)
   const setCategoryPath = useAdStore(state => state.setCategoryPath)
   const router = useRouter()
   const title = isEdit ? 'Редактирование объявления' : 'Новое объявление'
@@ -123,6 +124,8 @@ export const AdForm = ({
     }
   }, [isEdit, initialData, categories, setCategoryPath])
 
+  console.log(user?.phones)
+
   return (
     <div className='relative'>
       {step > 1 && (
@@ -141,7 +144,7 @@ export const AdForm = ({
 
       <div className='mb-6 flex flex-col gap-2'>
         <Heading level={1}>{title}</Heading>
-        {step > 1 && <CategoryBreadcrumbs />}
+        {step > 1 && <CategoryBreadcrumbs items={categoryPath.map(name => ({ name }))} />}
         {rejectionReason && <RejectionReason className='mt-2' text={rejectionReason} />}
       </div>
 

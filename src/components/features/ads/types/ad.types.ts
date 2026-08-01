@@ -1,3 +1,5 @@
+import { UserType } from '../../auth/types'
+
 export interface ICategoryFeature {
   id: string
   categoryId: string
@@ -28,6 +30,16 @@ export interface IAdUser {
   id: string
   phone?: string | null
   displayName: string
+  picture?: string | null
+  createdAt?: Date
+  // Сколько ещё активных (опубликованных, не просроченных) объявлений есть
+  // у этого продавца, помимо текущего — отдаётся только в GET /ads/:id
+  // (публичная карточка объявления), поэтому опционально: в списках
+  // (findAll и т.п.) это поле не приходит.
+  adsCount?: number
+  // Частное лицо / ИП / компания — по той же причине опционально: приходит
+  // только с GET /ads/:id.
+  type?: UserType
 }
 
 export interface IAd {
@@ -53,6 +65,8 @@ export interface IAd {
   category?: {
     id: string
     name: string
+    slug?: string
+    fullPath?: string
   }
   rejectionReason?: string
   isFavorite?: boolean

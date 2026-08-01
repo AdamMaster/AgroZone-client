@@ -29,7 +29,7 @@ export const AdCard = ({ ad }: AdCardProps) => {
 
   return (
     <article className='flex flex-col gap-2'>
-      <Link href='#' className='relative block overflow-hidden rounded-xl bg-gray-100 pt-[100%]'>
+      <Link href={`/ads/${ad.id}`} className='relative block overflow-hidden rounded-xl bg-gray-100 pt-[100%]'>
         {ad.images.length > 0 ? (
           <Image src={ad.images[0]} alt={ad.title} className='h-full w-full object-cover mix-blend-darken' fill />
         ) : (
@@ -41,7 +41,7 @@ export const AdCard = ({ ad }: AdCardProps) => {
           level={2}
           className='hover:text-primary mb-0.5 line-clamp-2 w-fit text-[15px] leading-5 font-medium transition-colors'
         >
-          <Link href='#'>{ad.title}</Link>
+          <Link href={`/ads/${ad.id}`}>{ad.title}</Link>
         </Heading>
         <p>
           <strong>{ad.price ? ad.price + '₽' : 'Цена договорная'}</strong>

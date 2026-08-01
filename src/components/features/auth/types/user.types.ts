@@ -10,6 +10,14 @@ export enum AuthMethod {
   Yandex = 'YANDEX'
 }
 
+// Чисто информационная метка типа продавца на карточке объявления —
+// без привязанных к ней привилегий на площадке.
+export enum UserType {
+  Individual = 'INDIVIDUAL',
+  IndividualEntrepreneur = 'INDIVIDUAL_ENTREPRENEUR',
+  Business = 'BUSINESS'
+}
+
 export interface IAccount {
   id: string
   createdAt: string
@@ -38,6 +46,7 @@ export interface IUser {
   method: AuthMethod
   accounts: IAccount[]
   maxUploadLimit: number
+  type: UserType
 }
 
 export interface IUserPhone {

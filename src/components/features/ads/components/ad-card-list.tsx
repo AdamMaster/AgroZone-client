@@ -29,7 +29,7 @@ export const AdCardList = ({ ad }: AdCardListProps) => {
 
   return (
     <article className='relative before:absolute before:-inset-3 before:rounded-3xl before:bg-gray-100 before:opacity-0 before:content-[""] hover:before:opacity-100'>
-      <Link href='#' className='grid w-full grid-cols-[236px_1fr_236px] gap-4'>
+      <Link href={`/ads/${ad.id}`} className='grid w-full grid-cols-[236px_1fr_236px] gap-4'>
         <div>
           <div className='relative block w-59 max-w-59 overflow-hidden rounded-xl bg-gray-100 pt-[100%]'>
             {ad.images.length > 0 ? (

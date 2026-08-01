@@ -6,6 +6,7 @@ import { CameraIcon } from 'lucide-react'
 import { ChangeEvent } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 
+import { UserType } from '@/components/features/auth/types'
 import {
   Avatar,
   AvatarFallback,
@@ -20,10 +21,16 @@ import {
   Input,
   Label,
   Loading,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
   Skeleton,
   Switch
 } from '@/components/ui'
 
+import { USER_TYPE_LABELS, USER_TYPE_OPTIONS } from '@/shared/constants/user-types'
 import { useProfile } from '@/shared/hooks'
 import { formatPhoneNumber, getPrimaryPhone } from '@/shared/utils'
 
@@ -40,7 +47,10 @@ export const ContentGeneral = () => {
   const form = useForm<TypeSettingsSchema>({
     resolver: zodResolver(SettingsSchema),
     values: {
-      name: user?.displayName || ''
+      name: user?.displayName || '',
+      // INDIVIDUAL — тот же дефолт, что и в схеме БД (@default(INDIVIDUAL)),
+      // используется, только пока профиль ещё не загрузился.
+      type: user?.type || UserType.Individual
     }
   })
 
@@ -127,6 +137,37 @@ export const ContentGeneral = () => {
                 Сохранить
               </Button>
             </div>
+            <Controller
+              name='type'
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid} isInvalid={fieldState.invalid}>
+                  <Label>Тип продавца</Label>
+                  {isLoading ? (
+                    <Skeleton className='rounded-1 h-10 w-full' />
+                  ) : (
+                    // items — не просто данные для рендера пунктов, а способ для
+                    // Select.Value узнать подпись выбранного значения (сама
+                    // Popup-часть со SelectItem может быть ещё не смонтирована).
+                    // Без этого в триггере показывался бы сырой enum-value
+                    // ('INDIVIDUAL') вместо 'Частное лицо'.
+                    <Select items={USER_TYPE_LABELS} value={field.value} onValueChange={field.onChange}>
+                      <SelectTrigger className='w-full'>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent alignItemWithTrigger={false} align='start'>
+                        {USER_TYPE_OPTIONS.map(option => (
+                          <SelectItem key={option.value} value={option.value}>
+                            {option.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                </Field>
+              )}
+            />
             <Field>
               <Label>Почта</Label>
               {isLoading ? (

@@ -1,7 +1,6 @@
 import { api } from '@/shared/api'
 
-import { IAd } from '../types/ad.types'
-import { UpdateAdDto } from './../../../../../../server/src/ads/dto/update-ad.dto'
+import { IAd, IUpdateAdDto } from '../types/ad.types'
 
 class AdsService {
   private URL = 'ads'
@@ -29,7 +28,7 @@ class AdsService {
     return response
   }
 
-  async republish(id: string, data?: UpdateAdDto) {
+  async republish(id: string, data?: IUpdateAdDto) {
     const response = await api.patch(`${this.URL}/${id}/republish`, data || {})
     return response
   }
@@ -59,6 +58,13 @@ class AdsService {
 
   async findOneForOwner(id: string): Promise<IAd> {
     const response = await api.get<IAd>(`${this.URL}/my/${id}`)
+    return response
+  }
+
+  // Публичная карточка объявления — доступна без авторизации, сервер сам
+  // отдаёт 404, если объявление не опубликовано/просрочено/не существует.
+  async findOne(id: string): Promise<IAd> {
+    const response = await api.get<IAd>(`${this.URL}/${id}`)
     return response
   }
 

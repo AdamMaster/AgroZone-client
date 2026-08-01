@@ -48,10 +48,15 @@ export const AdShortCard = ({ ad }: { ad: IAd }) => {
     republishAd({ id: ad.id })
   }
 
+  // Публичная страница объявления отдаёт 404 для всего, кроме PUBLISHED —
+  // так что для черновиков/на модерации/архива/просроченных ведём сразу
+  // на редактирование, чтобы клик по карточке никогда не был мёртвым.
+  const detailHref = ad.status === 'PUBLISHED' ? `/ads/${ad.id}` : `/ads/${ad.id}/edit`
+
   return (
     <div className='flex gap-4'>
       <Link
-        href={'#'}
+        href={detailHref}
         className='relative flex h-30 w-40 flex-shrink-0 items-center justify-center overflow-hidden rounded-lg bg-slate-100'
       >
         {ad.images.length ? (
@@ -64,7 +69,7 @@ export const AdShortCard = ({ ad }: { ad: IAd }) => {
       <div className='flex flex-grow flex-col'>
         <div className='mb-1 flex gap-3'>
           <Heading level={4}>
-            <Link href={'#'} className='hover:text-primary'>
+            <Link href={detailHref} className='hover:text-primary'>
               {ad.title}
             </Link>
           </Heading>
@@ -100,16 +105,18 @@ export const AdShortCard = ({ ad }: { ad: IAd }) => {
       </div>
 
       <div className='flex w-48 flex-col gap-2'>
-        {/* Раньше здесь было `ad.status === 'DRAFT' || (ad.status === 'ARCHIVED' && <Button/>)` —
-            из-за приоритета операторов это схлопывалось в boolean и не рендерило кнопку для DRAFT
-            (она появлялась только благодаря отдельному дублирующему блоку ниже). Явное условие
-            для обоих статусов сразу — надёжнее и без дублирования. */}
-        {(ad.status === 'DRAFT' || ad.status === 'ARCHIVED') && (
+        {ad.status === 'DRAFT' ||
+          (ad.status === 'ARCHIVED' && (
+            <Button variant='outline' onClick={() => handlePublished()} disabled={isLoadingActivate}>
+              Опубликовать
+            </Button>
+          ))}
+        {ad.status === 'PUBLISHED' && <Button variant='outline'>Поднять просмотры</Button>}
+        {ad.status === 'DRAFT' && (
           <Button variant='outline' onClick={() => handlePublished()} disabled={isLoadingActivate}>
             Опубликовать
           </Button>
         )}
-        {ad.status === 'PUBLISHED' && <Button variant='outline'>Поднять просмотры</Button>}
         {ad.status === 'EXPIRED' && (
           <Button variant='outline' onClick={() => handleRepublish()} disabled={isLoadingRepublishAd}>
             Опубликовать снова
