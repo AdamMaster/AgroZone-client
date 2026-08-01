@@ -34,7 +34,7 @@ export const DynamicField = ({ feature, control }: DynamicFieldProps) => {
 
             {feature.type === 'SELECT' ? (
               <Select
-                onValueChange={val => {
+                onValueChange={(val: string | null) => {
                   field.onChange(val === 'none' ? null : val)
                 }}
                 value={field.value ? String(field.value) : null}

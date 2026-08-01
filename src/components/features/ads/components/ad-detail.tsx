@@ -143,7 +143,7 @@ export const AdDetail = ({ ad: initialAd, categoryFeatures = [], categoryPath = 
         {ad.title}
       </Heading>
 
-      <div className='mb-8 grid grid-cols-1 gap-10 lg:grid-cols-[1fr_360px]'>
+      <div className='mb-9 grid grid-cols-1 gap-10 lg:grid-cols-[1fr_360px]'>
         <div>
           {ad.images.length > 0 ? (
             <div
@@ -226,7 +226,7 @@ export const AdDetail = ({ ad: initialAd, categoryFeatures = [], categoryPath = 
             ) : (
               <div className='flex gap-1.5'>
                 <Button
-                  variant='default'
+                  variant='secondary'
                   size='lg'
                   className='grow px-8'
                   onClick={() => setIsPhoneRevealed(true)}
@@ -234,7 +234,7 @@ export const AdDetail = ({ ad: initialAd, categoryFeatures = [], categoryPath = 
                 >
                   {isPhoneRevealed ? formatPhoneNumber(ad.phone) : 'Показать телефон'}
                 </Button>
-                <Button size='lg' variant='secondary' className='px-8'>
+                <Button size='lg' variant='ghost' className='px-8'>
                   Написать
                 </Button>
               </div>
@@ -242,13 +242,13 @@ export const AdDetail = ({ ad: initialAd, categoryFeatures = [], categoryPath = 
           </div>
 
           <div className='mb-6 flex items-center gap-3'>
-            <Avatar size='lg'>
+            <Avatar className='size-14!'>
               <AvatarImage src={ad.user?.picture ?? undefined} />
               <AvatarFallback>{ad.user?.displayName?.[0]?.toUpperCase() ?? '?'}</AvatarFallback>
             </Avatar>
             <div>
               <div className='flex items-center gap-1.5'>
-                <p className='text-sm font-medium'>{ad.user?.displayName ?? 'Пользователь'}</p>
+                <p className='text-lg font-bold'>{ad.user?.displayName ?? 'Пользователь'}</p>
                 {ad.user?.type && (
                   <span className='rounded-full bg-gray-100 px-2 py-0.5 text-[11px] text-gray-600'>
                     {USER_TYPE_LABELS[ad.user.type]}
@@ -264,53 +264,58 @@ export const AdDetail = ({ ad: initialAd, categoryFeatures = [], categoryPath = 
               )}
             </div>
           </div>
-          <address className='mb-4 flex items-center gap-2 not-italic'>
-            <MapPin className='size-5 flex-shrink-0' />
-            {ad.address}
-          </address>
         </div>
       </div>
 
-      {ad.description && (
-        <div className='mb-8'>
-          <Heading level={4} className='mb-2'>
-            Описание
-          </Heading>
-          <p className='leading-6 whitespace-pre-wrap'>{ad.description}</p>
-        </div>
-      )}
-
-      {filledFeatures.length > 0 && (
+      <div className='flex flex-col gap-8'>
         <div>
-          <Heading level={4} className='mb-3'>
-            Характеристики
+          <Heading level={4} className='mb-2'>
+            Местоположение
           </Heading>
-          <dl className='grid grid-cols-1 gap-x-6 gap-y-2'>
-            {filledFeatures.map(({ feature, value }) => (
-              <div key={feature.id} className='flex gap-2'>
-                <dt className='text-gray-600'>{feature.label}</dt>:<dd className='text-right font-medium'>{value}</dd>
-              </div>
-            ))}
-          </dl>
+          <address className='flex items-center gap-2 not-italic'>{ad.address}</address>
         </div>
-      )}
 
-      {ad.images.length > 0 && (
-        <Lightbox
-          open={isLightboxOpen}
-          close={closeLightbox}
-          index={activeImage}
-          slides={slides}
-          plugins={[Zoom]}
-          on={{ view: ({ index }) => setActiveImage(index) }}
-          // Ограничиваем шириной именно область самого фото (slide), а не
-          // весь лайтбокс — фон/контейнер остаются на всю ширину экрана,
-          // просто на широких мониторах фото не растягивается до огромных
-          // размеров. Внутренний <img> уже скейлится через object-fit
-          // относительно slide, так что этого достаточно.
-          styles={{ slide: { maxWidth: 1280, margin: '0 auto' } }}
-        />
-      )}
+        {ad.description && (
+          <div>
+            <Heading level={4} className='mb-2'>
+              Описание
+            </Heading>
+            <p className='whitespace-pre-wrap'>{ad.description}</p>
+          </div>
+        )}
+
+        {filledFeatures.length > 0 && (
+          <div>
+            <Heading level={4} className='mb-2'>
+              Характеристики
+            </Heading>
+            <dl className='grid grid-cols-1 gap-x-6 gap-y-2'>
+              {filledFeatures.map(({ feature, value }) => (
+                <div key={feature.id} className='flex gap-2'>
+                  <dt className='text-gray-600'>{feature.label}</dt>:<dd className='text-right font-medium'>{value}</dd>
+                </div>
+              ))}
+            </dl>
+          </div>
+        )}
+
+        {ad.images.length > 0 && (
+          <Lightbox
+            open={isLightboxOpen}
+            close={closeLightbox}
+            index={activeImage}
+            slides={slides}
+            plugins={[Zoom]}
+            on={{ view: ({ index }) => setActiveImage(index) }}
+            // Ограничиваем шириной именно область самого фото (slide), а не
+            // весь лайтбокс — фон/контейнер остаются на всю ширину экрана,
+            // просто на широких мониторах фото не растягивается до огромных
+            // размеров. Внутренний <img> уже скейлится через object-fit
+            // относительно slide, так что этого достаточно.
+            styles={{ slide: { maxWidth: 1280, margin: '0 auto' } }}
+          />
+        )}
+      </div>
     </div>
   )
 }
