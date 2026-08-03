@@ -10,7 +10,8 @@ export const Header = () => {
     <header className='relative bg-white pb-2'>
       <div>
         <Container>
-          <div className='flex h-14 items-center justify-end gap-6 py-4'>
+          <div className='flex h-14 items-center justify-between gap-6 py-4'>
+            <p className='text-secondary text-sm leading-3'>Агропромышленная торговая площадка</p>
             <HeaderActions />
           </div>
         </Container>
