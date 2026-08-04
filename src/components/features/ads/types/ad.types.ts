@@ -120,6 +120,10 @@ export type LocationOptionType = 'region' | 'locality'
 export interface ILocationOption {
   type: LocationOptionType
   label: string
-  regionIsoCode: string
+  // Регионы и локальности, пришедшие из реальных объявлений, всегда несут
+  // ISO-код региона (см. AdsService.getAvailableLocations). У городов из
+  // статичного справочника RuCity (доступны для поиска даже без единого
+  // объявления) его нет — мы намеренно не хардкодим ISO 3166-2:RU коды.
+  regionIsoCode?: string
   localityFiasId?: string
 }
