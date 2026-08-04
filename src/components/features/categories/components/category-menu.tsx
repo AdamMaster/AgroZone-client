@@ -81,69 +81,76 @@ export const CategoryMenu = () => {
   if (typeof window === 'undefined') return null
 
   return createPortal(
-    <div ref={menuRef} className='fixed top-[var(--header-height)] left-0 z-50 w-full pb-6'>
-      <div className='custom-shadow h-full bg-white'>
-        <Container>
-          <div className='mx-[-16px] grid h-full max-w-7xl grid-cols-[340px_1fr] overflow-hidden'>
-            <div className='relative flex flex-col overflow-y-auto py-6'>
-              {isLoadingCategories ? (
-                <Loading />
-              ) : (
-                categories?.map(category => {
-                  const isActive = category.id === activeCategoryId
+    <>
+      <div
+        className='animate-in fade-in-0 fixed top-[var(--header-height)] right-0 bottom-0 left-0 z-40 bg-black/30 duration-150'
+        onClick={close}
+        aria-hidden='true'
+      />
+      <div ref={menuRef} className='fixed top-[var(--header-height)] left-0 z-50 w-full pb-6'>
+        <div className='h-full bg-white'>
+          <Container>
+            <div className='mx-[-16px] grid h-full max-w-7xl grid-cols-[340px_1fr] overflow-hidden'>
+              <div className='relative flex flex-col overflow-y-auto py-6'>
+                {isLoadingCategories ? (
+                  <Loading />
+                ) : (
+                  categories?.map(category => {
+                    const isActive = category.id === activeCategoryId
 
-                  return (
-                    <button
-                      key={category.id}
-                      onMouseEnter={() => setActiveCategoryId(category.id)}
-                      className={[
-                        'relative flex w-full gap-3 rounded-lg px-4 py-3 pr-8 text-left text-[15px] font-medium',
-                        isActive ? 'bg-gray-100' : ''
-                      ].join(' ')}
-                    >
-                      <CategoryIcon
-                        name={category.iconId ? category.iconId : ''}
-                        className='text-primary size-5 min-w-5'
-                      />
-                      <span>{category.name}</span>
+                    return (
+                      <button
+                        key={category.id}
+                        onMouseEnter={() => setActiveCategoryId(category.id)}
+                        className={[
+                          'relative flex w-full gap-3 rounded-lg px-4 py-3 pr-8 text-left text-[15px] font-medium',
+                          isActive ? 'bg-gray-100' : ''
+                        ].join(' ')}
+                      >
+                        <CategoryIcon
+                          name={category.iconId ? category.iconId : ''}
+                          className='text-primary size-5 min-w-5'
+                        />
+                        <span>{category.name}</span>
 
-                      <ChevronRight className='absolute top-3.5 right-2 size-4' />
-                    </button>
-                  )
-                })
-              )}
+                        <ChevronRight className='absolute top-3.5 right-2 size-4' />
+                      </button>
+                    )
+                  })
+                )}
+              </div>
+
+              <div className='h-full overflow-y-auto p-8'>
+                {activeCategory ? (
+                  <>
+                    <Heading level={3} className='mb-4'>
+                      {activeCategory.name}
+                    </Heading>
+
+                    {activeCategory.children?.length ? (
+                      <div className='columns-3 gap-x-6'>
+                        {activeCategory.children.map(child => (
+                          <Link
+                            key={child.id}
+                            href={`/catalog/${child.fullPath}`}
+                            onClick={close}
+                            className='hover:text-primary block py-2 text-[15px] transition-colors'
+                          >
+                            {child.name}
+                          </Link>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className='py-4 text-sm text-gray-400 italic'>В этом разделе пока нет подкатегорий</div>
+                    )}
+                  </>
+                ) : null}
+              </div>
             </div>
-
-            <div className='h-full overflow-y-auto p-8'>
-              {activeCategory ? (
-                <>
-                  <Heading level={3} className='mb-4'>
-                    {activeCategory.name}
-                  </Heading>
-
-                  {activeCategory.children?.length ? (
-                    <div className='columns-3 gap-x-6'>
-                      {activeCategory.children.map(child => (
-                        <Link
-                          key={child.id}
-                          href={`/catalog/${child.fullPath}`}
-                          onClick={close}
-                          className='hover:text-primary block py-2 text-[15px] transition-colors'
-                        >
-                          {child.name}
-                        </Link>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className='py-4 text-sm text-gray-400 italic'>В этом разделе пока нет подкатегорий</div>
-                  )}
-                </>
-              ) : null}
-            </div>
-          </div>
-        </Container>
+          </Container>
+        </div>
       </div>
-    </div>,
+    </>,
     document.body
   )
 }
