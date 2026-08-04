@@ -24,7 +24,7 @@ function SelectTrigger({ className, children, ...props }: SelectPrimitive.Trigge
     <SelectPrimitive.Trigger
       data-slot='select-trigger'
       className={cn(
-        "flex h-10 w-fit items-center justify-between gap-1.5 rounded-lg border bg-gray-50 py-2 pr-2 pl-2.5 text-sm whitespace-nowrap transition-colors outline-none select-none hover:bg-gray-100 data-disabled:cursor-not-allowed data-disabled:opacity-50 data-[placeholder]:text-muted-foreground [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+        "flex h-10 w-fit items-center justify-between gap-1.5 rounded-lg border bg-gray-50 py-2 pr-2 pl-2.5 text-sm whitespace-nowrap transition-colors outline-none select-none hover:bg-gray-100 data-disabled:cursor-not-allowed data-disabled:opacity-50 data-[placeholder]:text-gray-500 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
         className
       )}
       {...props}
@@ -59,7 +59,7 @@ function SelectContent({
         <SelectPrimitive.Popup
           data-slot='select-content'
           className={cn(
-            'bg-popover text-popover-foreground ring-foreground/10 data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95 relative isolate z-110 max-h-(--available-height) min-w-46 w-(--anchor-width) origin-(--transform-origin) overflow-x-hidden overflow-y-auto rounded-lg py-2 shadow-md ring-1 duration-100',
+            'bg-popover text-popover-foreground ring-foreground/10 data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95 relative isolate z-110 max-h-(--available-height) w-(--anchor-width) min-w-46 origin-(--transform-origin) overflow-x-hidden overflow-y-auto rounded-lg py-2 shadow-md ring-1 duration-100',
             className
           )}
         >

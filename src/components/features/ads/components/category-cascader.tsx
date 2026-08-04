@@ -18,7 +18,7 @@ import { ICategory, ICategoryFeature } from '../types/ad.types'
 interface CategoryCascaderProps {
   categories: ICategory[]
   form: UseFormReturn<TypeCreateAdSchema>
-  onCategorySelect: (features: ICategoryFeature[]) => void
+  onCategorySelect: (features: ICategoryFeature[], priceUnits: string[]) => void
 }
 
 export const CategoryCascader = ({ categories, form, onCategorySelect }: CategoryCascaderProps) => {
@@ -49,13 +49,13 @@ export const CategoryCascader = ({ categories, form, onCategorySelect }: Categor
 
     if (fullCategory && (!fullCategory.children || fullCategory.children.length === 0)) {
       form.setValue('categoryId', catId, { shouldValidate: true })
-      onCategorySelect(fullCategory.categoryFeatures || [])
+      onCategorySelect(fullCategory.categoryFeatures || [], fullCategory.priceUnits?.length ? fullCategory.priceUnits : ['ITEM'])
       const pathNames = path.map(id => findCategoryById(categories, id)?.name).filter(Boolean) as string[]
       setCategoryPath(pathNames)
     } else {
       form.setValue('categoryId', '', { shouldValidate: true })
       form.setValue('categoryFeatures', {})
-      onCategorySelect([])
+      onCategorySelect([], ['ITEM'])
     }
     setOpen(false)
   }

@@ -19,10 +19,16 @@ import {
   Input,
   InputGroup,
   Label,
-  Loading
+  Loading,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
 } from '@/components/ui'
 import { Textarea } from '@/components/ui/textarea'
 
+import { PRICE_UNITS } from '@/shared/constants/units'
 import { useProfile } from '@/shared/hooks'
 import { findCategoryById, formatPhoneNumber, getPathToCategory } from '@/shared/utils'
 
@@ -56,6 +62,7 @@ export const AdForm = ({
 }: AdFormProps) => {
   const isEdit = !!initialData
   const [features, setFeatures] = useState<ICategoryFeature[]>([])
+  const [priceUnits, setPriceUnits] = useState<string[]>(['ITEM'])
   const [step, setStep] = useState(isEdit ? 2 : 1)
   const { user } = useProfile()
   const categoryPath = useAdStore(state => state.categoryPath)
@@ -116,6 +123,10 @@ export const AdForm = ({
         setFeatures(category.categoryFeatures)
       }
 
+      if (category?.priceUnits?.length) {
+        setPriceUnits(category.priceUnits)
+      }
+
       const path = getPathToCategory(categories, initialData.categoryId)
 
       const pathNames = path.map(id => findCategoryById(categories, id)?.name).filter(Boolean) as string[]
@@ -153,7 +164,15 @@ export const AdForm = ({
           <CategoryCascader
             categories={categories}
             form={form}
-            onCategorySelect={selectedFeatures => setFeatures(selectedFeatures)}
+            onCategorySelect={(selectedFeatures, selectedPriceUnits) => {
+              setFeatures(selectedFeatures)
+              setPriceUnits(selectedPriceUnits)
+              // Единица измерения зависит от категории — при выборе/смене
+              // категории подставляем первую (основную) из допустимых для
+              // неё, чтобы поле "Цена" сразу было согласовано с выбранным
+              // товаром.
+              form.setValue('unit', selectedPriceUnits[0] ?? 'ITEM')
+            }}
           />
         )}
         {step === 2 && (
@@ -172,19 +191,49 @@ export const AdForm = ({
                   </Field>
                 )}
               />
-              <Controller
-                name='price'
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid} isInvalid={fieldState.invalid}>
-                    <InputGroup>
-                      <Label>Цена</Label>
-                      <Input className='h-13' {...field} value={field.value ?? ''} type='number' placeholder='₽' />
-                    </InputGroup>
-                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                  </Field>
-                )}
-              />
+              <div className='flex gap-3'>
+                <Controller
+                  name='price'
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <Field data-invalid={fieldState.invalid} isInvalid={fieldState.invalid} className='flex-1'>
+                      <InputGroup>
+                        <Label>Цена</Label>
+                        <Input className='h-13' {...field} value={field.value ?? ''} type='number' placeholder='₽' />
+                      </InputGroup>
+                      {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                    </Field>
+                  )}
+                />
+                <Controller
+                  name='unit'
+                  control={form.control}
+                  render={({ field }) => (
+                    <Field className='w-[220px]'>
+                      <InputGroup>
+                        <Label>Единица</Label>
+                        <Select
+                          value={field.value ?? priceUnits[0] ?? 'ITEM'}
+                          onValueChange={(val: string | null) => field.onChange(val ?? 'ITEM')}
+                        >
+                          <SelectTrigger className='h-13! w-full px-4'>
+                            <SelectValue placeholder='Единица цены'>
+                              {(value: string | null) => (value ? (PRICE_UNITS[value] ?? value) : 'Единица цены')}
+                            </SelectValue>
+                          </SelectTrigger>
+                          <SelectContent alignItemWithTrigger={false} align='start'>
+                            {priceUnits.map(unit => (
+                              <SelectItem key={unit} value={unit} className='rounded-none px-4'>
+                                {PRICE_UNITS[unit] ?? unit}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </InputGroup>
+                    </Field>
+                  )}
+                />
+              </div>
               <Controller
                 name='description'
                 control={form.control}
@@ -252,14 +301,13 @@ export const AdForm = ({
                         <FieldButton
                           onClick={() =>
                             onOpen('add-phone', {
-                              phones: user?.phones,
                               onSuccessComplete: (phone: string) => {
                                 form.setValue('phone', formatPhoneNumber(phone))
                               }
                             })
                           }
                         >
-                          {user?.phones?.length ? 'Использовать другой номер' : 'Добавить номер'}
+                          {user?.primaryPhone && 'Использовать другой номер'}
                         </FieldButton>
                       </div>
                     </InputGroup>

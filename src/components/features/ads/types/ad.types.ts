@@ -23,6 +23,7 @@ export interface ICategory {
   path: string[]
   fullPath: string
   categoryFeatures: ICategoryFeature[]
+  priceUnits: string[]
   children?: ICategory[]
 }
 

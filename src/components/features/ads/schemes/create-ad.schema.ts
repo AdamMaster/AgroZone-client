@@ -4,7 +4,10 @@ export const CreateAdSchema = z.object({
   title: z.string().min(3, 'Название должно быть не менее 3 символов'),
   description: z.string().min(10, 'Описание должно быть не менее 10 символов'),
   price: z.string().optional(),
-  unit: z.string().default('pcs'),
+  // Значение — enum Prisma PriceUnit ('ITEM', 'TON', 'KG', ...), см.
+  // server/prisma/schema.prisma. 'ITEM' — универсальный запасной вариант,
+  // подходит для любой категории.
+  unit: z.string().default('ITEM'),
   images: z.array(z.any()).default([]),
   address: z.string().min(5, 'Укажите адрес'),
   lat: z.number().min(-90, 'Выберите местоположение'),
