@@ -135,8 +135,6 @@ export const AdForm = ({
     }
   }, [isEdit, initialData, categories, setCategoryPath])
 
-  console.log(user?.phones)
-
   return (
     <div className='relative'>
       {step > 1 && (
@@ -312,7 +310,7 @@ export const AdForm = ({
                             })
                           }
                         >
-                          {user?.primaryPhone && 'Использовать другой номер'}
+                          {user?.primaryPhone ? 'Использовать другой номер' : 'Добавить номер'}
                         </FieldButton>
                       </div>
                     </InputGroup>

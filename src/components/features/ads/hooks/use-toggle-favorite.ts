@@ -6,7 +6,7 @@ import { toast } from 'sonner'
 import { toastMessageHandler } from '@/shared/utils'
 
 import { adsService } from '../services/ads.service'
-import { IAd } from '../types/ad.types'
+import { IAdsListResponse } from '../types/ad.types'
 
 export function useToggleFavorite() {
   const queryClient = useQueryClient()
@@ -19,12 +19,19 @@ export function useToggleFavorite() {
     onMutate: async (id: string) => {
       await queryClient.cancelQueries({ queryKey: ['ads'] })
 
-      const previousQueries = queryClient.getQueriesData<IAd[]>({ queryKey: ['ads'] })
+      // Кэш под ключом ['ads', params] — это IAdsListResponse
+      // ({items, total, page, limit}), а не голый массив (с тех пор, как
+      // useAds стал отдавать total для пагинации фильтра) — раньше здесь
+      // ошибочно предполагался IAd[], из-за чего old.map падал с
+      // TypeError ещё до реального запроса на сервер, и избранное
+      // переставало добавляться/удаляться вообще молча (весь mutate
+      // обрывался в onMutate).
+      const previousQueries = queryClient.getQueriesData<IAdsListResponse>({ queryKey: ['ads'] })
 
       previousQueries.forEach(([queryKey]) => {
-        queryClient.setQueryData<IAd[]>(queryKey, old => {
+        queryClient.setQueryData<IAdsListResponse>(queryKey, old => {
           if (!old) return old
-          return old.map(ad => (ad.id === id ? { ...ad, isFavorite: !ad.isFavorite } : ad))
+          return { ...old, items: old.items.map(ad => (ad.id === id ? { ...ad, isFavorite: !ad.isFavorite } : ad)) }
         })
       })
 
