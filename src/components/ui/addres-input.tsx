@@ -11,6 +11,18 @@ interface AddressValue {
   address: string
   lat: number
   lng: number
+  // Из того же DaData-ответа, что и адрес/координаты — регион для
+  // фильтра каталога по местоположению (см. AdsService.getAvailableRegions
+  // и AdsService.findAll на бэкенде). regionIsoCode — ISO 3166-2:RU код,
+  // стабильный ключ для фильтрации; region — человекочитаемое название для
+  // отображения.
+  region?: string
+  regionIsoCode?: string
+  // Более узкий уровень, чем регион — конкретный город ИЛИ (если это не
+  // город, а посёлок/село) населённый пункт. locality — для отображения,
+  // localityFiasId — стабильный ФИАС-идентификатор для точного фильтра.
+  locality?: string
+  localityFiasId?: string
 }
 
 interface AddressInputProps {
@@ -33,19 +45,35 @@ export const AddressInput: React.FC<AddressInputProps> = ({
 
   const handleAddressChange = (suggestion: DaDataSuggestion<DaDataAddress> | undefined) => {
     if (!suggestion) {
-      onChange({ address: '', lat: 0, lng: 0 })
+      onChange({
+        address: '',
+        lat: 0,
+        lng: 0,
+        region: undefined,
+        regionIsoCode: undefined,
+        locality: undefined,
+        localityFiasId: undefined
+      })
       return
     }
 
     const lat = suggestion.data.geo_lat ? parseFloat(suggestion.data.geo_lat) : 0
     const lng = suggestion.data.geo_lon ? parseFloat(suggestion.data.geo_lon) : 0
 
-    const address = [suggestion.data.region_with_type, suggestion.value].filter(Boolean).join(', ')
+    // city и settlement — взаимоисключающие уровни адресной иерархии
+    // DaData (город ИЛИ, если это не город, посёлок/село), приоритет
+    // отдаём city.
+    const locality = suggestion.data.city_with_type ?? suggestion.data.settlement_with_type ?? undefined
+    const localityFiasId = suggestion.data.city_fias_id ?? suggestion.data.settlement_fias_id ?? undefined
 
     onChange({
       address: suggestion.value,
       lat,
-      lng
+      lng,
+      region: suggestion.data.region_with_type ?? undefined,
+      regionIsoCode: suggestion.data.region_iso_code ?? undefined,
+      locality,
+      localityFiasId
     })
   }
 

@@ -1,6 +1,6 @@
 import { api } from '@/shared/api'
 
-import { IAd, IAdsListResponse, IUpdateAdDto } from '../types/ad.types'
+import { IAd, IAdsListResponse, ILocationOption, IUpdateAdDto } from '../types/ad.types'
 
 class AdsService {
   private URL = 'ads'
@@ -48,6 +48,11 @@ class AdsService {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async findAll(params?: Record<string, any>): Promise<IAdsListResponse> {
     const response = await api.get<IAdsListResponse>(this.URL, { params })
+    return response
+  }
+
+  async findLocations(): Promise<ILocationOption[]> {
+    const response = await api.get<ILocationOption[]>(`${this.URL}/locations`)
     return response
   }
 

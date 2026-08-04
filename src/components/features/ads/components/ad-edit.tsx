@@ -29,6 +29,10 @@ export const AdEdit = ({ id, categories }: AdEditProps) => {
     address: ad.address,
     lat: ad.lat,
     lng: ad.lng,
+    region: ad.region ?? undefined,
+    regionIsoCode: ad.regionIsoCode ?? undefined,
+    locality: ad.locality ?? undefined,
+    localityFiasId: ad.localityFiasId ?? undefined,
     phone: formatPhoneNumber(ad.phone),
     images: ad.images,
     categoryFeatures: (ad.features as ICategoryFeature) || {}

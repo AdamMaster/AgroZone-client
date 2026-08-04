@@ -216,7 +216,7 @@ export const AdForm = ({
                           value={field.value ?? priceUnits[0] ?? 'ITEM'}
                           onValueChange={(val: string | null) => field.onChange(val ?? 'ITEM')}
                         >
-                          <SelectTrigger className='h-13! w-full px-4'>
+                          <SelectTrigger className='h-13! px-4'>
                             <SelectValue placeholder='Единица цены'>
                               {(value: string | null) => (value ? (PRICE_UNITS[value] ?? value) : 'Единица цены')}
                             </SelectValue>
@@ -277,6 +277,10 @@ export const AdForm = ({
                       field.onChange(geoData.address)
                       form.setValue('lat', geoData.lat)
                       form.setValue('lng', geoData.lng)
+                      form.setValue('region', geoData.region)
+                      form.setValue('regionIsoCode', geoData.regionIsoCode)
+                      form.setValue('locality', geoData.locality)
+                      form.setValue('localityFiasId', geoData.localityFiasId)
                     }}
                   />
                 )}

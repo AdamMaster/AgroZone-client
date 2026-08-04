@@ -60,6 +60,10 @@ export interface IAd {
   publishedAt: Date | null
   lat: number
   lng: number
+  region?: string | null
+  regionIsoCode?: string | null
+  locality?: string | null
+  localityFiasId?: string | null
   features: ICategoryFeature
   createdAt: Date
   updatedAt: Date
@@ -102,4 +106,20 @@ export interface IAdsListResponse {
   total: number
   page: number
   limit: number
+}
+
+// Ответ GET /ads/locations — реальные локации (регионы целиком и
+// конкретные города/сёла), где прямо сейчас есть опубликованные
+// объявления (см. AdsService.getAvailableLocations на бэкенде), для
+// фильтра каталога по местоположению. Один список на два уровня
+// специфичности — 'region' (выбор фильтрует весь регион целиком) и
+// 'locality' (точечный фильтр по конкретному городу/селу, через
+// стабильный ФИАС-id, а не сравнение строк).
+export type LocationOptionType = 'region' | 'locality'
+
+export interface ILocationOption {
+  type: LocationOptionType
+  label: string
+  regionIsoCode: string
+  localityFiasId?: string
 }

@@ -32,7 +32,9 @@ const parseFeatures = (raw: string | null): FeatureFiltersMap => {
   return {}
 }
 
-type ScalarPatch = Partial<Pick<CatalogFiltersState, 'sortBy' | 'unit' | 'minPrice' | 'maxPrice'>>
+type ScalarPatch = Partial<
+  Pick<CatalogFiltersState, 'sortBy' | 'unit' | 'minPrice' | 'maxPrice' | 'regionIsoCode' | 'localityFiasId'>
+>
 
 // Читает и обновляет параметры фильтра каталога прямо в URL
 // (?sortBy=&unit=&minPrice=&maxPrice=&features=), тем же способом, каким
@@ -49,6 +51,8 @@ export function useCatalogFilters() {
       unit: searchParams.get('unit') ?? undefined,
       minPrice: searchParams.get('minPrice') ?? undefined,
       maxPrice: searchParams.get('maxPrice') ?? undefined,
+      regionIsoCode: searchParams.get('regionIsoCode') ?? undefined,
+      localityFiasId: searchParams.get('localityFiasId') ?? undefined,
       features: parseFeatures(searchParams.get(FEATURES_PARAM))
     }),
     [searchParams]
@@ -106,12 +110,19 @@ export function useCatalogFilters() {
 
   const reset = useCallback(() => {
     const params = new URLSearchParams(searchParams.toString())
-    ;['sortBy', 'unit', 'minPrice', 'maxPrice', FEATURES_PARAM].forEach(key => params.delete(key))
+    ;['sortBy', 'unit', 'minPrice', 'maxPrice', 'regionIsoCode', 'localityFiasId', FEATURES_PARAM].forEach(key =>
+      params.delete(key)
+    )
     push(params)
   }, [searchParams, push])
 
   const hasActiveFilters = Boolean(
-    state.unit || state.minPrice || state.maxPrice || Object.keys(state.features).length
+    state.unit ||
+      state.minPrice ||
+      state.maxPrice ||
+      state.regionIsoCode ||
+      state.localityFiasId ||
+      Object.keys(state.features).length
   )
 
   return { ...state, update, setFeatureValue, reset, hasActiveFilters }

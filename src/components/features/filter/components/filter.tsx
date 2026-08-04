@@ -11,6 +11,7 @@ import { ICategory } from '../../categories/types'
 import { useCatalogFilters } from '../hooks/use-catalog-filters'
 import { getEffectivePriceUnits } from '../utils/price-units'
 import { FilterFeatureField } from './filter-feature-field'
+import { LocationFilter } from './location-filter'
 import { SubcategoryList } from './subcategory-list'
 
 interface FilterProps {
@@ -48,6 +49,11 @@ export const Filter = ({ categories }: FilterProps) => {
       <PriceRangeFilter priceUnits={getEffectivePriceUnits(category)} />
 
       {!isLeafCategory && <SubcategoryList category={category} />}
+
+      <LocationFilter
+        value={{ regionIsoCode: filters.regionIsoCode, localityFiasId: filters.localityFiasId }}
+        onChange={patch => filters.update(patch)}
+      />
 
       {filterableFeatures.map(feature => (
         <FilterFeatureField
@@ -93,10 +99,7 @@ const PriceRangeFilter = ({ priceUnits }: PriceRangeFilterProps) => {
     const parsedMin = nextMin.trim() === '' ? undefined : Number(nextMin)
     const parsedMax = nextMax.trim() === '' ? undefined : Number(nextMax)
 
-    if (
-      (parsedMin !== undefined && !Number.isFinite(parsedMin)) ||
-      (parsedMax !== undefined && !Number.isFinite(parsedMax))
-    ) {
+    if ((parsedMin !== undefined && !Number.isFinite(parsedMin)) || (parsedMax !== undefined && !Number.isFinite(parsedMax))) {
       return
     }
 

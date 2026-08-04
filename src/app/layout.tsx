@@ -18,10 +18,10 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: {
-    absolute: 'GreenBase — Оптовый маркетплейс продуктов питания',
-    template: '%s | GreenBase'
+    absolute: 'AgroZone — Агропромышленная торговая площадка',
+    template: '%s | AgroZone'
   },
-  description: 'Покупайте и продавайте свежие овощи, фрукты и продукты питания оптом напрямую от производителей.',
+  description: 'Всё для агробизнеса: продукция, сырьё, техника и оборудование оптом',
   icons: {
     icon: '/favicon.ico',
     shortcut: '/favicon.ico',

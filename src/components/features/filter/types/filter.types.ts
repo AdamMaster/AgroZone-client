@@ -14,5 +14,11 @@ export interface CatalogFiltersState {
   unit?: string
   minPrice?: string
   maxPrice?: string
+  // Локация — действует на любом уровне каталога, не зависит от выбранной
+  // категории (в отличие от features). Ровно одно из двух — либо весь
+  // регион (regionIsoCode), либо конкретный город/село (localityFiasId),
+  // см. LocationFilter.
+  regionIsoCode?: string
+  localityFiasId?: string
   features: FeatureFiltersMap
 }

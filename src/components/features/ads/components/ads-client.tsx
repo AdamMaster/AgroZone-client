@@ -57,6 +57,8 @@ export function AdsClient({ serverSlug, layout, className }: AdsClientProps) {
     unit: filters.unit,
     minPrice: filters.minPrice,
     maxPrice: filters.maxPrice,
+    regionIsoCode: filters.regionIsoCode,
+    localityFiasId: filters.localityFiasId,
     features: Object.keys(filters.features).length ? JSON.stringify(filters.features) : undefined
   })
 

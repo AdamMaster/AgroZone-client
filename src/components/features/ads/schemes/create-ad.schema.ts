@@ -12,6 +12,12 @@ export const CreateAdSchema = z.object({
   address: z.string().min(5, 'Укажите адрес'),
   lat: z.number().min(-90, 'Выберите местоположение'),
   lng: z.number().min(-180, 'Выберите местоположение'),
+  // Заполняются автоматически из AddressInput (тот же DaData-ответ, что и
+  // адрес/координаты) — не отдельное поле формы, пользователь их не вводит.
+  region: z.string().optional(),
+  regionIsoCode: z.string().optional(),
+  locality: z.string().optional(),
+  localityFiasId: z.string().optional(),
   phone: z
     .string()
     .min(10, 'Номер телефона указан не полностью')
