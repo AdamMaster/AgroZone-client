@@ -301,6 +301,7 @@ export const AdForm = ({
                         <FieldButton
                           onClick={() =>
                             onOpen('add-phone', {
+                              phones: user?.phones ?? [],
                               onSuccessComplete: (phone: string) => {
                                 form.setValue('phone', formatPhoneNumber(phone))
                               }

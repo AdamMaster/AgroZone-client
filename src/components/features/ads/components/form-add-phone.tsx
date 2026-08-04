@@ -128,7 +128,9 @@ export const FormAddPhone = ({ onSuccessComplete, phones = [], mode = 'ad' }: Fo
         <div className='flex flex-col gap-4'>
           <Select value={selectedPhone} onValueChange={setSelectedPhone}>
             <SelectTrigger className='h-13! w-full px-4'>
-              <SelectValue placeholder='Выберите номер' />
+              <SelectValue placeholder='Выберите номер'>
+                {(value: string | null) => (value ? formatPhoneNumber(value) : 'Выберите номер')}
+              </SelectValue>
             </SelectTrigger>
             <SelectContent alignItemWithTrigger={false} align='start'>
               {phones.map(p => (
