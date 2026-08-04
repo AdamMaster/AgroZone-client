@@ -10,6 +10,7 @@ import { cn } from '@/lib/utils'
 
 import { useCategories } from '../../categories/hooks/use-categories'
 import { ICategory } from '../../categories/types'
+import { useCatalogFilters } from '../../filter/hooks/use-catalog-filters'
 import { useAds } from '../hooks'
 
 const SKELETON_COUNT = 10
@@ -40,6 +41,7 @@ interface AdsClientProps {
 export function AdsClient({ serverSlug, layout, className }: AdsClientProps) {
   const searchParams = useSearchParams()
   const { categories, isLoadingCategories } = useCategories()
+  const filters = useCatalogFilters()
   const searchQuery = searchParams.get('search') ?? undefined
   const slug = serverSlug?.split('/').at(-1) ?? searchParams.get('category') ?? undefined
 
@@ -50,7 +52,12 @@ export function AdsClient({ serverSlug, layout, className }: AdsClientProps) {
 
   const { ads, isLoadingAds } = useAds({
     categoryId,
-    search: searchQuery
+    search: searchQuery,
+    sortBy: filters.sortBy,
+    unit: filters.unit,
+    minPrice: filters.minPrice,
+    maxPrice: filters.maxPrice,
+    features: Object.keys(filters.features).length ? JSON.stringify(filters.features) : undefined
   })
 
   const classNames = layout === 'cols-1' ? 'grid-cols-1' : layout === 'cols-4' ? 'grid-cols-4 gap-4' : 'grid-cols-5'
@@ -66,7 +73,13 @@ export function AdsClient({ serverSlug, layout, className }: AdsClientProps) {
   }
 
   if (!ads.length) {
-    return <div className='py-10 text-center text-gray-500'>В этой категории пока нет объявлений</div>
+    return (
+      <div className='py-10 text-center text-gray-500'>
+        {filters.hasActiveFilters
+          ? 'Ничего не найдено — попробуйте изменить фильтры'
+          : 'В этой категории пока нет объявлений'}
+      </div>
+    )
   }
 
   return (

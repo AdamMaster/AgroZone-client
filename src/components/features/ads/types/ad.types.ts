@@ -7,6 +7,9 @@ export interface ICategoryFeature {
   label: string
   type: 'TEXT' | 'NUMBER' | 'SELECT' | 'MULTI_SELECT' | 'BOOLEAN'
   options?: string[]
+  // Отдаётся бэкендом (CategoryFeature.filterable), нужно для сайдбара
+  // фильтра каталога.
+  filterable: boolean
   createdAt: Date
   updatedAt: Date
 }
@@ -91,3 +94,12 @@ export type AdCardListData = Pick<
   IAd,
   'id' | 'title' | 'description' | 'price' | 'images' | 'address' | 'createdAt' | 'isFavorite' | 'user'
 >
+
+// Ответ GET /ads — с приходом фильтра каталогу нужен total (количество
+// найденных объявлений), поэтому эндпоинт отдаёт не голый массив, а объект.
+export interface IAdsListResponse {
+  items: IAd[]
+  total: number
+  page: number
+  limit: number
+}

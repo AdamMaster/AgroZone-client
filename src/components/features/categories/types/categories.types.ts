@@ -3,8 +3,12 @@ export interface ICategoryFeature {
   categoryId: string
   name: string
   label: string
-  type: 'TEXT' | 'NUMBER' | 'SELECT' | 'BOOLEAN'
+  type: 'TEXT' | 'NUMBER' | 'SELECT' | 'MULTI_SELECT' | 'BOOLEAN'
   options?: string[]
+  // Отдаётся бэкендом (CategoryFeature.filterable), но раньше не было в
+  // типе — нужно для сайдбара фильтра, чтобы не показывать нефильтруемые
+  // поля (см. audit categories.ts).
+  filterable: boolean
   createdAt: Date
   updatedAt: Date
 }

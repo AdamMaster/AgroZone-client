@@ -1,6 +1,6 @@
 import { api } from '@/shared/api'
 
-import { IAd, IUpdateAdDto } from '../types/ad.types'
+import { IAd, IAdsListResponse, IUpdateAdDto } from '../types/ad.types'
 
 class AdsService {
   private URL = 'ads'
@@ -46,8 +46,8 @@ class AdsService {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  async findAll(params?: Record<string, any>): Promise<IAd[]> {
-    const response = await api.get<IAd[]>(this.URL, { params })
+  async findAll(params?: Record<string, any>): Promise<IAdsListResponse> {
+    const response = await api.get<IAdsListResponse>(this.URL, { params })
     return response
   }
 
