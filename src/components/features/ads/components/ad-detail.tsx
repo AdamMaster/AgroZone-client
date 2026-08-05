@@ -182,8 +182,8 @@ export const AdDetail = ({ ad: initialAd, categoryFeatures = [], categoryPath = 
                   type='button'
                   onClick={() => scrollToImage(index)}
                   className={cn(
-                    'relative size-16 flex-shrink-0 overflow-hidden rounded-lg bg-gray-100',
-                    index === activeImage && 'ring-primary ring-2'
+                    'relative size-16 flex-shrink-0 overflow-hidden rounded-lg border-1 border-transparent bg-gray-100',
+                    index === activeImage && 'border-primary'
                   )}
                 >
                   <Image

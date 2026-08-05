@@ -67,38 +67,36 @@ export const SearchBar = ({ className }: SearchBarProps) => {
 
   return (
     <div className={cn(className)}>
-      <form className='relative z-100' onSubmit={handleSearch}>
-        <Search
-          className={cn(
-            'absolute top-[50%] left-7 size-5 translate-[-50%] text-gray-400',
-            query.length > 0 && 'text-inherit'
-          )}
-        />
+      <form className='bg-primary relative z-100 flex items-center rounded-lg p-[2px]' onSubmit={handleSearch}>
+        <div className='relative w-full'>
+          <Input
+            value={query}
+            placeholder='Поиск по объявлениям'
+            onChange={e => handleInputChange(e.target.value)}
+            onClick={() => onClickInput()}
+            className='h-12 w-full rounded-[10px] border-0 pl-5 text-[15px]! focus-visible:border-transparent'
+            autoComplete='off'
+          />
 
-        <Input
-          value={query}
-          placeholder='Поиск по объявлениям'
-          onChange={e => handleInputChange(e.target.value)}
-          onClick={() => onClickInput()}
-          className='h-12 pl-12 focus-visible:border-transparent'
-          autoComplete='off'
-        />
-
-        <div className='absolute top-0 right-0 flex h-full items-center gap-4 p-[3px]'>
           {query.length > 0 && (
-            <button type='button' onClick={() => onClear()}>
+            <button
+              type='button'
+              onClick={() => onClear()}
+              className='absolute top-0 right-0 flex h-full items-center justify-center px-3'
+            >
               <X className='size-5 text-gray-400 hover:text-inherit' />
             </button>
           )}
-          <Button
-            type='submit'
-            variant='default'
-            className='text-md h-full px-5 font-normal'
-            onClick={() => onClickButton()}
-          >
-            Найти
-          </Button>
         </div>
+
+        <Button
+          type='submit'
+          variant='default'
+          className='text-md h-12! px-5 font-normal'
+          onClick={() => onClickButton()}
+        >
+          <Search className={cn('size-5 text-white')} />
+        </Button>
 
         {isFocus && suggestions.length > 0 && (
           <div className='custom-shadow absolute top-[calc(100%+4px)] left-0 z-100 max-h-64 w-full overflow-hidden overflow-y-auto rounded-lg bg-white'>

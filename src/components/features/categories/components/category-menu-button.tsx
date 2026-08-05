@@ -14,7 +14,7 @@ export const CategoryMenuButton = () => {
 
   return (
     <button
-      className='bg-secondary hover:bg-secondary-foreground! focus:bg-secondary-foreground! flex h-12 items-center gap-2 rounded-lg px-4 text-sm text-white'
+      className='bg-primary hover:bg-primary-foreground! focus:bg-primary-foreground! flex h-13 items-center gap-2 rounded-lg px-4 text-sm text-white'
       data-category-toggle
       onClick={handleClick}
     >
