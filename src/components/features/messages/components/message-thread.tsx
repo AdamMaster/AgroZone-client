@@ -9,15 +9,24 @@ import { useProfile } from '@/shared/hooks'
 import { IMessage } from '../types/message.types'
 import { MessageBubble } from './message-bubble'
 
+interface MessageThreadCounterpart {
+  displayName?: string | null
+  picture?: string | null
+}
+
 interface MessageThreadProps {
   messages: IMessage[]
   isLoading: boolean
+  counterpart?: MessageThreadCounterpart
 }
 
-export const MessageThread = ({ messages, isLoading }: MessageThreadProps) => {
+export const MessageThread = ({ messages, isLoading, counterpart }: MessageThreadProps) => {
   const { user } = useProfile()
   const bottomRef = useRef<HTMLDivElement>(null)
 
+  // Прокручиваем к последнему сообщению при открытии диалога и при
+  // появлении новых — без этого пользователь каждый раз видел бы начало
+  // переписки, а не то, что ему только что написали.
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ block: 'end' })
   }, [messages.length])
@@ -31,10 +40,15 @@ export const MessageThread = ({ messages, isLoading }: MessageThreadProps) => {
   }
 
   return (
-    <ScrollArea className='h-full min-h-0 grow py-3 pr-3'>
-      <div className='flex grow flex-col justify-end gap-2'>
+    <ScrollArea className='min-h-0 flex-1 px-4 py-3'>
+      <div className='flex flex-col gap-2'>
         {messages.map(message => (
-          <MessageBubble key={message.id} message={message} isOwn={message.senderId === user?.id} />
+          <MessageBubble
+            key={message.id}
+            message={message}
+            isOwn={message.senderId === user?.id}
+            counterpart={counterpart}
+          />
         ))}
         <div ref={bottomRef} />
       </div>

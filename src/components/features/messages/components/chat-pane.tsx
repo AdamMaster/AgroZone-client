@@ -31,6 +31,9 @@ export const ChatPane = ({ activeConversationId, conversations, newAdId, onStart
     return <NewConversation adId={newAdId} onStarted={onStarted} onBack={onBack} />
   }
 
+  // MessagesClient рендерит ChatPane, только когда что-то выбрано — эта
+  // ветка недостижима, но оставлена на случай, если вызывающий код когда-то
+  // изменится.
   return null
 }
 
@@ -56,7 +59,7 @@ const ExistingConversation = ({ conversationId, conversations, onBack }: Existin
   return (
     <div className='flex min-w-0 flex-1 flex-col'>
       <ChatHeader ad={conversation?.ad} counterpart={conversation?.counterpart} onBack={onBack} />
-      <MessageThread messages={messages} isLoading={isLoading} />
+      <MessageThread messages={messages} isLoading={isLoading} counterpart={conversation?.counterpart} />
       <MessageComposer onSend={sendMessage} isSending={isSending} />
     </div>
   )
@@ -69,6 +72,9 @@ interface NewConversationProps {
 }
 
 const NewConversation = ({ adId, onStarted, onBack }: NewConversationProps) => {
+  // Тот же кэш-ключ, что и на странице объявления (useAd) — если после
+  // отправки первого сообщения пользователь зайдёт на страницу этого
+  // объявления, данные уже будут тёплыми.
   const { data: ad, isLoading } = useQuery({
     queryKey: ['ad-public', adId],
     queryFn: () => adsService.findOne(adId),
