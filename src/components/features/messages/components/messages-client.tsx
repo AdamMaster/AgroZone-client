@@ -1,9 +1,11 @@
 'use client'
 
+import { Ellipsis } from 'lucide-react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useMemo } from 'react'
 
 import { Heading } from '@/components/ui'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 
 import { useConversations } from '../hooks'
 import { ChatPane } from './chat-pane'
@@ -45,17 +47,34 @@ export const MessagesClient = () => {
     router.replace(`/profile/settings/messages?c=${conversationId}`)
   }
 
+  // Возврат к списку — сбрасываем и c, и ad, а не router.back(): если сюда
+  // зашли по прямой ссылке "Написать" с объявления, "назад" в истории
+  // браузера увёл бы со страницы сообщений вообще, а не к списку диалогов.
   const handleBack = () => {
     router.push('/profile/settings/messages')
   }
 
+  // Как в Авито: список диалогов и открытая переписка не показываются
+  // одновременно — либо весь блок под список, либо весь блок под чат (с
+  // кнопкой "назад" в шапке — см. ChatHeader).
   const isChatOpen = !!activeConversationId || !!newAdId
 
   return (
     <div className='max-w-[800px]'>
-      <Heading level={2} className='mb-6'>
-        Сообщения
-      </Heading>
+      <div className='mb-6 flex items-center justify-between'>
+        <Heading level={2}>Сообщения</Heading>
+        <DropdownMenu>
+          <DropdownMenuTrigger
+            className='flex size-9 items-center justify-center rounded-lg hover:bg-gray-100'
+            aria-label='Ещё'
+          >
+            <Ellipsis className='size-5' />
+          </DropdownMenuTrigger>
+          <DropdownMenuContent>
+            <DropdownMenuItem onClick={() => router.push('/profile/settings/blocked')}>Черный список</DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
 
       <div className='flex h-[600px]'>
         {isChatOpen ? (

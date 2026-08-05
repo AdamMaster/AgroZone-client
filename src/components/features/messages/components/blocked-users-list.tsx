@@ -1,6 +1,6 @@
 'use client'
 
-import { Avatar, AvatarFallback, AvatarImage, Button, Heading } from '@/components/ui'
+import { Avatar, AvatarFallback, AvatarImage, Button, Heading, Loading } from '@/components/ui'
 
 import { useBlockedUsers, useUnblockUser } from '../hooks'
 
@@ -9,23 +9,23 @@ export const BlockedUsersList = () => {
   const { unblockUser, isUnblocking } = useUnblockUser()
 
   return (
-    <div>
+    <div className='h-full max-w-[800px]'>
       <Heading level={2} className='mb-6'>
-        Заблокированные пользователи
+        Черный список
       </Heading>
 
-      <div className='flex flex-col overflow-hidden rounded-xl border'>
-        {isLoading && <div className='p-4 text-sm text-gray-400'>Загрузка...</div>}
+      <div className='relative flex h-full w-full flex-col gap-4 overflow-hidden'>
+        {isLoading && <Loading />}
 
         {!isLoading && blockedUsers.length === 0 && (
-          <div className='p-4 text-sm text-gray-500'>
+          <div className='text-sm text-gray-500'>
             Вы никого не заблокировали. Заблокировать пользователя можно из меню рядом с диалогом на странице
-            "Сообщения".
+            &quot;Сообщения&quot;.
           </div>
         )}
 
         {blockedUsers.map(user => (
-          <div key={user.id} className='flex items-center gap-3 border-b p-3 last:border-b-0'>
+          <div key={user.id} className='flex items-center gap-3'>
             <Avatar>
               <AvatarImage src={user.picture ?? undefined} />
               <AvatarFallback>{user.displayName?.[0]?.toUpperCase() ?? '?'}</AvatarFallback>
@@ -35,8 +35,8 @@ export const BlockedUsersList = () => {
 
             <Button
               type='button'
-              variant='outline'
-              size='sm'
+              variant='ghost'
+              size='default'
               disabled={isUnblocking}
               onClick={() => unblockUser(user.id)}
             >

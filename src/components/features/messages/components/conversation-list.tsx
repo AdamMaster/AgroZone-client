@@ -1,3 +1,5 @@
+import { Skeleton } from '@/components/ui'
+
 import { IConversationListItem } from '../types/message.types'
 import { ConversationListItem } from './conversation-list-item'
 
@@ -10,8 +12,14 @@ interface ConversationListProps {
 
 export const ConversationList = ({ conversations, activeId, isLoading, onSelect }: ConversationListProps) => {
   return (
-    <div className='-ml-3 flex w-full flex-col overflow-y-auto'>
-      {isLoading && <div className='p-4 text-sm text-gray-400'>Загрузка...</div>}
+    <div className='-ml-3 flex w-full flex-col gap-3 overflow-y-auto'>
+      {isLoading &&
+        Array.from({ length: 3 }).map((_, i) => (
+          <div className='flex w-full items-center gap-3' key={i}>
+            <Skeleton className='size-15 min-w-15 rounded-full' />
+            <Skeleton className='h-15 w-full rounded-lg' />
+          </div>
+        ))}
 
       {!isLoading && conversations.length === 0 && (
         <div className='p-4 text-sm text-gray-500'>

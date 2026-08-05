@@ -1,6 +1,6 @@
 'use client'
 
-import { Ban, Bell, Building2, Heart, Layers, MessageCircle, Shield, User } from 'lucide-react'
+import { Bell, Building2, Heart, Layers, MessageCircle, Shield, User } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
@@ -13,7 +13,6 @@ const items = [
   { label: 'Безопасность', icon: Shield, id: 'security', href: '/profile/settings/security' },
   { label: 'Мои объявления', icon: Layers, id: 'ads', href: '/profile/settings/ads' },
   { label: 'Сообщения', icon: MessageCircle, id: 'messages', href: '/profile/settings/messages' },
-  { label: 'Заблокированные', icon: Ban, id: 'blocked', href: '/profile/settings/blocked' },
   { label: 'Избранное', icon: Heart, id: 'favorites', href: '/profile/settings/favorites' },
   { label: 'Организация', icon: Building2, id: 'company', href: '/profile/settings/company' },
   { label: 'Уведомления', icon: Bell, id: 'notifications', href: '/profile/settings/notifications' }
