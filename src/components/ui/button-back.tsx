@@ -10,7 +10,7 @@ interface ButtonBack {
 export const ButtonBack = ({ className, onClick }: ButtonBack) => {
   return (
     <button
-      className={cn(className, 'custom-shadow flex size-13 items-center justify-center rounded-full bg-white')}
+      className={cn('custom-shadow flex size-13 items-center justify-center rounded-full bg-white', className)}
       onClick={onClick}
     >
       <ArrowLeft className='font-bold' size={20} />

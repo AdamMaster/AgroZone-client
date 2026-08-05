@@ -1,15 +1,18 @@
 'use client'
 
-import { Bell, Building2, Heart, Layers, Shield, User } from 'lucide-react'
+import { Bell, Building2, Heart, Layers, MessageCircle, Shield, User } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
 import { cn } from '@/lib/utils'
 
+import { useConversations } from '../../messages/hooks'
+
 const items = [
   { label: 'Личные данные', icon: User, id: 'general', href: '/profile/settings/general' },
   { label: 'Безопасность', icon: Shield, id: 'security', href: '/profile/settings/security' },
   { label: 'Мои объявления', icon: Layers, id: 'ads', href: '/profile/settings/ads' },
+  { label: 'Сообщения', icon: MessageCircle, id: 'messages', href: '/profile/settings/messages' },
   { label: 'Избранное', icon: Heart, id: 'favorites', href: '/profile/settings/favorites' },
   { label: 'Организация', icon: Building2, id: 'company', href: '/profile/settings/company' },
   { label: 'Уведомления', icon: Bell, id: 'notifications', href: '/profile/settings/notifications' }
@@ -17,6 +20,10 @@ const items = [
 
 export const SettingsNav = () => {
   const pathname = usePathname()
+  // Опрашиваем список диалогов и здесь же, в навигации — чтобы было видно
+  // непрочитанные, даже когда пользователь не на вкладке "Сообщения".
+  const { conversations } = useConversations()
+  const unreadCount = conversations.filter(item => item.isUnread).length
 
   return (
     <nav>
@@ -36,6 +43,11 @@ export const SettingsNav = () => {
               >
                 <Icon size={18} className={cn('text-gray-400', isActive && 'text-primary')} />
                 {item.label}
+                {item.id === 'messages' && unreadCount > 0 && (
+                  <span className='bg-primary ml-auto flex h-5 min-w-5 items-center justify-center rounded-full px-1 text-[11px] text-white'>
+                    {unreadCount}
+                  </span>
+                )}
               </Link>
             </li>
           )

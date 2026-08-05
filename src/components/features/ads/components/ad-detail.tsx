@@ -2,6 +2,7 @@
 
 import { ImageIcon, MapPin, Phone } from 'lucide-react'
 import Image from 'next/image'
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import Lightbox from 'yet-another-react-lightbox'
@@ -240,7 +241,16 @@ export const AdDetail = ({ ad: initialAd, categoryFeatures = [], categoryPath = 
                 >
                   {isPhoneRevealed ? formatPhoneNumber(ad.phone) : 'Показать телефон'}
                 </Button>
-                <Button size='lg' variant='secondary' className='px-8'>
+                {/* /profile/settings/messages защищена middleware'ом — незалогиненного
+                    просто отправит на /?auth=true, отдельно проверять авторизацию тут
+                    не нужно (та же логика, что уже работает для остальных /profile
+                    страниц). */}
+                <Button
+                  size='lg'
+                  variant='secondary'
+                  className='px-8'
+                  render={<Link href={`/profile/settings/messages?ad=${ad.id}`} />}
+                >
                   Написать
                 </Button>
               </div>

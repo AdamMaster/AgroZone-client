@@ -1,0 +1,54 @@
+export interface IMessageAd {
+  id: string
+  title: string
+  images: string[]
+  slug: string
+}
+
+// displayName/picture — nullable, ровно как в модели User на бэкенде
+// (пользователь мог не заполнить профиль).
+export interface IMessageUser {
+  id: string
+  displayName: string | null
+  picture: string | null
+}
+
+export interface IMessage {
+  id: string
+  conversationId: string
+  senderId: string
+  text: string
+  attachments: string[]
+  createdAt: string
+}
+
+// Диалог "как он есть" — ровно то, что отдаёт POST /conversations в поле
+// conversation. Для отображения в списке используется другая, более богатая
+// форма — IConversationListItem (см. ниже), которую отдаёт GET /conversations.
+export interface IConversation {
+  id: string
+  adId: string
+  buyerId: string
+  sellerId: string
+  lastMessageAt: string | null
+  buyerLastReadAt: string | null
+  sellerLastReadAt: string | null
+  dealConfirmed: boolean
+  createdAt: string
+  updatedAt: string
+}
+
+export interface IConversationListItem {
+  id: string
+  ad: IMessageAd
+  counterpart: IMessageUser
+  lastMessage: IMessage | null
+  dealConfirmed: boolean
+  isUnread: boolean
+  updatedAt: string
+}
+
+export interface IStartConversationResponse {
+  conversation: IConversation
+  message: IMessage
+}
