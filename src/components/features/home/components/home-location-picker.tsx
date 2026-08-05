@@ -60,8 +60,8 @@ export const HomeLocationPicker = ({ className }: HomeLocationPickerProps) => {
         <CommandList className='py-2'>
           <CommandEmpty>Ничего не найдено.</CommandEmpty>
           <CommandGroup>
-            <CommandItem value='Вся Россия' onSelect={handleShowAll} className='px-4 text-[15px] hover:bg-gray-100'>
-              Вся Россия
+            <CommandItem value='Россия' onSelect={handleShowAll} className='px-4 text-[15px] hover:bg-gray-100'>
+              Россия
             </CommandItem>
             {locations.map(option => (
               <CommandItem

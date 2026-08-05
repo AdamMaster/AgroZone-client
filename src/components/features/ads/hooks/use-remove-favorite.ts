@@ -3,8 +3,10 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
+import { toastMessageHandler } from '@/shared/utils'
+
 import { adsService } from '../services/ads.service'
-import { IAdsListResponse } from '../types/ad.types'
+import { IAd, IAdsListResponse } from '../types/ad.types'
 
 export function useRemoveFavorite() {
   const queryClient = useQueryClient()
@@ -16,6 +18,7 @@ export function useRemoveFavorite() {
 
     onMutate: async (id: string) => {
       await queryClient.cancelQueries({ queryKey: ['ads'] })
+      await queryClient.cancelQueries({ queryKey: ['ad-public', id] })
 
       // Кэш под ['ads', params] — это IAdsListResponse, не голый массив
       // (см. use-toggle-favorite.ts) — тут была та же причина, по которой
@@ -32,17 +35,28 @@ export function useRemoveFavorite() {
         })
       })
 
-      return { previousQueries }
+      // См. комментарий в use-add-favorite.ts — страница объявления читает
+      // isFavorite из ['ad-public', id], а не из ['ads'].
+      const previousAd = queryClient.getQueryData<IAd>(['ad-public', id])
+      if (previousAd) {
+        queryClient.setQueryData<IAd>(['ad-public', id], { ...previousAd, isFavorite: false })
+      }
+
+      return { previousQueries, previousAd }
     },
 
-    onError: (_err, _id, context) => {
+    onError: (err, id, context) => {
       if (context?.previousQueries) {
         context.previousQueries.forEach(([queryKey, previousData]) => {
           queryClient.setQueryData(queryKey, previousData)
         })
       }
 
-      toast.error('Не удалось удалить из избранного')
+      if (context?.previousAd) {
+        queryClient.setQueryData(['ad-public', id], context.previousAd)
+      }
+
+      toastMessageHandler(err)
     },
 
     onSuccess: () => {

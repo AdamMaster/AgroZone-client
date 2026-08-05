@@ -6,7 +6,7 @@ import { toast } from 'sonner'
 import { toastMessageHandler } from '@/shared/utils'
 
 import { adsService } from '../services/ads.service'
-import { IAdsListResponse } from '../types/ad.types'
+import { IAd, IAdsListResponse } from '../types/ad.types'
 
 export function useToggleFavorite() {
   const queryClient = useQueryClient()
@@ -18,6 +18,7 @@ export function useToggleFavorite() {
 
     onMutate: async (id: string) => {
       await queryClient.cancelQueries({ queryKey: ['ads'] })
+      await queryClient.cancelQueries({ queryKey: ['ad-public', id] })
 
       // Кэш под ключом ['ads', params] — это IAdsListResponse
       // ({items, total, page, limit}), а не голый массив (с тех пор, как
@@ -35,16 +36,28 @@ export function useToggleFavorite() {
         })
       })
 
-      return { previousQueries }
+      // См. комментарий в use-add-favorite.ts — страница объявления читает
+      // isFavorite из ['ad-public', id], а не из ['ads'].
+      const previousAd = queryClient.getQueryData<IAd>(['ad-public', id])
+      if (previousAd) {
+        queryClient.setQueryData<IAd>(['ad-public', id], { ...previousAd, isFavorite: !previousAd.isFavorite })
+      }
+
+      return { previousQueries, previousAd }
     },
 
-    onError: (_err, _id, context) => {
+    onError: (err, id, context) => {
       if (context?.previousQueries) {
         context.previousQueries.forEach(([queryKey, previousData]) => {
           queryClient.setQueryData(queryKey, previousData)
         })
       }
-      toast.error('Ошибка при обновлении избранного')
+
+      if (context?.previousAd) {
+        queryClient.setQueryData(['ad-public', id], context.previousAd)
+      }
+
+      toastMessageHandler(err)
     },
 
     onSuccess(data) {

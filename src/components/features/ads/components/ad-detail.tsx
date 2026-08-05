@@ -7,6 +7,8 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import Lightbox from 'yet-another-react-lightbox'
 import Zoom from 'yet-another-react-lightbox/plugins/zoom'
 
+import 'yet-another-react-lightbox/styles.css'
+
 import { Avatar, AvatarFallback, AvatarImage, Button, ButtonBack, Heading } from '@/components/ui'
 
 import { PRICE_UNITS } from '@/shared/constants/units'
@@ -20,8 +22,6 @@ import { useAd, useAddFavorite, useRemoveFavorite } from '../hooks'
 import { IAd, ICategoryFeature } from '../types/ad.types'
 import { CategoryBreadcrumbItem, CategoryBreadcrumbs } from './category-breadcrumbs'
 import { FavoriteButton } from './favorite-button'
-
-import 'yet-another-react-lightbox/styles.css'
 
 interface AdDetailProps {
   // Объявление, полученное на сервере (SSR) — используется как initialData
@@ -58,7 +58,6 @@ export const AdDetail = ({ ad: initialAd, categoryFeatures = [], categoryPath = 
   const [activeImage, setActiveImage] = useState(0)
   const [isLightboxOpen, setIsLightboxOpen] = useState(false)
   const [isPhoneRevealed, setIsPhoneRevealed] = useState(false)
-  const [isFavorite, setIsFavorite] = useState(!!ad.isFavorite)
 
   const { addFavorite, isAddingFavorite } = useAddFavorite()
   const { removeFavorite, isRemovingFavorite } = useRemoveFavorite()
@@ -96,14 +95,21 @@ export const AdDetail = ({ ad: initialAd, categoryFeatures = [], categoryPath = 
 
   const isOwner = !!user && user.id === ad.userId
 
+  // isFavorite больше не отдельный локальный стейт — раньше он менялся тут
+  // же безусловно на каждый клик (setIsFavorite(prev => !prev)), независимо
+  // от результата мутации, из-за чего при ошибке (например, у
+  // неавторизованного пользователя) сердечко оставалось закрашенным,
+  // несмотря на всплывший тост с ошибкой. Теперь значение берётся напрямую
+  // из ad.isFavorite (кэш react-query, ключ ['ad-public', id] — см.
+  // use-ad.ts), который сами хуки избранного корректно оптимистично
+  // обновляют и откатывают при ошибке (см. use-add-favorite.ts /
+  // use-remove-favorite.ts).
   const onClickFavorite = () => {
-    if (isFavorite) {
+    if (ad.isFavorite) {
       removeFavorite(ad.id)
     } else {
       addFavorite(ad.id)
     }
-
-    setIsFavorite(prev => !prev)
   }
 
   const features = (ad.features as unknown as Record<string, unknown>) || {}
@@ -143,12 +149,12 @@ export const AdDetail = ({ ad: initialAd, categoryFeatures = [], categoryPath = 
         {ad.title}
       </Heading>
 
-      <div className='mb-9 grid grid-cols-1 gap-10 lg:grid-cols-[1fr_360px]'>
+      <div className='mb-8 grid grid-cols-1 gap-10 lg:grid-cols-[1fr_360px]'>
         <div>
           {ad.images.length > 0 ? (
             <div
               ref={galleryRef}
-              className='mb-2 flex snap-x snap-mandatory [scrollbar-width:none] overflow-x-auto overscroll-x-contain rounded-xl bg-gray-100 [&::-webkit-scrollbar]:hidden'
+              className='mb-2 flex snap-x snap-mandatory overflow-x-auto overscroll-x-contain rounded-xl bg-gray-100 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden'
             >
               {ad.images.map((image, index) => (
                 <button
@@ -182,8 +188,8 @@ export const AdDetail = ({ ad: initialAd, categoryFeatures = [], categoryPath = 
                   type='button'
                   onClick={() => scrollToImage(index)}
                   className={cn(
-                    'relative size-16 flex-shrink-0 overflow-hidden rounded-lg border-1 border-transparent bg-gray-100',
-                    index === activeImage && 'border-primary'
+                    'relative size-16 flex-shrink-0 overflow-hidden rounded-lg bg-gray-100',
+                    index === activeImage && 'ring-primary ring-2'
                   )}
                 >
                   <Image
@@ -208,7 +214,7 @@ export const AdDetail = ({ ad: initialAd, categoryFeatures = [], categoryPath = 
             </p>
             <FavoriteButton
               onClick={onClickFavorite}
-              isFavorite={isFavorite}
+              isFavorite={!!ad.isFavorite}
               isLoading={isAddingFavorite || isRemovingFavorite}
             />
           </div>
@@ -226,7 +232,7 @@ export const AdDetail = ({ ad: initialAd, categoryFeatures = [], categoryPath = 
             ) : (
               <div className='flex gap-1.5'>
                 <Button
-                  variant='secondary'
+                  variant='default'
                   size='lg'
                   className='grow px-8'
                   onClick={() => setIsPhoneRevealed(true)}
@@ -234,7 +240,7 @@ export const AdDetail = ({ ad: initialAd, categoryFeatures = [], categoryPath = 
                 >
                   {isPhoneRevealed ? formatPhoneNumber(ad.phone) : 'Показать телефон'}
                 </Button>
-                <Button size='lg' variant='ghost' className='px-8'>
+                <Button size='lg' variant='secondary' className='px-8'>
                   Написать
                 </Button>
               </div>
@@ -242,13 +248,15 @@ export const AdDetail = ({ ad: initialAd, categoryFeatures = [], categoryPath = 
           </div>
 
           <div className='mb-6 flex items-center gap-3'>
-            <Avatar className='size-14!'>
+            <Avatar size='lg'>
               <AvatarImage src={ad.user?.picture ?? undefined} />
               <AvatarFallback>{ad.user?.displayName?.[0]?.toUpperCase() ?? '?'}</AvatarFallback>
             </Avatar>
             <div>
               <div className='flex items-center gap-1.5'>
-                <p className='text-lg font-bold'>{ad.user?.displayName ?? 'Пользователь'}</p>
+                <p className='text-sm font-medium'>{ad.user?.displayName ?? 'Пользователь'}</p>
+                {/* Частное лицо / ИП / Компания — чисто информационная метка,
+                    без привязанных к ней привилегий на площадке. */}
                 {ad.user?.type && (
                   <span className='rounded-full bg-gray-100 px-2 py-0.5 text-[11px] text-gray-600'>
                     {USER_TYPE_LABELS[ad.user.type]}
@@ -256,66 +264,62 @@ export const AdDetail = ({ ad: initialAd, categoryFeatures = [], categoryPath = 
                 )}
               </div>
               {publishedDate && <p className='text-xs text-gray-500'>Опубликовано {publishedDate}</p>}
+              {/* Ссылки нет: страницы всех объявлений продавца в проекте
+                  пока не существует — как появится, обернуть в Link. */}
               {!!ad.user?.adsCount && (
                 <p className='text-xs text-gray-500'>
-                  Ещё {ad.user.adsCount} {pluralizeRu(ad.user.adsCount, ['объявление', 'объявления', 'объявлений'])}{' '}
-                  продавца
+                  Ещё {ad.user.adsCount} {pluralizeRu(ad.user.adsCount, ['объявление', 'объявления', 'объявлений'])} продавца
                 </p>
               )}
             </div>
           </div>
+          <address className='mb-4 flex items-center gap-2 not-italic'>
+            <MapPin className='size-5 flex-shrink-0' />
+            {ad.address}
+          </address>
         </div>
       </div>
 
-      <div className='flex flex-col gap-8'>
-        <div>
+      {ad.description && (
+        <div className='mb-8'>
           <Heading level={4} className='mb-2'>
-            Местоположение
+            Описание
           </Heading>
-          <address className='flex items-center gap-2 not-italic'>{ad.address}</address>
+          <p className='leading-6 whitespace-pre-wrap'>{ad.description}</p>
         </div>
+      )}
 
-        {ad.description && (
-          <div>
-            <Heading level={4} className='mb-2'>
-              Описание
-            </Heading>
-            <p className='whitespace-pre-wrap'>{ad.description}</p>
-          </div>
-        )}
+      {filledFeatures.length > 0 && (
+        <div>
+          <Heading level={4} className='mb-3'>
+            Характеристики
+          </Heading>
+          <dl className='grid grid-cols-1 gap-x-6 gap-y-2'>
+            {filledFeatures.map(({ feature, value }) => (
+              <div key={feature.id} className='flex gap-2'>
+                <dt className='text-gray-600'>{feature.label}</dt>:<dd className='text-right font-medium'>{value}</dd>
+              </div>
+            ))}
+          </dl>
+        </div>
+      )}
 
-        {filledFeatures.length > 0 && (
-          <div>
-            <Heading level={4} className='mb-2'>
-              Характеристики
-            </Heading>
-            <dl className='grid grid-cols-1 gap-x-6 gap-y-2'>
-              {filledFeatures.map(({ feature, value }) => (
-                <div key={feature.id} className='flex gap-2'>
-                  <dt className='text-gray-600'>{feature.label}</dt>:<dd className='text-right font-medium'>{value}</dd>
-                </div>
-              ))}
-            </dl>
-          </div>
-        )}
-
-        {ad.images.length > 0 && (
-          <Lightbox
-            open={isLightboxOpen}
-            close={closeLightbox}
-            index={activeImage}
-            slides={slides}
-            plugins={[Zoom]}
-            on={{ view: ({ index }) => setActiveImage(index) }}
-            // Ограничиваем шириной именно область самого фото (slide), а не
-            // весь лайтбокс — фон/контейнер остаются на всю ширину экрана,
-            // просто на широких мониторах фото не растягивается до огромных
-            // размеров. Внутренний <img> уже скейлится через object-fit
-            // относительно slide, так что этого достаточно.
-            styles={{ slide: { maxWidth: 1280, margin: '0 auto' } }}
-          />
-        )}
-      </div>
+      {ad.images.length > 0 && (
+        <Lightbox
+          open={isLightboxOpen}
+          close={closeLightbox}
+          index={activeImage}
+          slides={slides}
+          plugins={[Zoom]}
+          on={{ view: ({ index }) => setActiveImage(index) }}
+          // Ограничиваем шириной именно область самого фото (slide), а не
+          // весь лайтбокс — фон/контейнер остаются на всю ширину экрана,
+          // просто на широких мониторах фото не растягивается до огромных
+          // размеров. Внутренний <img> уже скейлится через object-fit
+          // относительно slide, так что этого достаточно.
+          styles={{ slide: { maxWidth: 1280, margin: '0 auto' } }}
+        />
+      )}
     </div>
   )
 }
