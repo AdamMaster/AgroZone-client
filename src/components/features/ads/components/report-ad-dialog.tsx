@@ -83,7 +83,12 @@ export const ReportAdDialog = ({ adId }: ReportAdDialogProps) => {
               onValueChange={(value: string | null) => setReason(value as AdReportReason)}
             >
               <SelectTrigger className='w-full px-4'>
-                <SelectValue placeholder='Выберите причину' />
+                <SelectValue placeholder='Выберите причину'>
+                  {(value: string | null) => {
+                    const option = AD_REPORT_REASON_OPTIONS.find(item => item.value === value)
+                    return option?.label ?? 'Выберите причину'
+                  }}
+                </SelectValue>
               </SelectTrigger>
               <SelectContent alignItemWithTrigger={false}>
                 {AD_REPORT_REASON_OPTIONS.map(option => (
