@@ -1,6 +1,6 @@
 'use client'
 
-import { Command as CommandPrimitive } from 'cmdk'
+import { Command as CommandPrimitive, useCommandState } from 'cmdk'
 import { CheckIcon, SearchIcon } from 'lucide-react'
 import * as React from 'react'
 
@@ -43,7 +43,12 @@ function CommandDialog({
         className={cn('top-1/3 translate-y-0 rounded-xl! p-0', className)}
         showCloseButton={showCloseButton}
       >
-        {children}
+        {/* CommandInput/CommandList и другие Command-примитивы читают
+            состояние (фильтр, выбранный пункт) из контекста, который
+            создаёт именно корневой cmdk Command — без этой обёртки они
+            падают с "Cannot read properties of undefined (reading
+            'subscribe')" при попытке прочитать несуществующий контекст. */}
+        <Command>{children}</Command>
       </DialogContent>
     </Dialog>
   )
@@ -70,8 +75,24 @@ function CommandInput({ className, ...props }: React.ComponentProps<typeof Comma
 }
 
 function CommandList({ className, ...props }: React.ComponentProps<typeof CommandPrimitive.List>) {
+  const listRef = React.useRef<React.ComponentRef<typeof CommandPrimitive.List>>(null)
+
+  // cmdk сам не сбрасывает скролл списка при изменении поискового
+  // запроса — если до этого проскроллить длинный список (например,
+  // справочник городов из ~1200 записей) вниз, а потом начать печатать,
+  // отфильтрованные результаты остаются с тем же скроллом, и лучшие
+  // совпадения наверху списка оказываются не видны, пока не проскроллить
+  // руками. Подписываемся на search из внутреннего состояния cmdk и при
+  // каждом его изменении возвращаем список наверх.
+  const search = useCommandState(state => state.search)
+
+  React.useEffect(() => {
+    listRef.current?.scrollTo({ top: 0 })
+  }, [search])
+
   return (
     <CommandPrimitive.List
+      ref={listRef}
       data-slot='command-list'
       className={cn('no-scrollbar max-h-72 scroll-py-1 overflow-x-hidden overflow-y-auto outline-none', className)}
       {...props}
@@ -117,7 +138,7 @@ function CommandItem({ className, children, ...props }: React.ComponentProps<typ
     <CommandPrimitive.Item
       data-slot='command-item'
       className={cn(
-        "group/command-item data-selected:bg-muted data-selected:text-foreground data-selected:*:[svg]:text-foreground relative flex cursor-default items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-hidden select-none in-data-[slot=dialog-content]:rounded-lg! data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+        "group/command-item data-selected:bg-muted data-selected:text-foreground data-selected:*:[svg]:text-foreground relative flex cursor-default items-center gap-2 px-2 py-1.5 text-sm outline-hidden select-none data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
         className
       )}
       {...props}

@@ -32,13 +32,24 @@ const findIdBySlug = (categories: ICategory[], slug?: string | null): string | u
   return
 }
 
+interface AdsLocationOverride {
+  regionIsoCode?: string
+  localityFiasId?: string
+}
+
 interface AdsClientProps {
   serverSlug?: string | null
   layout?: string
   className?: 'cols-1' | 'cols-4'
+  // Только для главной (см. HomeAdsFeed) — подставляет "домашний" регион
+  // пользователя (HomeLocationPicker, localStorage) вместо
+  // regionIsoCode/localityFiasId из URL-фильтра каталога. На страницу
+  // каталога не влияет — там этот проп никогда не передаётся, и
+  // используются только filters.* как раньше.
+  locationOverride?: AdsLocationOverride
 }
 
-export function AdsClient({ serverSlug, layout, className }: AdsClientProps) {
+export function AdsClient({ serverSlug, layout, className, locationOverride }: AdsClientProps) {
   const searchParams = useSearchParams()
   const { categories, isLoadingCategories } = useCategories()
   const filters = useCatalogFilters()
@@ -50,6 +61,12 @@ export function AdsClient({ serverSlug, layout, className }: AdsClientProps) {
     return findIdBySlug(categories, slug)
   }, [categories, slug])
 
+  const regionIsoCode = locationOverride ? locationOverride.regionIsoCode : filters.regionIsoCode
+  const localityFiasId = locationOverride ? locationOverride.localityFiasId : filters.localityFiasId
+  const hasLocationOverride = Boolean(
+    locationOverride && (locationOverride.regionIsoCode || locationOverride.localityFiasId)
+  )
+
   const { ads, isLoadingAds } = useAds({
     categoryId,
     search: searchQuery,
@@ -57,8 +74,8 @@ export function AdsClient({ serverSlug, layout, className }: AdsClientProps) {
     unit: filters.unit,
     minPrice: filters.minPrice,
     maxPrice: filters.maxPrice,
-    regionIsoCode: filters.regionIsoCode,
-    localityFiasId: filters.localityFiasId,
+    regionIsoCode,
+    localityFiasId,
     features: Object.keys(filters.features).length ? JSON.stringify(filters.features) : undefined
   })
 
@@ -77,9 +94,11 @@ export function AdsClient({ serverSlug, layout, className }: AdsClientProps) {
   if (!ads.length) {
     return (
       <div className='py-10 text-center text-gray-500'>
-        {filters.hasActiveFilters
-          ? 'Ничего не найдено — попробуйте изменить фильтры'
-          : 'В этой категории пока нет объявлений'}
+        {hasLocationOverride
+          ? 'В этом регионе пока нет объявлений — попробуйте выбрать другой регион или посмотреть всю Россию'
+          : filters.hasActiveFilters
+            ? 'Ничего не найдено — попробуйте изменить фильтры'
+            : 'В этой категории пока нет объявлений'}
       </div>
     )
   }

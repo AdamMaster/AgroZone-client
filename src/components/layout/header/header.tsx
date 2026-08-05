@@ -1,4 +1,5 @@
 import { CategoryMenuButton } from '@/components/features/categories/components'
+import { HomeLocationPicker } from '@/components/features/home/components'
 import { SearchBar } from '@/components/features/search/components'
 import { Logo } from '@/components/ui'
 
@@ -23,6 +24,7 @@ export const Header = () => {
             <div className='flex w-full items-center gap-2'>
               <CategoryMenuButton />
               <SearchBar className='grow' />
+              <HomeLocationPicker className='ml-8' />
             </div>
           </div>
         </Container>
