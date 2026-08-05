@@ -10,7 +10,7 @@ interface ConversationListProps {
 
 export const ConversationList = ({ conversations, activeId, isLoading, onSelect }: ConversationListProps) => {
   return (
-    <div className='flex w-full flex-col overflow-y-auto'>
+    <div className='-ml-3 flex w-full flex-col overflow-y-auto'>
       {isLoading && <div className='p-4 text-sm text-gray-400'>Загрузка...</div>}
 
       {!isLoading && conversations.length === 0 && (

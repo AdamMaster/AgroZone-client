@@ -57,7 +57,7 @@ export const MessagesClient = () => {
         Сообщения
       </Heading>
 
-      <div className='flex h-[600px] overflow-auto'>
+      <div className='flex h-[600px]'>
         {isChatOpen ? (
           <ChatPane
             activeConversationId={activeConversationId}

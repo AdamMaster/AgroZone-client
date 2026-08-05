@@ -38,7 +38,7 @@ export const SettingsNav = () => {
                 href={item.href}
                 className={cn(
                   'hover:text-primary flex items-center gap-2 rounded-lg px-4 py-2 text-gray-900',
-                  isActive && 'text-primary bg-gray-50'
+                  isActive && 'text-primary bg-gray-100'
                 )}
               >
                 <Icon size={18} className={cn('text-gray-400', isActive && 'text-primary')} />
