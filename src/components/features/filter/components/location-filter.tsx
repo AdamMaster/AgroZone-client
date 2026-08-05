@@ -113,7 +113,6 @@ export const LocationFilter = ({ value, onChange }: LocationFilterProps) => {
                     onSelect={() => handleSelect(option)}
                   >
                     <span>{option.label}</span>
-                    {option.type === 'region' && <span className='ml-auto text-xs text-gray-400'>весь регион</span>}
                   </CommandItem>
                 ))}
               </CommandGroup>

@@ -238,6 +238,14 @@ export const AdDetail = ({ ad: initialAd, categoryFeatures = [], categoryPath = 
                   size='lg'
                   className='grow px-8'
                   onClick={() => setIsPhoneRevealed(true)}
+                  // Пока телефон скрыт, это обычная <button> (клик просто
+                  // раскрывает номер), а после раскрытия render подменяет её
+                  // на <a href='tel:...'>, чтобы можно было сразу позвонить —
+                  // то есть реальный рендерящийся элемент меняется вместе с
+                  // isPhoneRevealed, и nativeButton должен меняться синхронно
+                  // с ним (не статичное true/false), иначе Base UI ругается
+                  // в консоль в одном из двух состояний.
+                  nativeButton={!isPhoneRevealed}
                   render={isPhoneRevealed ? <a href={`tel:+${ad.phone}`} /> : undefined}
                 >
                   {isPhoneRevealed ? formatPhoneNumber(ad.phone) : 'Показать телефон'}
@@ -250,6 +258,13 @@ export const AdDetail = ({ ad: initialAd, categoryFeatures = [], categoryPath = 
                   size='lg'
                   variant='secondary'
                   className='px-8'
+                  // Эта кнопка ВСЕГДА рендерится как <Link> (= <a>), никогда
+                  // как настоящий <button> — в отличие от кнопки телефона
+                  // выше, тут нет условия. nativeButton по умолчанию true —
+                  // отсюда то же предупреждение Base UI, только теперь на
+                  // этой кнопке, и оно всегда актуально, а не только в одном
+                  // из состояний.
+                  nativeButton={false}
                   render={<Link href={`/profile/settings/messages?ad=${ad.id}`} />}
                 >
                   Написать
