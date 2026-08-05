@@ -40,9 +40,9 @@ export const MessageComposer = ({ onSend, isSending, placeholder = 'Сообще
         onKeyDown={handleKeyDown}
         placeholder={placeholder}
         rows={1}
-        className='min-h-11 flex-1 resize-none wrap-anywhere placeholder:text-gray-400'
+        className='min-h-12 flex-1 resize-none px-4! py-3 wrap-anywhere placeholder:text-gray-400'
       />
-      <Button size='icon-lg' className='size-11 rounded-lg!' onClick={handleSend} disabled={!text.trim() || isSending}>
+      <Button size='icon-lg' className='size-12! rounded-lg!' onClick={handleSend} disabled={!text.trim() || isSending}>
         <SendHorizontal />
       </Button>
     </div>

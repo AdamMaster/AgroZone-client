@@ -60,8 +60,8 @@ export const MessagesClient = () => {
   const isChatOpen = !!activeConversationId || !!newAdId
 
   return (
-    <div className='max-w-[800px]'>
-      <div className='mb-6 flex items-center justify-between'>
+    <div>
+      <div className='mb-6 flex justify-between'>
         <Heading level={2}>Сообщения</Heading>
         <DropdownMenu>
           <DropdownMenuTrigger
@@ -70,7 +70,7 @@ export const MessagesClient = () => {
           >
             <Ellipsis className='size-5' />
           </DropdownMenuTrigger>
-          <DropdownMenuContent>
+          <DropdownMenuContent align='end'>
             <DropdownMenuItem onClick={() => router.push('/profile/settings/blocked')}>Черный список</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

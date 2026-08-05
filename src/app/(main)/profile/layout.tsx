@@ -14,7 +14,7 @@ export default function MainLayout({
           <div className='rounded-xl'>
             <SettingsNav />
           </div>
-          <div className='relative w-full'>{children}</div>
+          <div className='relative w-[800px]'>{children}</div>
         </div>
       </Container>
     </div>
