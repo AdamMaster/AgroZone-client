@@ -40,7 +40,7 @@ export const ConversationListItem = ({ conversation, isActive, onClick }: Conver
         }
       }}
       className={cn(
-        'ml relative flex w-full items-center gap-3 rounded-lg px-3 py-3 text-left transition-colors hover:bg-gray-100',
+        'ml relative flex w-full cursor-pointer items-center gap-3 rounded-lg px-3 py-3 text-left transition-colors hover:bg-gray-100',
         isActive && 'bg-gray-50'
       )}
     >

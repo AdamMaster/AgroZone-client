@@ -1,18 +1,22 @@
 'use client'
 
-import { Avatar, AvatarFallback, AvatarImage, Button, Heading, Loading } from '@/components/ui'
+import { useRouter } from 'next/navigation'
+
+import { Avatar, AvatarFallback, AvatarImage, Button, ButtonBack, Heading, Loading } from '@/components/ui'
 
 import { useBlockedUsers, useUnblockUser } from '../hooks'
 
 export const BlockedUsersList = () => {
   const { blockedUsers, isLoading } = useBlockedUsers()
   const { unblockUser, isUnblocking } = useUnblockUser()
+  const router = useRouter()
 
   return (
     <div className='h-full max-w-[800px]'>
-      <Heading level={2} className='mb-6'>
-        Черный список
-      </Heading>
+      <div className='mb-6 flex items-center gap-3'>
+        <ButtonBack onClick={() => router.back()} />
+        <Heading level={2}>Черный список</Heading>
+      </div>
 
       <div className='relative flex h-full w-full flex-col gap-4 overflow-hidden'>
         {isLoading && <Loading />}
