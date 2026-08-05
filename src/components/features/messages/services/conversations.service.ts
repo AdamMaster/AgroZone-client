@@ -24,6 +24,12 @@ class ConversationsService {
   async markRead(conversationId: string): Promise<void> {
     await api.patch(`${this.URL}/${conversationId}/read`, {})
   }
+
+  // Скрывает диалог только у текущего пользователя — не физическое удаление
+  // (см. комментарий в schema.prisma на бэкенде).
+  async deleteConversation(conversationId: string): Promise<void> {
+    await api.delete(`${this.URL}/${conversationId}`)
+  }
 }
 
 export const conversationsService = new ConversationsService()

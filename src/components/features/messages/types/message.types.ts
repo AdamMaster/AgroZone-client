@@ -52,3 +52,13 @@ export interface IStartConversationResponse {
   conversation: IConversation
   message: IMessage
 }
+
+// Элемент списка заблокированных — отдаёт GET /blocked-users. id — это id
+// заблокированного юзера (не id самой записи блокировки), его же передаём
+// обратно в DELETE /blocked-users/:id при разблокировке.
+export interface IBlockedUser {
+  id: string
+  displayName: string | null
+  picture: string | null
+  blockedAt: string
+}

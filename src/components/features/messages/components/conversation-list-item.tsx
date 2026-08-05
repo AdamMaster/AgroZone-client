@@ -5,6 +5,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 
 import { cn } from '@/lib/utils'
 
+import { useBlockUser, useDeleteConversation } from '../hooks'
 import { IConversationListItem } from '../types/message.types'
 import { formatMessageTime } from '../utils/format-message-time'
 
@@ -16,11 +17,28 @@ interface ConversationListItemProps {
 
 export const ConversationListItem = ({ conversation, isActive, onClick }: ConversationListItemProps) => {
   const { ad, counterpart, lastMessage, isUnread } = conversation
+  const { deleteConversation, isDeleting } = useDeleteConversation()
+  const { blockUser, isBlocking } = useBlockUser()
 
+  // Раньше вся строка была <button>, а DropdownMenuTrigger — сам по себе уже
+  // рендерит <button> (см. как он используется в ad-short-card.tsx — ему
+  // передают className напрямую, без обёртки) — плюс внутри него был ещё
+  // один ручной <button>. Получалось button > button > button, невалидный
+  // HTML: браузер сам разрывает такую вложенность, из-за чего клики вели
+  // себя непредсказуемо. Меняю корневой <button> на <div role='button'> (с
+  // клавиатурной доступностью через onKeyDown) — сам DropdownMenuTrigger
+  // остаётся один-единственный "настоящий" button, без ручной обёртки.
   return (
-    <button
-      type='button'
+    <div
+      role='button'
+      tabIndex={0}
       onClick={onClick}
+      onKeyDown={event => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault()
+          onClick()
+        }
+      }}
       className={cn(
         'ml relative flex w-full items-center gap-3 rounded-lg px-3 py-3 text-left transition-colors hover:bg-gray-100',
         isActive && 'bg-gray-50'
@@ -35,7 +53,10 @@ export const ConversationListItem = ({ conversation, isActive, onClick }: Conver
         <div className='flex items-center justify-between gap-2'>
           <p className={cn('text-[16px] leading-5 font-semibold')}>{counterpart.displayName ?? 'Пользователь'}</p>
           {lastMessage && (
-            <span className='shrink-0 text-xs text-gray-400'>{formatMessageTime(lastMessage.createdAt)}</span>
+            <div className='flex gap-3'>
+              <span className='shrink-0 text-xs text-gray-400'>{formatMessageTime(lastMessage.createdAt)}</span>
+              {isUnread && <span className='bg-primary size-2 shrink-0 rounded-full' />}
+            </div>
           )}
         </div>
         <p className='truncate text-sm'>{ad.title}</p>
@@ -46,19 +67,22 @@ export const ConversationListItem = ({ conversation, isActive, onClick }: Conver
         )}
       </div>
 
-      {isUnread && <span className='bg-primary size-2 shrink-0 rounded-full' />}
       <DropdownMenu>
-        <DropdownMenuTrigger>
-          <button className='absolute right-3 bottom-3 flex size-9 items-center justify-center rounded-lg bg-white'>
-            <Ellipsis className='size-5' />
-          </button>
+        <DropdownMenuTrigger
+          onClick={event => event.stopPropagation()}
+          className='absolute right-3 bottom-3 flex size-9 items-center justify-center rounded-lg bg-white'
+        >
+          <Ellipsis className='size-5' />
         </DropdownMenuTrigger>
-        <DropdownMenuContent>
-          <DropdownMenuItem>Variant 1</DropdownMenuItem>
-          <DropdownMenuItem>Variant 2</DropdownMenuItem>
-          <DropdownMenuItem>Variant 3</DropdownMenuItem>
+        <DropdownMenuContent onClick={event => event.stopPropagation()} align='end' className='w-44'>
+          <DropdownMenuItem disabled={isBlocking} onClick={() => blockUser(counterpart.id)}>
+            Заблокировать
+          </DropdownMenuItem>
+          <DropdownMenuItem disabled={isDeleting} onClick={() => deleteConversation(conversation.id)}>
+            Удалить переписку
+          </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
-    </button>
+    </div>
   )
 }

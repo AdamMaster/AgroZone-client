@@ -1,3 +1,4 @@
+export * from './blocked-users-list'
 export * from './chat-header'
 export * from './chat-pane'
 export * from './conversation-list'
