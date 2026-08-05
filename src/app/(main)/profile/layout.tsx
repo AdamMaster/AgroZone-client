@@ -11,7 +11,7 @@ export default function MainLayout({
     <div className='pt-10'>
       <Container>
         <div className='grid grid-cols-[280px_1fr] gap-6'>
-          <div className='rounded-xl'>
+          <div className='-ml-4 rounded-xl'>
             <SettingsNav />
           </div>
           <div className='relative w-[800px]'>{children}</div>

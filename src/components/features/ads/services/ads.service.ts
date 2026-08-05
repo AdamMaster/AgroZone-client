@@ -1,6 +1,6 @@
 import { api } from '@/shared/api'
 
-import { IAd, IAdsListResponse, ILocationOption, IUpdateAdDto } from '../types/ad.types'
+import { IAd, IAdsListResponse, ICreateAdReportDto, ILocationOption, IUpdateAdDto } from '../types/ad.types'
 
 class AdsService {
   private URL = 'ads'
@@ -107,6 +107,10 @@ class AdsService {
     const response = await api.patch(`${this.URL}/${id}/reject`, { reason })
 
     return response
+  }
+
+  async report(id: string, dto: ICreateAdReportDto): Promise<void> {
+    await api.post(`${this.URL}/${id}/reports`, { ...dto })
   }
 }
 

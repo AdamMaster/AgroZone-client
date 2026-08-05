@@ -80,6 +80,21 @@ export interface IAd {
   isFavorite?: boolean
 }
 
+// Значения — строго как в enum AdReportReason на бэкенде (prisma/schema.prisma).
+export enum AdReportReason {
+  Scam = 'SCAM',
+  WrongCategory = 'WRONG_CATEGORY',
+  ProhibitedItem = 'PROHIBITED_ITEM',
+  Duplicate = 'DUPLICATE',
+  Spam = 'SPAM',
+  Other = 'OTHER'
+}
+
+export interface ICreateAdReportDto {
+  reason: AdReportReason
+  comment?: string
+}
+
 export interface IUpdateAdDto {
   title?: string
   description?: string

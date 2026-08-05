@@ -133,7 +133,7 @@ export const ContentGeneral = () => {
                   </Field>
                 )}
               />
-              <Button variant='secondary' size='lg' type='submit' className='h-10 w-fit'>
+              <Button variant='secondary' size='lg' type='submit' className='h-12 w-fit'>
                 Сохранить
               </Button>
             </div>

@@ -23,6 +23,7 @@ import { useAd, useAddFavorite, useRemoveFavorite } from '../hooks'
 import { IAd, ICategoryFeature } from '../types/ad.types'
 import { CategoryBreadcrumbItem, CategoryBreadcrumbs } from './category-breadcrumbs'
 import { FavoriteButton } from './favorite-button'
+import { ReportAdDialog } from './report-ad-dialog'
 
 interface AdDetailProps {
   // Объявление, полученное на сервере (SSR) — используется как initialData
@@ -287,6 +288,13 @@ export const AdDetail = ({ ad: initialAd, categoryFeatures = [], categoryPath = 
             <MapPin className='size-5 flex-shrink-0' />
             {ad.address}
           </address>
+
+          {/* Только для чужих объявлений и только для авторизованных — в
+              отличие от "Написать" (это переход на защищённый middleware'ом
+              маршрут), тут прямое действие на этой же странице, поэтому
+              незалогиненного просто не показываем, а не полагаемся на
+              редирект. */}
+          {!isOwner && user && <ReportAdDialog adId={ad.id} />}
         </div>
       </div>
 
