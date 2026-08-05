@@ -1,11 +1,5 @@
-import { Heading } from '@/components/ui'
+import { redirect } from 'next/navigation'
 
 export default function AdminPage() {
-  return (
-    <div>
-      <Heading level={2} className='mt-8 text-center'>
-        Старница админа
-      </Heading>
-    </div>
-  )
+  redirect('/admin/moderation')
 }

@@ -108,6 +108,35 @@ export interface IUpdateAdDto {
   categoryId?: string
 }
 
+// Форма объявления в очереди модерации (GET /ads/pending) — отличается от
+// обычного IAd: category и user отдаются полными объектами (не опционально,
+// не в укороченном виде), плюс у user есть email/телефон — модератору нужно
+// иметь возможность связаться с продавцом, на публичной карточке объявления
+// эти поля никогда не отдаются.
+export interface IPendingAdUser {
+  id: string
+  displayName: string | null
+  email: string | null
+  phones: { phone: string }[]
+}
+
+export interface IPendingAdCategory {
+  id: string
+  name: string
+  fullPath: string
+}
+
+export interface IPendingAd {
+  id: string
+  title: string
+  price: number | null
+  images: string[]
+  address: string
+  createdAt: string
+  category: IPendingAdCategory
+  user: IPendingAdUser
+}
+
 export type AdCardData = Pick<IAd, 'id' | 'title' | 'price' | 'images' | 'address' | 'createdAt' | 'isFavorite'>
 export type AdCardListData = Pick<
   IAd,
