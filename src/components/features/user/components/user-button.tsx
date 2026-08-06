@@ -31,6 +31,11 @@ export const UserButton = ({ className, user }: UserButtonProps) => {
   const onMyAdsClick = () => {
     router.push('/profile/settings/ads')
   }
+
+  const onMessagesClick = () => {
+    router.push('/profile/settings/messages')
+  }
+
   const onMyFavoritesClick = () => {
     router.push('/profile/settings/favorites')
   }
@@ -39,6 +44,7 @@ export const UserButton = ({ className, user }: UserButtonProps) => {
     { id: 'general', text: 'Личные данные', onClick: () => onPersonalDataClick() },
     { id: 'security', text: 'Безопасность', onClick: () => onSecurityClick() },
     { id: 'ads', text: 'Мои объявления', onClick: () => onMyAdsClick() },
+    { id: 'messages', text: 'Сообщения', onClick: () => onMessagesClick() },
     { id: 'favorites', text: 'Избранное', onClick: () => onMyFavoritesClick() }
   ]
 

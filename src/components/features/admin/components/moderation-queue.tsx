@@ -13,7 +13,7 @@ export const ModerationQueue = () => {
   const { publishAd, isLoadingPublish } = usePublishAd()
 
   return (
-    <div>
+    <div className='h-full'>
       <Heading level={2} className='mb-6'>
         Объявления на модерации
       </Heading>
@@ -26,11 +26,9 @@ export const ModerationQueue = () => {
 
       <div className='flex flex-col gap-3'>
         {pendingAds.map(ad => (
-          <div key={ad.id} className='flex items-center gap-4 rounded-xl border p-4'>
+          <div key={ad.id} className='flex items-center gap-4'>
             <div className='relative size-20 shrink-0 overflow-hidden rounded-lg bg-gray-100'>
-              {ad.images[0] && (
-                <Image src={ad.images[0]} alt={ad.title} fill className='object-cover' sizes='80px' />
-              )}
+              {ad.images[0] && <Image src={ad.images[0]} alt={ad.title} fill className='object-cover' sizes='80px' />}
             </div>
 
             <div className='min-w-0 flex-1'>
@@ -44,7 +42,7 @@ export const ModerationQueue = () => {
             </div>
 
             <div className='flex shrink-0 gap-2'>
-              <Button size='sm' disabled={isLoadingPublish} onClick={() => publishAd(ad.id)}>
+              <Button size='lg' disabled={isLoadingPublish} onClick={() => publishAd(ad.id)}>
                 Опубликовать
               </Button>
               <RejectAdDialog adId={ad.id} />

@@ -20,12 +20,7 @@ export const AdminNav = () => {
 
   return (
     <nav>
-      <Link href='/' className='mb-4 flex items-center gap-2 px-4 text-sm text-gray-500 hover:text-gray-700'>
-        <ArrowLeft className='size-4' />
-        Вернуться на сайт
-      </Link>
-
-      <ul className='flex flex-col'>
+      <ul className='flex flex-col gap-1'>
         {items.map(item => {
           const Icon = item.icon
           const isActive = pathname === item.href
@@ -35,11 +30,10 @@ export const AdminNav = () => {
               <Link
                 href={item.href}
                 className={cn(
-                  'hover:text-primary flex items-center gap-2 rounded-lg px-4 py-2 text-gray-900',
-                  isActive && 'text-primary bg-gray-50'
+                  'flex items-center gap-2 rounded-lg px-4 py-3 hover:bg-gray-50',
+                  isActive && 'bg-gray-100'
                 )}
               >
-                <Icon size={18} className={cn('text-gray-400', isActive && 'text-primary')} />
                 {item.label}
               </Link>
             </li>

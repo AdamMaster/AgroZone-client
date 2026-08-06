@@ -31,7 +31,7 @@ export const ReportsQueue = () => {
 
       <div className='flex flex-col gap-3'>
         {reports.map(report => (
-          <div key={report.id} className='flex items-start gap-4 rounded-xl border p-4'>
+          <div key={report.id} className='flex items-start gap-4'>
             <div className='min-w-0 flex-1'>
               <div className='mb-1 flex items-center gap-2'>
                 <Link href={`/ads/${report.ad.id}`} target='_blank' className='hover:text-primary font-medium'>
