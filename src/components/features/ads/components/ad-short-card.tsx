@@ -9,8 +9,30 @@ import { Button, Heading, Tooltip, TooltipContent, TooltipTrigger } from '@/comp
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 
 import { IAd } from '../../ads/types/ad.types'
-import { useActivateAd, useDraftAd, useRemoveAd, useRepublishAd } from '../hooks'
+import { useActivateAd, useBumpAd, useDraftAd, useRemoveAd, useRepublishAd } from '../hooks'
 import { useArchiveAd } from '../hooks/use-archive-ad'
+
+// Поднятие платное и без ограничения на повторный клик (см. обсуждение —
+// кнопка нарочно всегда активна, а не блокируется на N часов после
+// последнего поднятия), поэтому вместо "заблокировано до..." тут просто
+// показываем, когда объявление поднимали в последний раз.
+const formatBumpDate = (value: Date | string) => {
+  const date = new Date(value)
+  const now = new Date()
+
+  if (date.toDateString() === now.toDateString()) {
+    return `сегодня в ${date.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })}`
+  }
+
+  const yesterday = new Date(now)
+  yesterday.setDate(now.getDate() - 1)
+
+  if (date.toDateString() === yesterday.toDateString()) {
+    return 'вчера'
+  }
+
+  return new Intl.DateTimeFormat('ru-RU', { day: 'numeric', month: 'long' }).format(date)
+}
 
 export const AdShortCard = ({ ad }: { ad: IAd }) => {
   const router = useRouter()
@@ -19,6 +41,7 @@ export const AdShortCard = ({ ad }: { ad: IAd }) => {
   const { activateAd, isLoadingActivate } = useActivateAd()
   const { draftAd, isLoadingDraft } = useDraftAd()
   const { republishAd, isLoadingRepublishAd } = useRepublishAd()
+  const { bumpAd, isLoadingBump } = useBumpAd()
 
   const handleEdit = () => {
     router.push(`/ads/${ad.id}/edit`)
@@ -46,6 +69,10 @@ export const AdShortCard = ({ ad }: { ad: IAd }) => {
 
   const handleRepublish = () => {
     republishAd({ id: ad.id })
+  }
+
+  const handleBump = () => {
+    bumpAd(ad.id)
   }
 
   // Публичная страница объявления отдаёт 404 для всего, кроме PUBLISHED —
@@ -111,7 +138,16 @@ export const AdShortCard = ({ ad }: { ad: IAd }) => {
               Опубликовать
             </Button>
           ))}
-        {ad.status === 'PUBLISHED' && <Button variant='outline'>Поднять просмотры</Button>}
+        {ad.status === 'PUBLISHED' && (
+          <div>
+            <Button className='w-full' variant='outline' onClick={() => handleBump()} disabled={isLoadingBump}>
+              Поднять объявление
+            </Button>
+            {ad.bumpedAt && (
+              <p className='mt-1 text-center text-[11px] text-gray-500'>Поднято {formatBumpDate(ad.bumpedAt)}</p>
+            )}
+          </div>
+        )}
         {ad.status === 'DRAFT' && (
           <Button variant='outline' onClick={() => handlePublished()} disabled={isLoadingActivate}>
             Опубликовать

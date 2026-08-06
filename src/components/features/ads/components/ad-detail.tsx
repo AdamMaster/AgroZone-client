@@ -21,6 +21,7 @@ import { cn } from '@/lib/utils'
 
 import { useAd, useAddFavorite, useRemoveFavorite } from '../hooks'
 import { IAd, ICategoryFeature } from '../types/ad.types'
+import { BumpStatusHandler } from './bump-status-handler'
 import { CategoryBreadcrumbItem, CategoryBreadcrumbs } from './category-breadcrumbs'
 import { FavoriteButton } from './favorite-button'
 import { ReportAdDialog } from './report-ad-dialog'
@@ -142,6 +143,7 @@ export const AdDetail = ({ ad: initialAd, categoryFeatures = [], categoryPath = 
 
   return (
     <div className='relative mt-6 max-w-[950px]'>
+      <BumpStatusHandler adId={ad.id} />
       <div className='absolute top-0 -left-18 h-full'>
         <ButtonBack onClick={() => router.back()} />
       </div>

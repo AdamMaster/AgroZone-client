@@ -78,6 +78,12 @@ export interface IAd {
   }
   rejectionReason?: string
   isFavorite?: boolean
+  // Когда объявление в последний раз "подняли" (платно) — влияет на
+  // сортировку каталога (см. ads.service.ts на бэкенде, DATE_DESC:
+  // COALESCE(bumped_at, created_at)), не имеет отдельного "срока действия":
+  // просто более свежий bumpedAt естественно вытесняется более новыми/снова
+  // поднятыми объявлениями со временем.
+  bumpedAt?: Date | string | null
 }
 
 // Значения — строго как в enum AdReportReason на бэкенде (prisma/schema.prisma).
@@ -159,6 +165,26 @@ export interface IAdsListResponse {
 // специфичности — 'region' (выбор фильтрует весь регион целиком) и
 // 'locality' (точечный фильтр по конкретному городу/селу, через
 // стабильный ФИАС-id, а не сравнение строк).
+// Значения — строго как в enum AdBumpStatus на бэкенде (prisma/schema.prisma).
+export type AdBumpStatus = 'PENDING' | 'SUCCEEDED' | 'CANCELED'
+
+export interface IAdBump {
+  id: string
+  adId: string
+  userId: string
+  status: AdBumpStatus
+  amount: number
+  yookassaPaymentId?: string | null
+  paidAt?: string | null
+  createdAt: string
+  updatedAt: string
+}
+
+export interface ICreateBumpCheckoutResponse {
+  confirmationUrl: string
+  bumpId: string
+}
+
 export type LocationOptionType = 'region' | 'locality'
 
 export interface ILocationOption {
