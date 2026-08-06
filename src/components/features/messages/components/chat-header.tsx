@@ -2,7 +2,8 @@ import { ArrowLeft, ImageIcon } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 
-import { Avatar, AvatarFallback, AvatarImage, Button } from '@/components/ui'
+import { Button } from '@/components/ui'
+import { UserAvatar } from '@/components/features/user/components'
 
 interface ChatHeaderAd {
   id: string
@@ -11,6 +12,7 @@ interface ChatHeaderAd {
 }
 
 interface ChatHeaderCounterpart {
+  id: string
   displayName?: string | null
   picture?: string | null
 }
@@ -37,10 +39,7 @@ export const ChatHeader = ({ ad, counterpart, isLoading, onBack }: ChatHeaderPro
           <ArrowLeft className='size-5' />
         </Button>
       )}
-      <Avatar>
-        <AvatarImage src={counterpart?.picture ?? undefined} />
-        <AvatarFallback>{counterpart?.displayName?.[0]?.toUpperCase() ?? '?'}</AvatarFallback>
-      </Avatar>
+      <UserAvatar user={counterpart ?? { id: '', displayName: null, picture: null }} />
       <div className='min-w-0 flex-1'>
         <p className='truncate text-sm font-medium'>
           {counterpart?.displayName ?? (isLoading ? 'Загрузка...' : 'Пользователь')}

@@ -3,11 +3,12 @@
 import { LogOut, Settings } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 
-import { Avatar, AvatarFallback, AvatarImage, Skeleton } from '@/components/ui'
+import { Skeleton } from '@/components/ui'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 
 import { IUser } from '../../auth/types'
 import { useLogoutMutation } from '../hooks'
+import { UserAvatar } from './user-avatar'
 
 interface UserButtonProps {
   className?: string
@@ -51,10 +52,7 @@ export const UserButton = ({ className, user }: UserButtonProps) => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger className={className}>
-        <Avatar>
-          <AvatarImage src={user.picture} />
-          <AvatarFallback>{user.displayName?.slice(0, 1)}</AvatarFallback>
-        </Avatar>
+        <UserAvatar user={user} />
       </DropdownMenuTrigger>
       <DropdownMenuContent className='w-40' align='end'>
         {list.map(item => (

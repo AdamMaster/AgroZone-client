@@ -2,7 +2,8 @@
 
 import { useRouter } from 'next/navigation'
 
-import { Avatar, AvatarFallback, AvatarImage, Button, ButtonBack, Heading, Loading } from '@/components/ui'
+import { Button, ButtonBack, Heading, Loading } from '@/components/ui'
+import { UserAvatar } from '@/components/features/user/components'
 
 import { useBlockedUsers, useUnblockUser } from '../hooks'
 
@@ -30,10 +31,7 @@ export const BlockedUsersList = () => {
 
         {blockedUsers.map(user => (
           <div key={user.id} className='flex items-center gap-3'>
-            <Avatar>
-              <AvatarImage src={user.picture ?? undefined} />
-              <AvatarFallback>{user.displayName?.[0]?.toUpperCase() ?? '?'}</AvatarFallback>
-            </Avatar>
+            <UserAvatar user={user} />
 
             <p className='min-w-0 flex-1 truncate text-sm font-medium'>{user.displayName ?? 'Пользователь'}</p>
 

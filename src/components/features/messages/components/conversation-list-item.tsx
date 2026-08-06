@@ -1,6 +1,7 @@
-import { Ellipsis } from 'lucide-react'
+import { Ellipsis, ImageIcon } from 'lucide-react'
+import Image from 'next/image'
 
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui'
+import { UserAvatar } from '@/components/features/user/components'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 
 import { cn } from '@/lib/utils'
@@ -20,14 +21,6 @@ export const ConversationListItem = ({ conversation, isActive, onClick }: Conver
   const { deleteConversation, isDeleting } = useDeleteConversation()
   const { blockUser, isBlocking } = useBlockUser()
 
-  // Раньше вся строка была <button>, а DropdownMenuTrigger — сам по себе уже
-  // рендерит <button> (см. как он используется в ad-short-card.tsx — ему
-  // передают className напрямую, без обёртки) — плюс внутри него был ещё
-  // один ручной <button>. Получалось button > button > button, невалидный
-  // HTML: браузер сам разрывает такую вложенность, из-за чего клики вели
-  // себя непредсказуемо. Меняю корневой <button> на <div role='button'> (с
-  // клавиатурной доступностью через onKeyDown) — сам DropdownMenuTrigger
-  // остаётся один-единственный "настоящий" button, без ручной обёртки.
   return (
     <div
       role='button'
@@ -44,10 +37,16 @@ export const ConversationListItem = ({ conversation, isActive, onClick }: Conver
         isActive && 'bg-gray-50'
       )}
     >
-      <Avatar className='size-15'>
-        <AvatarImage src={counterpart.picture ?? undefined} />
-        <AvatarFallback className=''>{counterpart.displayName?.[0]?.toUpperCase() ?? '?'}</AvatarFallback>
-      </Avatar>
+      <div className='relative'>
+        <UserAvatar user={counterpart} className='absolute -top-2 -left-2 z-10 size-9 border-2 border-white' />
+        <div className='relative size-15 overflow-hidden rounded-lg bg-gray-100'>
+          {ad.images?.[0] ? (
+            <Image src={ad.images[0]} alt='' className='size-full object-cover' fill sizes='200px' />
+          ) : (
+            <ImageIcon className='size-5 text-gray-400' />
+          )}
+        </div>
+      </div>
 
       <div className='flex min-w-0 flex-1 flex-col gap-0.5'>
         <div className='flex items-center justify-between gap-2'>

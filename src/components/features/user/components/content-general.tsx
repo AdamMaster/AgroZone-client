@@ -39,6 +39,7 @@ import { cn } from '@/lib/utils'
 import { useUpdateAvatarMutation } from '../hooks'
 import { useUpdateProfileMutation } from '../hooks/use-update-profile-mutation'
 import { SettingsSchema, TypeSettingsSchema } from '../schemes'
+import { UserAvatar } from './user-avatar'
 
 export const ContentGeneral = () => {
   const { user, isLoading } = useProfile()
@@ -88,10 +89,7 @@ export const ContentGeneral = () => {
                   isLoadingUpdateAvatar && 'pointer-events-none opacity-50'
                 )}
               >
-                <Avatar className='size-18 transition-all'>
-                  <AvatarImage src={user.picture} />
-                  <AvatarFallback className='text-lg'>{user.displayName?.slice(0, 1)}</AvatarFallback>
-                </Avatar>
+                <UserAvatar user={user} className='size-18' />
 
                 <div className='absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 transition-all duration-200 group-hover:opacity-100'>
                   <CameraIcon className='size-6 text-white' />

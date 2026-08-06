@@ -1,4 +1,4 @@
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui'
+import { UserAvatar } from '@/components/features/user/components'
 
 import { cn } from '@/lib/utils'
 
@@ -6,6 +6,7 @@ import { IMessage } from '../types/message.types'
 import { formatMessageTime } from '../utils/format-message-time'
 
 interface MessageBubbleCounterpart {
+  id: string
   displayName?: string | null
   picture?: string | null
 }
@@ -24,10 +25,11 @@ export const MessageBubble = ({ message, isOwn, counterpart }: MessageBubbleProp
     <div className='flex items-end'>
       <div className={cn('flex w-full items-end gap-2', isOwn ? 'justify-end' : 'justify-start')}>
         {!isOwn && (
-          <Avatar size='lg' className='mb-0.5 shrink-0'>
-            <AvatarImage src={counterpart?.picture ?? undefined} />
-            <AvatarFallback>{counterpart?.displayName?.[0]?.toUpperCase() ?? '?'}</AvatarFallback>
-          </Avatar>
+          <UserAvatar
+            user={counterpart ?? { id: '', displayName: null, picture: null }}
+            size='lg'
+            className='mb-0.5 shrink-0'
+          />
         )}
         <div
           className={cn(

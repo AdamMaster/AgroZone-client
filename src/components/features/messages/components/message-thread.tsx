@@ -10,6 +10,7 @@ import { IMessage } from '../types/message.types'
 import { MessageBubble } from './message-bubble'
 
 interface MessageThreadCounterpart {
+  id: string
   displayName?: string | null
   picture?: string | null
 }
