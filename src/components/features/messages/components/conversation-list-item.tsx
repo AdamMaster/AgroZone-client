@@ -41,7 +41,7 @@ export const ConversationListItem = ({ conversation, isActive, onClick }: Conver
         <UserAvatar user={counterpart} className='absolute -top-2 -left-2 z-10 size-9 border-2 border-white' />
         <div className='relative size-15 overflow-hidden rounded-lg bg-gray-100'>
           {ad.images?.[0] ? (
-            <Image src={ad.images[0]} alt='' className='size-full object-cover' fill sizes='200px' />
+            <Image src={ad.images[0]} alt='' className='size-full object-cover' fill />
           ) : (
             <ImageIcon className='size-5 text-gray-400' />
           )}

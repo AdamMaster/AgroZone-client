@@ -2,8 +2,8 @@ import { ArrowLeft, ImageIcon } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 
-import { Button } from '@/components/ui'
 import { UserAvatar } from '@/components/features/user/components'
+import { Button } from '@/components/ui'
 
 interface ChatHeaderAd {
   id: string
@@ -49,13 +49,6 @@ export const ChatHeader = ({ ad, counterpart, isLoading, onBack }: ChatHeaderPro
             href={`/ads/${ad.id}`}
             className='hover:text-primary flex items-center gap-1.5 truncate text-xs text-gray-500'
           >
-            {ad.images?.[0] ? (
-              <span className='relative size-4 shrink-0 overflow-hidden rounded'>
-                <Image src={ad.images[0]} alt={ad.title} fill sizes='16px' className='object-cover' />
-              </span>
-            ) : (
-              <ImageIcon className='size-3.5 shrink-0' />
-            )}
             <span className='truncate'>{ad.title}</span>
           </Link>
         )}
