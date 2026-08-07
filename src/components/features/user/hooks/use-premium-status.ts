@@ -25,10 +25,16 @@ export function usePremiumStatusCheck() {
 
     onSuccess(purchase) {
       if (purchase.status === 'SUCCEEDED') {
-        toast.success('Премиум активирован')
-        // Именно ['profile'] (см. useProfile) — premiumUntil приходит в
-        // составе профиля, отдельного кэша под премиум нет.
+        toast.success('Премиум активирован', {
+          description: 'Все ваши объявления подняты в поиске и теперь поднимаются автоматически каждый день'
+        })
+        // ['profile'] — premiumUntil приходит в составе профиля, отдельного
+        // кэша под премиум нет. ['my-ads'] — при покупке премиума бэкенд
+        // сразу поднимает (bumpedAt) все опубликованные объявления
+        // пользователя (см. PremiumService.reconcilePayment), список "мои
+        // объявления" должен это увидеть без ручного обновления страницы.
         queryClient.invalidateQueries({ queryKey: ['profile'] })
+        queryClient.invalidateQueries({ queryKey: ['my-ads'] })
       } else if (purchase.status === 'CANCELED') {
         toast.error('Оплата не прошла', { description: 'Платёж отменён — премиум не активирован' })
       } else {

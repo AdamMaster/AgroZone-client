@@ -11,6 +11,20 @@ import { PremiumStatusHandler } from './premium-status-handler'
 
 const PREMIUM_PRICE_LABEL = '1499 ₽ за 30 дней'
 
+// ВАЖНО: сейчас реально работают (завязаны на premiumUntil) "До 15 фото"
+// (см. AdsService.validateFileLimits) и "Автоматический подъём объявлений"
+// (см. AdAutoBumpWorker + PremiumService.reconcilePayment — при покупке
+// premium сразу поднимает все опубликованные объявления, дальше держит их
+// свежими всё время, пока premium активен). Бейдж «Премиум» и
+// автовыделение — пока НЕ реализованы технически (план — см.
+// agro-zone-monetization-plan.md). Скидка на «Поднять объявление» тоже не
+// реализована и, возможно, вообще не нужна: премиум-пользователям кнопка
+// "Поднять объявление" теперь просто не показывается (см. AdShortCard) —
+// им нечего покупать со скидкой, объявления и так поднимаются бесплатно.
+// Показывать нереализованные пункты здесь до реализации — осознанный
+// маркетинговый риск (по сути обещание того, что покупатель сегодня не
+// получит), поэтому либо доделать функциональность в первую очередь, либо
+// явно пометить эти пункты как "скоро" на странице.
 const BENEFITS = [
   {
     title: 'До 15 фото к объявлению',
@@ -53,9 +67,9 @@ export const ContentPremium = () => {
       </Heading>
 
       {isLoading ? (
-        <Skeleton className='h-[500px] w-full max-w-lg rounded-xl' />
+        <Skeleton className='h-48 w-full max-w-md rounded-xl' />
       ) : isPremiumActive ? (
-        <div className='max-w-lg rounded-xl bg-amber-100 p-6'>
+        <div className='max-w-md rounded-xl bg-amber-100 p-6'>
           <div className='mb-3 flex items-center gap-2'>
             <Crown className='size-5 text-orange-500' />
             <Heading level={4}>Премиум активен</Heading>
@@ -66,15 +80,15 @@ export const ContentPremium = () => {
           </Button>
         </div>
       ) : (
-        <div className='max-w-lg rounded-xl bg-gray-100 p-6'>
+        <div className='max-w-md rounded-xl bg-gray-50 p-6'>
           <p className='mb-4 text-2xl font-bold'>{PREMIUM_PRICE_LABEL}</p>
-          <ul className='mb-6 flex flex-col gap-3'>
+          <ul className='mb-6 flex flex-col gap-2'>
             {BENEFITS.map(benefit => (
-              <li key={benefit.title} className='flex items-start gap-2'>
+              <li key={benefit.title} className='flex items-start gap-2 text-gray-700'>
                 <Check className='text-primary mt-0.5 size-4 flex-shrink-0' strokeWidth={3} />
                 <div>
-                  <p className='font-medium'>{benefit.title}</p>
-                  {benefit.description && <p className='text-sm text-gray-600'>{benefit.description}</p>}
+                  <p className='text-sm font-medium'>{benefit.title}</p>
+                  {benefit.description && <p className='text-xs text-gray-500'>{benefit.description}</p>}
                 </div>
               </li>
             ))}

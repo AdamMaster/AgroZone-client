@@ -5,8 +5,12 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 
+import { Crown } from 'lucide-react'
+
 import { Button, Heading, Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
+
+import { useProfile } from '@/shared/hooks'
 
 import { IAd } from '../../ads/types/ad.types'
 import { useActivateAd, useBumpAd, useDraftAd, useRemoveAd, useRepublishAd } from '../hooks'
@@ -34,14 +38,26 @@ const formatBumpDate = (value: Date | string) => {
   return new Intl.DateTimeFormat('ru-RU', { day: 'numeric', month: 'long' }).format(date)
 }
 
+const formatServiceUntilDate = (value: Date | string) => {
+  return new Intl.DateTimeFormat('ru-RU', { day: 'numeric', month: 'long' }).format(new Date(value))
+}
+
 export const AdShortCard = ({ ad }: { ad: IAd }) => {
   const router = useRouter()
+  const { user } = useProfile()
   const { removeAd, isLoadingRemove } = useRemoveAd()
   const { archiveAd, isLoadingArchive } = useArchiveAd()
   const { activateAd, isLoadingActivate } = useActivateAd()
   const { draftAd, isLoadingDraft } = useDraftAd()
   const { republishAd, isLoadingRepublishAd } = useRepublishAd()
   const { bumpAd, isLoadingBump } = useBumpAd()
+
+  // Премиум и так поднимает ВСЕ опубликованные объявления владельца
+  // автоматически каждый день (см. AdAutoBumpWorker) — покупать разовую
+  // услугу поверх премиума было бы просто потраченными деньгами, поэтому
+  // прячем кнопку и объясняем, почему её нет.
+  const isOwnerPremiumActive = !!user?.premiumUntil && new Date(user.premiumUntil) > new Date()
+  const isBumpServiceActive = !!ad.bumpServiceUntil && new Date(ad.bumpServiceUntil) > new Date()
 
   const handleEdit = () => {
     router.push(`/ads/${ad.id}/edit`)
@@ -140,9 +156,27 @@ export const AdShortCard = ({ ad }: { ad: IAd }) => {
           ))}
         {ad.status === 'PUBLISHED' && (
           <div>
-            <Button className='w-full' variant='outline' onClick={() => handleBump()} disabled={isLoadingBump}>
-              Поднять объявление
-            </Button>
+            {isOwnerPremiumActive ? (
+              <Tooltip>
+                <TooltipTrigger className='flex w-full items-center justify-center gap-1.5 rounded-lg bg-amber-100 px-3 py-2 text-xs font-medium text-amber-700'>
+                  <Crown className='size-3.5' />
+                  Поднимается автоматически
+                </TooltipTrigger>
+                <TooltipContent>
+                  Премиум-аккаунт сам поднимает все ваши объявления в топ каждый день — покупать услугу отдельно не
+                  нужно.
+                </TooltipContent>
+              </Tooltip>
+            ) : (
+              <Button className='w-full' variant='outline' onClick={() => handleBump()} disabled={isLoadingBump}>
+                Поднять объявление
+              </Button>
+            )}
+            {isBumpServiceActive && (
+              <p className='mt-1 text-center text-[11px] text-gray-500'>
+                Услуга активна до {formatServiceUntilDate(ad.bumpServiceUntil as Date | string)}
+              </p>
+            )}
             {ad.bumpedAt && (
               <p className='mt-1 text-center text-[11px] text-gray-500'>Поднято {formatBumpDate(ad.bumpedAt)}</p>
             )}

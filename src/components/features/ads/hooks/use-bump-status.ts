@@ -24,7 +24,9 @@ export function useBumpStatusCheck(adId: string) {
 
     onSuccess(bump) {
       if (bump.status === 'SUCCEEDED') {
-        toast.success('Объявление поднято в поиске')
+        toast.success('Объявление поднято в поиске', {
+          description: 'Услуга активна 7 дней — всё это время объявление будет каждый день само подниматься в топ'
+        })
         queryClient.invalidateQueries({ queryKey: ['ad-public', adId] })
         queryClient.invalidateQueries({ queryKey: ['my-ads'] })
       } else if (bump.status === 'CANCELED') {
