@@ -47,6 +47,10 @@ export interface IUser {
   accounts: IAccount[]
   maxUploadLimit: number
   type: UserType
+  // Премиум активен, если дата в будущем — НЕ связано с полем role (см.
+  // комментарий в schema.prisma на бэкенде, UserRole.Premium оставлен
+  // только для обратной совместимости и новым кодом не используется).
+  premiumUntil?: string | null
 }
 
 export interface IUserPhone {
