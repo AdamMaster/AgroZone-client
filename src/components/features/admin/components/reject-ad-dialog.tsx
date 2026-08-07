@@ -47,7 +47,7 @@ export const RejectAdDialog = ({ adId }: RejectAdDialogProps) => {
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogTrigger render={<Button variant='destructive' size='lg' />}>Отклонить</DialogTrigger>
+      <DialogTrigger render={<Button variant='ghost' size='lg' />}>Отклонить</DialogTrigger>
 
       <DialogContent className='max-w-100'>
         <DialogHeader>

@@ -1,6 +1,14 @@
 import { api } from '@/shared/api'
 
-import { IAd, IAdsListResponse, ICreateAdReportDto, ILocationOption, IPendingAd, IUpdateAdDto } from '../types/ad.types'
+import {
+  IAd,
+  IAdsListResponse,
+  ICreateAdReportDto,
+  ILocationOption,
+  IModerationAd,
+  IPendingAd,
+  IUpdateAdDto
+} from '../types/ad.types'
 
 class AdsService {
   private URL = 'ads'
@@ -116,6 +124,13 @@ class AdsService {
   // Очередь модерации — только для админа (см. AdsController.findPending).
   async findPending(): Promise<IPendingAd[]> {
     return api.get<IPendingAd[]>(`${this.URL}/pending`)
+  }
+
+  // Полная карточка для предпросмотра модератором — только для админа (см.
+  // AdsController.findOneForModeration), в отличие от findOne не
+  // ограничена статусом PUBLISHED.
+  async findOneForModeration(id: string): Promise<IModerationAd> {
+    return api.get<IModerationAd>(`${this.URL}/${id}/moderation`)
   }
 }
 

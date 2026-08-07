@@ -24,6 +24,14 @@ export function usePublishAd() {
       queryClient.invalidateQueries({
         queryKey: ['published-ads']
       })
+
+      // Без id: invalidateQueries матчит по префиксу, так что это разом
+      // инвалидирует и ['ad-moderation', <любой id>] — если публикация
+      // произошла со страницы предпросмотра модератора (см.
+      // use-moderation-ad.ts), статус там обновится без ручного рефреша.
+      queryClient.invalidateQueries({
+        queryKey: ['ad-moderation']
+      })
     },
 
     onError(error) {

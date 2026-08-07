@@ -49,10 +49,6 @@ export default async function AdPage({ params }: AdPageProps) {
     return notFound()
   }
 
-  // Цепочка категорий от корня до текущей — нужна и для лейблов
-  // характеристик (берём их с самой глубокой, целевой категории), и для
-  // хлебных крошек со ссылками (у каждой категории есть свой fullPath,
-  // ровно тот, что уже используется для ссылок на каталог в CategoryGrid).
   const categoryChain = getPathToCategory(categories, ad.categoryId)
     .map(id => findCategoryById(categories, id))
     .filter((c): c is NonNullable<typeof c> => c !== null)

@@ -24,6 +24,11 @@ export function useRejectAd() {
       queryClient.invalidateQueries({
         queryKey: ['rejected-ads']
       })
+
+      // См. use-publish-ad.ts — та же причина, тот же приём.
+      queryClient.invalidateQueries({
+        queryKey: ['ad-moderation']
+      })
     },
 
     onError(error) {

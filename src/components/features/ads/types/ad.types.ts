@@ -148,6 +148,15 @@ export interface IPendingAd {
   user: IPendingAdUser
 }
 
+// Полная карточка объявления для превью модератора (GET /ads/:id/moderation)
+// — по сути тот же IAd, но с "владельческим" видом на продавца (email и
+// телефон напрямую, как в IPendingAd/IPendingAdUser, а не скрытый номер
+// как на публичной странице) и без опциональности статус-зависимых полей.
+export type IModerationAd = Omit<IAd, 'user' | 'category'> & {
+  user: IPendingAdUser | null
+  category: IPendingAdCategory
+}
+
 export type AdCardData = Pick<IAd, 'id' | 'title' | 'price' | 'images' | 'address' | 'createdAt' | 'isFavorite'>
 export type AdCardListData = Pick<
   IAd,

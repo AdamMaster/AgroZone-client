@@ -13,7 +13,7 @@ export const ModerationQueue = () => {
   const { publishAd, isLoadingPublish } = usePublishAd()
 
   return (
-    <div className='h-full'>
+    <div>
       <Heading level={2} className='mb-6'>
         Объявления на модерации
       </Heading>
@@ -26,17 +26,17 @@ export const ModerationQueue = () => {
 
       <div className='flex flex-col gap-3'>
         {pendingAds.map(ad => (
-          <div key={ad.id} className='flex gap-4 border-b py-3'>
+          <div key={ad.id} className='flex gap-4 rounded-xl py-3'>
             <div className='relative size-20 shrink-0 overflow-hidden rounded-lg bg-gray-100'>
-              {ad.images[0] && <Image src={ad.images[0]} alt={ad.title} fill className='h-full w-full object-cover' />}
+              {ad.images[0] && <Image src={ad.images[0]} alt={ad.title} fill className='object-cover' sizes='80px' />}
             </div>
 
             <div className='min-w-0 flex-1'>
-              <Link href={`/ads/${ad.id}`} target='_blank' className='hover:text-primary font-medium'>
+              <Link href={`/admin/moderation/${ad.id}`} className='hover:text-primary font-medium'>
                 {ad.title}
               </Link>
               {/* <p className='text-sm text-gray-500'>{ad.category.fullPath}</p> */}
-              <p className='text-sm'>
+              <p className='text-sm text-gray-500'>
                 {ad.user.displayName ?? 'Пользователь'} · {ad.user.email ?? ad.user.phones[0]?.phone ?? '—'}
               </p>
             </div>

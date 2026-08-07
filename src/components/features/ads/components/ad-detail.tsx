@@ -8,8 +8,6 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import Lightbox from 'yet-another-react-lightbox'
 import Zoom from 'yet-another-react-lightbox/plugins/zoom'
 
-import 'yet-another-react-lightbox/styles.css'
-
 import { Avatar, AvatarFallback, AvatarImage, Button, ButtonBack, Heading } from '@/components/ui'
 
 import { PRICE_UNITS } from '@/shared/constants/units'
@@ -25,6 +23,8 @@ import { BumpStatusHandler } from './bump-status-handler'
 import { CategoryBreadcrumbItem, CategoryBreadcrumbs } from './category-breadcrumbs'
 import { FavoriteButton } from './favorite-button'
 import { ReportAdDialog } from './report-ad-dialog'
+
+import 'yet-another-react-lightbox/styles.css'
 
 interface AdDetailProps {
   // Объявление, полученное на сервере (SSR) — используется как initialData
@@ -65,11 +65,6 @@ export const AdDetail = ({ ad: initialAd, categoryFeatures = [], categoryPath = 
   const { addFavorite, isAddingFavorite } = useAddFavorite()
   const { removeFavorite, isRemovingFavorite } = useRemoveFavorite()
 
-  // Свайп по самим фото — обычный горизонтальный скролл со scroll-snap,
-  // без единой JS-библиотеки: нативная инерция браузера/тачпада на
-  // мобильных ничем не хуже (а часто и лучше) любой карусельной либы.
-  // JS-библиотека (yarl) нужна только там, где CSS реально бессилен — для
-  // зума в полноэкранном режиме.
   const scrollToImage = (index: number) => {
     const slide = galleryRef.current?.children[index] as HTMLElement | undefined
     slide?.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' })
@@ -126,18 +121,10 @@ export const AdDetail = ({ ad: initialAd, categoryFeatures = [], categoryPath = 
 
   const publishedDate = formatDate(ad.publishedAt)
 
-  // yarl сравнивает slides по ссылке: если пересоздавать массив на каждый
-  // рендер (а рендер триггерится в том числе самим on.view при свайпе),
-  // лайтбокс считает, что слайды "изменились", и сбрасывает текущий кадр
-  // обратно на index — свайп визуально не даёт пролистать дальше текущего
-  // фото. useMemo держит ссылку стабильной, пока не поменялись сами фото.
   const slides = useMemo(() => ad.images.map(src => ({ src })), [ad.images])
 
   const closeLightbox = () => {
     setIsLightboxOpen(false)
-    // Досинхронизировать фоновую scroll-snap галерею с тем, на каком фото
-    // остановились внутри лайтбокса — делаем это один раз при закрытии, а
-    // не на каждый шаг свайпа, чтобы не гонять лишний scrollIntoView.
     scrollToImage(activeImage)
   }
 
@@ -147,7 +134,7 @@ export const AdDetail = ({ ad: initialAd, categoryFeatures = [], categoryPath = 
       <div className='absolute top-0 -left-18 h-full'>
         <ButtonBack onClick={() => router.back()} />
       </div>
-      <CategoryBreadcrumbs className='mb-2' items={[{ name: 'Каталог', href: '/catalog' }, ...categoryPath]} />
+      <CategoryBreadcrumbs className='mb-2' items={[{ name: 'Объявления', href: '/catalog' }, ...categoryPath]} />
 
       <Heading level={1} className='mb-6'>
         {ad.title}
@@ -158,7 +145,7 @@ export const AdDetail = ({ ad: initialAd, categoryFeatures = [], categoryPath = 
           {ad.images.length > 0 ? (
             <div
               ref={galleryRef}
-              className='mb-2 flex snap-x snap-mandatory overflow-x-auto overscroll-x-contain rounded-xl bg-gray-100 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden'
+              className='mb-2 flex snap-x snap-mandatory [scrollbar-width:none] overflow-x-auto overscroll-x-contain rounded-xl bg-gray-100 [&::-webkit-scrollbar]:hidden'
             >
               {ad.images.map((image, index) => (
                 <button
@@ -296,7 +283,8 @@ export const AdDetail = ({ ad: initialAd, categoryFeatures = [], categoryPath = 
                   пока не существует — как появится, обернуть в Link. */}
               {!!ad.user?.adsCount && (
                 <p className='text-xs text-gray-500'>
-                  Ещё {ad.user.adsCount} {pluralizeRu(ad.user.adsCount, ['объявление', 'объявления', 'объявлений'])} продавца
+                  Ещё {ad.user.adsCount} {pluralizeRu(ad.user.adsCount, ['объявление', 'объявления', 'объявлений'])}{' '}
+                  продавца
                 </p>
               )}
             </div>
