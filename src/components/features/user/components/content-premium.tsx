@@ -12,9 +12,26 @@ import { PremiumStatusHandler } from './premium-status-handler'
 const PREMIUM_PRICE_LABEL = '1499 ₽ за 30 дней'
 
 const BENEFITS = [
-  'Выделенное объявление',
-  'Автоподнятие объявления каждые 7 дней',
-  'До 15 фото к каждому объявлению вместо 5'
+  {
+    title: 'До 15 фото к объявлению',
+    description: 'Вместо 5 — покажите технику или животных со всех сторон'
+  },
+  {
+    title: 'Выделенное объявление',
+    description: 'Все ваши объявления автоматически подсвечиваются в каталоге и списках'
+  },
+  {
+    title: 'Бейдж «Премиум»',
+    description: 'Отмечает вас как надёжного продавца рядом с именем в объявлениях и профиле'
+  },
+  {
+    title: 'Скидка на «Поднять объявление»',
+    description: 'Дешевле поднимать объявления в поиске, пока активен премиум'
+  },
+  {
+    title: 'Автоматический подъём объявлений',
+    description: 'Объявления сами поднимаются в поиске — без ручных действий и доплат'
+  }
 ]
 
 const formatDate = (value: string) => {
@@ -36,9 +53,9 @@ export const ContentPremium = () => {
       </Heading>
 
       {isLoading ? (
-        <Skeleton className='h-48 w-full max-w-md rounded-xl' />
+        <Skeleton className='h-[500px] w-full max-w-lg rounded-xl' />
       ) : isPremiumActive ? (
-        <div className='max-w-md rounded-xl bg-amber-100 p-6'>
+        <div className='max-w-lg rounded-xl bg-amber-100 p-6'>
           <div className='mb-3 flex items-center gap-2'>
             <Crown className='size-5 text-orange-500' />
             <Heading level={4}>Премиум активен</Heading>
@@ -49,13 +66,16 @@ export const ContentPremium = () => {
           </Button>
         </div>
       ) : (
-        <div className='max-w-md rounded-xl bg-gray-50 p-6'>
+        <div className='max-w-lg rounded-xl bg-gray-100 p-6'>
           <p className='mb-4 text-2xl font-bold'>{PREMIUM_PRICE_LABEL}</p>
-          <ul className='mb-6 flex flex-col gap-2'>
+          <ul className='mb-6 flex flex-col gap-3'>
             {BENEFITS.map(benefit => (
-              <li key={benefit} className='flex items-start gap-2 text-gray-700'>
+              <li key={benefit.title} className='flex items-start gap-2'>
                 <Check className='text-primary mt-0.5 size-4 flex-shrink-0' strokeWidth={3} />
-                {benefit}
+                <div>
+                  <p className='font-medium'>{benefit.title}</p>
+                  {benefit.description && <p className='text-sm text-gray-600'>{benefit.description}</p>}
+                </div>
               </li>
             ))}
           </ul>

@@ -36,8 +36,8 @@ export const SettingsNav = () => {
               <Link
                 href={item.href}
                 className={cn(
-                  'hover:text-primary flex items-center gap-2 rounded-lg px-4 py-2 text-gray-900',
-                  isActive && 'text-primary bg-gray-100',
+                  'flex items-center gap-2 rounded-lg px-4 py-2 text-gray-900 hover:bg-gray-50',
+                  isActive && 'bg-gray-100',
                   item.id === 'premium' && 'text-orange-500 hover:text-orange-600'
                 )}
               >
@@ -45,8 +45,8 @@ export const SettingsNav = () => {
                   size={18}
                   className={cn(
                     'text-gray-400',
-                    isActive && 'text-primary',
-                    item.id === 'premium' && 'text-orange-500'
+                    item.id === 'premium' && 'text-orange-500',
+                    isActive && 'text-inherit'
                   )}
                 />
                 {item.label}
