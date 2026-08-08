@@ -1,11 +1,10 @@
 'use client'
 
 import { CircleAlert, Ellipsis, ImageIcon } from 'lucide-react'
+import { Crown } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-
-import { Crown } from 'lucide-react'
 
 import { Button, Heading, Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
@@ -159,7 +158,6 @@ export const AdShortCard = ({ ad }: { ad: IAd }) => {
             {isOwnerPremiumActive ? (
               <Tooltip>
                 <TooltipTrigger className='flex w-full items-center justify-center gap-1.5 rounded-lg bg-amber-100 px-3 py-2 text-xs font-medium text-amber-700'>
-                  <Crown className='size-3.5' />
                   Поднимается автоматически
                 </TooltipTrigger>
                 <TooltipContent>
@@ -177,9 +175,9 @@ export const AdShortCard = ({ ad }: { ad: IAd }) => {
                 Услуга активна до {formatServiceUntilDate(ad.bumpServiceUntil as Date | string)}
               </p>
             )}
-            {ad.bumpedAt && (
+            {/* {ad.bumpedAt && (
               <p className='mt-1 text-center text-[11px] text-gray-500'>Поднято {formatBumpDate(ad.bumpedAt)}</p>
-            )}
+            )} */}
           </div>
         )}
         {ad.status === 'DRAFT' && (

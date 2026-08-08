@@ -44,6 +44,11 @@ export interface IAdUser {
   // Частное лицо / ИП / компания — по той же причине опционально: приходит
   // только с GET /ads/:id.
   type?: UserType
+  // Для бейджа "Премиум" рядом с именем продавца (см. AdDetail) — та же
+  // причина опциональности, что и у остальных полей выше. Сырое значение
+  // с бэкенда, активность проверяется на фронте через isPremiumActive из
+  // '@/shared/utils/user.util'.
+  premiumUntil?: string | null
 }
 
 export interface IAd {

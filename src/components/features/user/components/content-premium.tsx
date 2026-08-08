@@ -69,13 +69,20 @@ export const ContentPremium = () => {
       {isLoading ? (
         <Skeleton className='h-48 w-full max-w-md rounded-xl' />
       ) : isPremiumActive ? (
-        <div className='max-w-md rounded-xl bg-amber-100 p-6'>
-          <div className='mb-3 flex items-center gap-2'>
-            <Crown className='size-5 text-orange-500' />
-            <Heading level={4}>Премиум активен</Heading>
+        <div className='max-w-md rounded-2xl bg-gray-100 p-8'>
+          <div className='mb-1.5 flex items-center gap-2'>
+            <Heading level={4} className='font-medium'>
+              Премиум активен
+            </Heading>
+            <Crown className='size-5 fill-orange-500 text-orange-500' />
           </div>
-          <p className='mb-6 text-sm text-gray-600'>Действует до {formatDate(user!.premiumUntil as string)}</p>
-          <Button variant='outline' onClick={() => startPremiumCheckout()} disabled={isStartingPremiumCheckout}>
+          <p className='mb-7 text-sm'>Действует до {formatDate(user!.premiumUntil as string)}</p>
+          <Button
+            variant='default'
+            className='border-0 px-4'
+            onClick={() => startPremiumCheckout()}
+            disabled={isStartingPremiumCheckout}
+          >
             Продлить ещё на 30 дней — {PREMIUM_PRICE_LABEL}
           </Button>
         </div>

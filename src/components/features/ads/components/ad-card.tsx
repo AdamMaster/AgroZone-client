@@ -28,7 +28,7 @@ export const AdCard = ({ ad }: AdCardProps) => {
   }
 
   return (
-    <article className='flex flex-col gap-2'>
+    <article className='flex flex-col gap-2 rounded-xl bg-gray-100 p-2'>
       <Link href={`/ads/${ad.id}`} className='relative block overflow-hidden rounded-xl bg-gray-100 pt-[100%]'>
         {ad.images.length > 0 ? (
           <Image src={ad.images[0]} alt={ad.title} className='h-full w-full object-cover mix-blend-darken' fill />

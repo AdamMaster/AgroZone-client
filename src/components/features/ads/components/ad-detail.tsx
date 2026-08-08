@@ -1,6 +1,6 @@
 'use client'
 
-import { ImageIcon, MapPin, Phone } from 'lucide-react'
+import { Crown, ImageIcon, MapPin, Phone } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
@@ -13,10 +13,11 @@ import { Avatar, AvatarFallback, AvatarImage, Button, ButtonBack, Heading } from
 import { PRICE_UNITS } from '@/shared/constants/units'
 import { USER_TYPE_LABELS } from '@/shared/constants/user-types'
 import { useProfile } from '@/shared/hooks'
-import { formatPhoneNumber, pluralizeRu } from '@/shared/utils'
+import { formatPhoneNumber, isPremiumActive, pluralizeRu } from '@/shared/utils'
 
 import { cn } from '@/lib/utils'
 
+import { UserAvatar } from '../../user/components'
 import { useAd, useAddFavorite, useRemoveFavorite } from '../hooks'
 import { IAd, ICategoryFeature } from '../types/ad.types'
 import { BumpStatusHandler } from './bump-status-handler'
@@ -127,6 +128,12 @@ export const AdDetail = ({ ad: initialAd, categoryFeatures = [], categoryPath = 
     setIsLightboxOpen(false)
     scrollToImage(activeImage)
   }
+
+  // Бейдж "Премиум" рядом с именем продавца — намеренно не "проверенный
+  // пользователь" и т.п.: премиум означает только оплаченную подписку, а
+  // не реальную верификацию личности/документов, называть его как-то
+  // иначе было бы вводящим в заблуждение обещанием.
+  const isSellerPremium = isPremiumActive(ad.user?.premiumUntil)
 
   return (
     <div className='relative mt-6 max-w-[950px]'>
@@ -262,25 +269,13 @@ export const AdDetail = ({ ad: initialAd, categoryFeatures = [], categoryPath = 
             )}
           </div>
 
-          <div className='mb-6 flex items-center gap-3'>
-            <Avatar size='lg'>
-              <AvatarImage src={ad.user?.picture ?? undefined} />
-              <AvatarFallback>{ad.user?.displayName?.[0]?.toUpperCase() ?? '?'}</AvatarFallback>
-            </Avatar>
+          <div className='mb-4 flex items-center gap-3'>
+            <UserAvatar user={ad.user!} className='size-12' />
             <div>
               <div className='flex items-center gap-1.5'>
                 <p className='text-sm font-medium'>{ad.user?.displayName ?? 'Пользователь'}</p>
-                {/* Частное лицо / ИП / Компания — чисто информационная метка,
-                    без привязанных к ней привилегий на площадке. */}
-                {ad.user?.type && (
-                  <span className='rounded-full bg-gray-100 px-2 py-0.5 text-[11px] text-gray-600'>
-                    {USER_TYPE_LABELS[ad.user.type]}
-                  </span>
-                )}
               </div>
               {publishedDate && <p className='text-xs text-gray-500'>Опубликовано {publishedDate}</p>}
-              {/* Ссылки нет: страницы всех объявлений продавца в проекте
-                  пока не существует — как появится, обернуть в Link. */}
               {!!ad.user?.adsCount && (
                 <p className='text-xs text-gray-500'>
                   Ещё {ad.user.adsCount} {pluralizeRu(ad.user.adsCount, ['объявление', 'объявления', 'объявлений'])}{' '}
@@ -289,43 +284,58 @@ export const AdDetail = ({ ad: initialAd, categoryFeatures = [], categoryPath = 
               )}
             </div>
           </div>
-          <address className='mb-4 flex items-center gap-2 not-italic'>
-            <MapPin className='size-5 flex-shrink-0' />
-            {ad.address}
-          </address>
-
-          {/* Только для чужих объявлений и только для авторизованных — в
-              отличие от "Написать" (это переход на защищённый middleware'ом
-              маршрут), тут прямое действие на этой же странице, поэтому
-              незалогиненного просто не показываем, а не полагаемся на
-              редирект. */}
+          <div className='mb-6 flex gap-2'>
+            {ad.user?.type && (
+              <span className='rounded-full bg-gray-100 px-2.5 py-1 text-xs text-gray-600'>
+                {USER_TYPE_LABELS[ad.user.type]}
+              </span>
+            )}
+            {isSellerPremium && (
+              <span className='flex items-center gap-1 rounded-full bg-amber-100 px-2.5 py-1 text-xs text-amber-700'>
+                <Crown size={11} />
+                Премиум
+              </span>
+            )}
+          </div>
           {!isOwner && user && <ReportAdDialog adId={ad.id} />}
         </div>
       </div>
 
-      {ad.description && (
-        <div className='mb-8'>
-          <Heading level={4} className='mb-2'>
-            Описание
-          </Heading>
-          <p className='leading-6 whitespace-pre-wrap'>{ad.description}</p>
-        </div>
-      )}
-
-      {filledFeatures.length > 0 && (
+      <div className='flex flex-col gap-8'>
         <div>
-          <Heading level={4} className='mb-3'>
-            Характеристики
+          <Heading level={4} className='mb-2'>
+            Адрес
           </Heading>
-          <dl className='grid grid-cols-1 gap-x-6 gap-y-2'>
-            {filledFeatures.map(({ feature, value }) => (
-              <div key={feature.id} className='flex gap-2'>
-                <dt className='text-gray-600'>{feature.label}</dt>:<dd className='text-right font-medium'>{value}</dd>
-              </div>
-            ))}
-          </dl>
+          <address className='flex gap-2 not-italic'>
+            <MapPin className='size-5 flex-shrink-0 translate-y-0.5' />
+            {ad.address}
+          </address>
         </div>
-      )}
+
+        {ad.description && (
+          <div>
+            <Heading level={4} className='mb-2'>
+              Описание
+            </Heading>
+            <p className='leading-6 whitespace-pre-wrap'>{ad.description}</p>
+          </div>
+        )}
+
+        {filledFeatures.length > 0 && (
+          <div>
+            <Heading level={4} className='mb-3'>
+              Характеристики
+            </Heading>
+            <dl className='grid grid-cols-1 gap-x-6 gap-y-2'>
+              {filledFeatures.map(({ feature, value }) => (
+                <div key={feature.id} className='flex gap-2'>
+                  <dt className='text-gray-600'>{feature.label}</dt>:<dd className='text-right font-medium'>{value}</dd>
+                </div>
+              ))}
+            </dl>
+          </div>
+        )}
+      </div>
 
       {ad.images.length > 0 && (
         <Lightbox
