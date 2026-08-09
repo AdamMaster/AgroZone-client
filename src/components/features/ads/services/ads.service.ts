@@ -81,8 +81,8 @@ class AdsService {
     return response
   }
 
-  async update(id: string, data: FormData) {
-    const response = await api.patch(`${this.URL}/${id}`, data)
+  async update(id: string, data: FormData): Promise<IAd> {
+    const response = await api.patch<IAd>(`${this.URL}/${id}`, data)
     return response
   }
 

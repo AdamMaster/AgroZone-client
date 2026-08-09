@@ -58,7 +58,7 @@ export const AdEdit = ({ id, categories }: AdEditProps) => {
     } else {
       appendImages(formData, values.images)
     }
-    updateAd(formData)
+    updateAd(formData, ad.status === 'REJECTED')
   }
 
   return (
@@ -67,6 +67,7 @@ export const AdEdit = ({ id, categories }: AdEditProps) => {
       initialData={initialData}
       isSubmitting={isLoadingUpdate}
       rejectionReason={ad.rejectionReason}
+      isRejected={ad.status === 'REJECTED'}
       onSubmit={onSubmit}
     />
   )

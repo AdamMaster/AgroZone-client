@@ -56,9 +56,8 @@ export const NotificationBell = () => {
       </DropdownMenuTrigger>
 
       <DropdownMenuContent className='w-80' align='end'>
-        <div className='flex items-center justify-between px-1.5 py-1'>
-          <p className='text-sm font-medium'>Уведомления</p>
-          {unreadCount > 0 && (
+        {unreadCount > 0 && (
+          <div className='flex items-center justify-between px-1.5 py-1'>
             <button
               type='button'
               disabled={isMarkingAllAsRead}
@@ -67,8 +66,8 @@ export const NotificationBell = () => {
             >
               Прочитать все
             </button>
-          )}
-        </div>
+          </div>
+        )}
 
         {isLoadingNotifications ? (
           <p className='px-1.5 py-4 text-center text-sm text-gray-500'>Загрузка...</p>

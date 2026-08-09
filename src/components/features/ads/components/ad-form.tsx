@@ -47,6 +47,11 @@ interface AdFormProps {
   isSubmitting?: boolean
   isSaveDrafting?: boolean
   rejectionReason?: string
+  // Отклонённое объявление при сохранении правок само уходит на повторную
+  // модерацию (см. AdsService.update на бэкенде) — кнопка должна честно
+  // говорить об этом, а не выглядеть как обычное "Сохранить", будто ничего
+  // особенного не произойдёт (см. обсуждение с пользователем).
+  isRejected?: boolean
   onSubmit: (values: TypeCreateAdSchema) => void
   onSaveDraft?: (values: Partial<TypeCreateAdSchema>) => void
 }
@@ -57,6 +62,7 @@ export const AdForm = ({
   isSubmitting,
   isSaveDrafting,
   rejectionReason,
+  isRejected,
   onSubmit,
   onSaveDraft
 }: AdFormProps) => {
@@ -69,7 +75,7 @@ export const AdForm = ({
   const setCategoryPath = useAdStore(state => state.setCategoryPath)
   const router = useRouter()
   const title = isEdit ? 'Редактирование объявления' : 'Новое объявление'
-  const submitButtonText = isEdit ? 'Сохранить' : 'Опубликовать'
+  const submitButtonText = isRejected ? 'Сохранить и отправить на проверку' : isEdit ? 'Сохранить' : 'Опубликовать'
   const isPremium = user?.role === 'PREMIUM'
   const { onOpen } = useAppModal()
   const [selectedPhone, setSelectedPhone] = useState<string | null>(null)
