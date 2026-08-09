@@ -52,7 +52,7 @@ export const AboutTrust = () => {
                 <feature.icon className='size-5' />
               </div>
               <Heading level={4}>{feature.title}</Heading>
-              <p className='mt-1.5 text-sm text-gray-500'>{feature.description}</p>
+              <p className='mt-1.5 text-gray-500'>{feature.description}</p>
             </div>
           ))}
         </div>
