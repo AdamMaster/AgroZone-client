@@ -78,7 +78,7 @@ export const ContentNotifications = () => {
                   <p className='font-medium'>{notification.title}</p>
                 </div>
                 <p className='text-sm text-gray-600'>{notification.message}</p>
-                <p className='text-xs text-gray-400'>{formatNotificationDate(notification.createdAt)}</p>
+                <p className='mt-1 text-xs text-gray-400'>{formatNotificationDate(notification.createdAt)}</p>
               </>
             )
 

@@ -15,21 +15,15 @@ export const ModerationQueue = () => {
   const { publishAd, isLoadingPublish } = usePublishAd()
 
   return (
-    <div>
-      <Heading level={2} className='mb-6'>
-        Объявления на модерации
-      </Heading>
+    <div className='py-6 text-neutral-50'>
+      {isLoading && <p className='text-sm'>Загрузка...</p>}
 
-      {isLoading && <p className='text-sm text-gray-400'>Загрузка...</p>}
-
-      {!isLoading && pendingAds.length === 0 && (
-        <p className='text-sm text-gray-500'>Нечего проверять — очередь пуста.</p>
-      )}
+      {!isLoading && pendingAds.length === 0 && <p className='text-sm'>Нечего проверять — очередь пуста.</p>}
 
       <div className='flex flex-col gap-3'>
         {pendingAds.map(ad => (
-          <div key={ad.id} className='flex gap-4 rounded-xl bg-gray-100 p-3'>
-            <div className='relative size-20 shrink-0 overflow-hidden rounded-lg bg-gray-100'>
+          <div key={ad.id} className='flex gap-4 bg-neutral-600/50 p-3'>
+            <div className='relative size-20 shrink-0 overflow-hidden rounded-md bg-gray-100'>
               {ad.images[0] && <Image src={ad.images[0]} alt={ad.title} fill className='object-cover' sizes='200px' />}
             </div>
 
@@ -37,18 +31,25 @@ export const ModerationQueue = () => {
               <Link href={`/admin/moderation/${ad.id}`} className='hover:text-primary font-semibold'>
                 {ad.title}
               </Link>
-              {/* <p className='text-sm text-gray-500'>{ad.category.fullPath}</p> */}
               <p className='text-sm'>
                 {ad.user.displayName ?? 'Пользователь'} ·{' '}
                 {ad.user.email ?? formatPhoneNumber(ad.user.phones[0]?.phone) ?? '—'}
               </p>
             </div>
 
-            <div className='flex shrink-0 gap-2'>
-              <Button variant='secondary' size='lg' disabled={isLoadingPublish} onClick={() => publishAd(ad.id)}>
+            <div className='flex shrink-0 gap-1'>
+              <Button
+                className='rounded-sm bg-neutral-100 text-neutral-950 hover:bg-neutral-200'
+                size='sm'
+                disabled={isLoadingPublish}
+                onClick={() => publishAd(ad.id)}
+              >
                 Опубликовать
               </Button>
-              <RejectAdDialog className='bg-white' adId={ad.id} />
+              <RejectAdDialog
+                adId={ad.id}
+                className='rounded-sm bg-neutral-100 text-neutral-950 hover:bg-neutral-200'
+              />
             </div>
           </div>
         ))}

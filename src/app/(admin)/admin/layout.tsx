@@ -8,13 +8,10 @@ export default function AdminLayout({
   children: React.ReactNode
 }>) {
   return (
-    <div className='py-8'>
+    <div className='bg-neutral-800'>
       <Container>
-        <div className='mb-6'>
-          <Logo className='w-40' />
-        </div>
         <div className='grid min-h-screen grid-cols-[280px_1fr] gap-6'>
-          <div className='rounded-xl'>
+          <div className='bg-neutral-700/30'>
             <AdminNav />
           </div>
           <div className='relative w-full'>{children}</div>

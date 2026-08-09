@@ -20,7 +20,7 @@ export const AdminNav = () => {
 
   return (
     <nav>
-      <ul className='flex flex-col gap-1'>
+      <ul className='flex flex-col'>
         {items.map(item => {
           const Icon = item.icon
           const isActive = pathname === item.href
@@ -30,8 +30,8 @@ export const AdminNav = () => {
               <Link
                 href={item.href}
                 className={cn(
-                  'flex items-center gap-2 rounded-lg px-4 py-3 hover:bg-gray-50',
-                  isActive && 'bg-gray-100'
+                  'flex items-center gap-2 px-4 py-3 text-neutral-50 hover:bg-neutral-600/30',
+                  isActive && 'bg-neutral-600/40'
                 )}
               >
                 {item.label}
