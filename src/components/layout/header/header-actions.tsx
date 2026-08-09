@@ -1,12 +1,13 @@
 'use client'
 
 import { useAppModal } from '@/store'
-import { Bell, Heart, Layers, Lock, Plus } from 'lucide-react'
+import { Heart, Layers, Lock, Plus } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import React, { PropsWithChildren, ReactNode, useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
+import { NotificationBell } from '@/components/features/notifications/components'
 import { UserButton } from '@/components/features/user/components'
 
 import { useProfile } from '@/shared/hooks'
@@ -60,9 +61,7 @@ export const HeaderActions: React.FC<Props> = () => {
           <Link href='/profile/settings/favorites' className='px-2 py-1'>
             <Heart className='size-6 fill-gray-300 text-gray-300 hover:fill-gray-400 hover:text-gray-400' />
           </Link>
-          <button className='px-2 py-1'>
-            <Bell className='size-6 fill-gray-300 text-gray-300 hover:fill-gray-400 hover:text-gray-400' />
-          </button>
+          <NotificationBell />
           <UserButton className='ml-2' user={user} />
         </div>
       )}
