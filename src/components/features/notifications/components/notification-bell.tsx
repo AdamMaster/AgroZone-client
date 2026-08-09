@@ -1,6 +1,7 @@
 'use client'
 
 import { Bell } from 'lucide-react'
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
@@ -12,17 +13,7 @@ import {
   useUnreadNotificationsCount
 } from '../hooks'
 import { INotification } from '../types/notification.types'
-
-const formatNotificationDate = (value: string) => {
-  const date = new Date(value)
-  const now = new Date()
-
-  if (date.toDateString() === now.toDateString()) {
-    return date.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })
-  }
-
-  return new Intl.DateTimeFormat('ru-RU', { day: 'numeric', month: 'long' }).format(date)
-}
+import { formatNotificationDate } from '../utils'
 
 export const NotificationBell = () => {
   const router = useRouter()
@@ -89,6 +80,13 @@ export const NotificationBell = () => {
             </DropdownMenuItem>
           ))
         )}
+
+        <Link
+          href='/profile/settings/notifications'
+          className='block rounded-md bg-gray-50 py-2 text-center text-xs text-gray-600 transition-colors hover:bg-gray-100'
+        >
+          Смотреть все
+        </Link>
       </DropdownMenuContent>
     </DropdownMenu>
   )
