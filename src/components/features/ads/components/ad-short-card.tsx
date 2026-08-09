@@ -245,7 +245,7 @@ export const AdShortCard = ({ ad }: { ad: IAd }) => {
           )}
           <div className='flex gap-1'>
             <Button className='grow' variant='outline' onClick={() => handleEdit()}>
-              Редактировать
+              {ad.status === 'REJECTED' ? 'Исправить' : 'Редактировать'}
             </Button>
             {ad.status === 'PUBLISHED' && (
               <DropdownMenu>

@@ -1,6 +1,6 @@
 import { CategoryGrid, CategoryMenu } from '@/components/features/categories/components'
 import { categoriesService } from '@/components/features/categories/services'
-import { Header } from '@/components/layout'
+import { Footer, Header } from '@/components/layout'
 
 export default async function MainLayout({
   children
@@ -15,6 +15,7 @@ export default async function MainLayout({
       <CategoryGrid categories={categories} className='mb-8 pt-4' />
       <CategoryMenu />
       <main className='flex-1'>{children}</main>
+      <Footer />
     </>
   )
 }

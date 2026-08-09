@@ -48,7 +48,7 @@ export const RejectAdDialog = ({ adId, className }: RejectAdDialogProps) => {
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogTrigger render={<Button variant='destructive' size='sm' className={className} />}>Отклонить</DialogTrigger>
+      <DialogTrigger render={<Button variant='ghost' size='lg' className={className} />}>Отклонить</DialogTrigger>
 
       <DialogContent className='max-w-100'>
         <DialogHeader>
@@ -65,7 +65,12 @@ export const RejectAdDialog = ({ adId, className }: RejectAdDialogProps) => {
         />
 
         <DialogFooter>
-          <Button type='button' variant='destructive' disabled={!reason.trim() || isLoadingReject} onClick={handleSubmit}>
+          <Button
+            type='button'
+            variant='destructive'
+            disabled={!reason.trim() || isLoadingReject}
+            onClick={handleSubmit}
+          >
             Отклонить объявление
           </Button>
         </DialogFooter>
