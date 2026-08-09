@@ -27,7 +27,7 @@ export const AuthFormWrapper = ({
   isShowSocial = true
 }: PropsWithChildren<AuthFormWrapperProps>) => {
   return (
-    <div className={cn('flex w-full flex-col text-center', className)}>
+    <div className={cn('flex w-full flex-col', className)}>
       <div className='mb-8 flex flex-col gap-2'>
         <Heading level={2}>{heading}</Heading>
         {description && <p className='text-gray-500'>{description}</p>}

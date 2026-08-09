@@ -67,7 +67,7 @@ export const FormEmailChange = () => {
 
   return (
     <UserFormWrapper
-      heading={user?.email ? 'Смена почты' : 'Привязка почты'}
+      heading={user?.email ? 'Изменить адрес почты' : 'Привязка почты'}
       description={
         user?.email
           ? 'Введите новую почту. Мы отправим на нее письмо с подтверждением.'

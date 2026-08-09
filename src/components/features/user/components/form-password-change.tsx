@@ -59,7 +59,7 @@ export const FormPasswordChange = () => {
 
   return (
     <UserFormWrapper
-      heading={isOAuthOnly ? 'Установить пароль' : 'Смена пароля'}
+      heading={isOAuthOnly ? 'Установить пароль' : 'Изменить пароль'}
       description={
         isOAuthOnly
           ? 'Установите пароль для прямого доступа к аккаунту'

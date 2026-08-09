@@ -19,11 +19,12 @@ import { useProfile } from '@/shared/hooks'
 
 import { cn } from '@/lib/utils'
 
+import { UserRole } from '../../auth/types'
 import { useTwoFactorMutation } from '../hooks/use-two-factor-mutation'
 
 export const ContentSecurity = () => {
   const { user, isLoading } = useProfile()
-  const { onOpen, onClose, setView } = useAppModal()
+  const { onOpen } = useAppModal()
   const { toggle2fa, isToggleLoading } = useTwoFactorMutation()
 
   return (
@@ -73,6 +74,33 @@ export const ContentSecurity = () => {
             </Field>
           )}
         </div>
+
+        {/* Администратору самоудаление недоступно — см. UserService.deleteAccount
+            на сервере, тут просто скрываем саму возможность нажать. */}
+        {!isLoading && user?.role !== UserRole.Admin && (
+          <div>
+            <Heading level={5} className='mb-4'>
+              Удаление аккаунта
+            </Heading>
+            <Field className='rounded-lg border border-red-100 bg-red-50 px-4 py-4'>
+              <div className='flex items-center justify-between gap-4'>
+                <div className='space-y-0.5'>
+                  <Label>Удалить аккаунт</Label>
+                  <FieldDescription>Действие необратимо — все данные аккаунта будут обезличены</FieldDescription>
+                </div>
+                <Button
+                  type='button'
+                  variant='destructive'
+                  size='sm'
+                  className='shrink-0'
+                  onClick={() => onOpen('delete-account')}
+                >
+                  Удалить
+                </Button>
+              </div>
+            </Field>
+          </div>
+        )}
       </div>
     </div>
   )

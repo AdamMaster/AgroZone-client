@@ -7,6 +7,7 @@ import { StatusMessage } from '@/components/ui'
 import { Dialog, DialogContent } from '@/components/ui/dialog'
 
 import {
+  FormDeleteAccount,
   FormEmailChange,
   FormLogin,
   FormPasswordChange,
@@ -32,6 +33,8 @@ export const AppModal = () => {
         return <FormResetPassword />
       case 'change-password':
         return <FormPasswordChange />
+      case 'delete-account':
+        return <FormDeleteAccount />
       case 'change-email':
         return <FormEmailChange />
       case 'add-phone':

@@ -14,6 +14,7 @@ type ModalView =
   | 'register-sms-message'
   | 'change-password'
   | 'change-password-confirm'
+  | 'delete-account'
 
 interface AppModalStore {
   isOpen: boolean
