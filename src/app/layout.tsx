@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
+import { Google_Sans, Inter } from 'next/font/google'
 
 import { AppModal } from '@/components/modals/app'
 import { CategoriesModal } from '@/components/modals/categories'
@@ -9,9 +9,9 @@ import { cn } from '@/lib/utils'
 
 import './globals.css'
 
-const inter = Inter({
+const inter = Google_Sans({
   subsets: ['latin', 'cyrillic'],
-  weight: ['400', '500', '600', '700', '900'],
+  weight: ['400', '500', '600', '700'],
   variable: '--font-sans',
   display: 'swap'
 })

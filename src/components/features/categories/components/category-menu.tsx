@@ -134,7 +134,7 @@ export const CategoryMenu = () => {
                             key={child.id}
                             href={`/catalog/${child.fullPath}`}
                             onClick={close}
-                            className='hover:text-primary block py-2 text-[15px] transition-colors'
+                            className='hover:text-primary mb-4 block text-[15px] transition-colors'
                           >
                             {child.name}
                           </Link>
