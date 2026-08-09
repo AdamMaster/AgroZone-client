@@ -6,9 +6,15 @@ import Link from 'next/link'
 
 import { Heading, Skeleton } from '@/components/ui'
 
+import { isFutureDate, isPremiumActive } from '@/shared/utils'
+
+import { cn } from '@/lib/utils'
+
+import { AD_PRICE_HIGHLIGHT_CLASS } from '../constants/ad-services.constants'
 import { useAddFavorite } from '../hooks/use-add-favorite'
 import { useRemoveFavorite } from '../hooks/use-remove-favorite'
 import { type AdCardListData } from '../types/ad.types'
+import { AdBadgeChip } from './ad-badge-chip'
 import { FavoriteButton } from './favorite-button'
 
 interface AdCardListProps {
@@ -27,6 +33,11 @@ export const AdCardList = ({ ad }: AdCardListProps) => {
     }
   }
 
+  // Премиум включает выделение цены — та же логика, что и в AdCard, см.
+  // комментарий там.
+  const isPriceHighlighted = isFutureDate(ad.priceHighlightUntil) || isPremiumActive(ad.user?.premiumUntil)
+  const isBadgeShown = isFutureDate(ad.badgeUntil) && !!ad.badge
+
   return (
     <article className='relative before:absolute before:-inset-3 before:rounded-3xl before:bg-gray-100 before:opacity-0 before:content-[""] hover:before:opacity-100'>
       <Link href={`/ads/${ad.id}`} className='grid w-full grid-cols-[236px_1fr_236px] gap-4'>
@@ -37,6 +48,7 @@ export const AdCardList = ({ ad }: AdCardListProps) => {
             ) : (
               <ImageIcon size={50} className='absolute top-[50%] left-[50%] translate-[-50%] text-gray-500' />
             )}
+            {isBadgeShown && <AdBadgeChip badge={ad.badge!} className='absolute top-0 left-0' />}
           </div>
         </div>
         <div className='relative grow'>
@@ -47,7 +59,9 @@ export const AdCardList = ({ ad }: AdCardListProps) => {
             {ad.title}
           </Heading>
           <p className='mb-1 text-[18px]'>
-            <strong>{ad.price ? ad.price + '₽' : 'Цена договорная'}</strong>
+            <strong className={cn(isPriceHighlighted && AD_PRICE_HIGHLIGHT_CLASS)}>
+              {ad.price ? ad.price + '₽' : 'Цена договорная'}
+            </strong>
           </p>
           <address className='mb-2 text-[13px] leading-4 not-italic'>
             <MapPin className='mr-1.5 inline size-3.5' />

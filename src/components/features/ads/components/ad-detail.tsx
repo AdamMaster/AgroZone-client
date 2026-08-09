@@ -13,13 +13,16 @@ import { Avatar, AvatarFallback, AvatarImage, Button, ButtonBack, Heading } from
 import { PRICE_UNITS } from '@/shared/constants/units'
 import { USER_TYPE_LABELS } from '@/shared/constants/user-types'
 import { useProfile } from '@/shared/hooks'
-import { formatPhoneNumber, isPremiumActive, pluralizeRu } from '@/shared/utils'
+import { formatPhoneNumber, isFutureDate, isPremiumActive, pluralizeRu } from '@/shared/utils'
 
 import { cn } from '@/lib/utils'
 
 import { UserAvatar } from '../../user/components'
+import { AD_PRICE_HIGHLIGHT_CLASS } from '../constants/ad-services.constants'
 import { useAd, useAddFavorite, useRemoveFavorite } from '../hooks'
 import { IAd, ICategoryFeature } from '../types/ad.types'
+import { AdBadgeChip } from './ad-badge-chip'
+import { AdServicesStatusHandler } from './ad-services-status-handler'
 import { BumpStatusHandler } from './bump-status-handler'
 import { CategoryBreadcrumbItem, CategoryBreadcrumbs } from './category-breadcrumbs'
 import { FavoriteButton } from './favorite-button'
@@ -135,9 +138,17 @@ export const AdDetail = ({ ad: initialAd, categoryFeatures = [], categoryPath = 
   // иначе было бы вводящим в заблуждение обещанием.
   const isSellerPremium = isPremiumActive(ad.user?.premiumUntil)
 
+  // Значок и выделение цены — платные услуги со страницы "Поднять
+  // просмотры" (см. PromoteAd), тот же приём проверки срока, что и везде
+  // в этой фиче (isFutureDate). Выделение цены дополнительно включено в
+  // премиум (см. AdCard) — значок премиум не покрывает.
+  const isPriceHighlighted = isFutureDate(ad.priceHighlightUntil) || isSellerPremium
+  const isBadgeShown = isFutureDate(ad.badgeUntil) && !!ad.badge
+
   return (
     <div className='relative mt-6 max-w-[950px]'>
       <BumpStatusHandler adId={ad.id} />
+      <AdServicesStatusHandler adId={ad.id} />
       <div className='absolute top-0 -left-18 h-full'>
         <ButtonBack onClick={() => router.back()} />
       </div>
@@ -150,27 +161,30 @@ export const AdDetail = ({ ad: initialAd, categoryFeatures = [], categoryPath = 
       <div className='mb-8 grid grid-cols-1 gap-10 lg:grid-cols-[1fr_360px]'>
         <div>
           {ad.images.length > 0 ? (
-            <div
-              ref={galleryRef}
-              className='mb-2 flex snap-x snap-mandatory [scrollbar-width:none] overflow-x-auto overscroll-x-contain rounded-xl bg-gray-100 [&::-webkit-scrollbar]:hidden'
-            >
-              {ad.images.map((image, index) => (
-                <button
-                  key={image + index}
-                  type='button'
-                  onClick={() => setIsLightboxOpen(true)}
-                  className='relative w-full flex-shrink-0 snap-center pt-[66%]'
-                >
-                  <Image
-                    src={image}
-                    alt={`${ad.title} — фото ${index + 1}`}
-                    className='h-full w-full object-cover'
-                    fill
-                    sizes='(min-width: 1024px) 640px, 100vw'
-                    priority={index === 0}
-                  />
-                </button>
-              ))}
+            <div className='relative mb-2'>
+              {isBadgeShown && <AdBadgeChip badge={ad.badge!} className='absolute top-2 left-2 z-10' />}
+              <div
+                ref={galleryRef}
+                className='flex snap-x snap-mandatory [scrollbar-width:none] overflow-x-auto overscroll-x-contain rounded-xl bg-gray-100 [&::-webkit-scrollbar]:hidden'
+              >
+                {ad.images.map((image, index) => (
+                  <button
+                    key={image + index}
+                    type='button'
+                    onClick={() => setIsLightboxOpen(true)}
+                    className='relative w-full flex-shrink-0 snap-center pt-[66%]'
+                  >
+                    <Image
+                      src={image}
+                      alt={`${ad.title} — фото ${index + 1}`}
+                      className='h-full w-full object-cover'
+                      fill
+                      sizes='(min-width: 1024px) 900px, 100vw'
+                      priority={index === 0}
+                    />
+                  </button>
+                ))}
+              </div>
             </div>
           ) : (
             <div className='relative mb-2 overflow-hidden rounded-xl bg-gray-100 pt-[66%]'>
@@ -186,8 +200,8 @@ export const AdDetail = ({ ad: initialAd, categoryFeatures = [], categoryPath = 
                   type='button'
                   onClick={() => scrollToImage(index)}
                   className={cn(
-                    'relative size-16 flex-shrink-0 overflow-hidden rounded-lg bg-gray-100',
-                    index === activeImage && 'ring-primary ring-2'
+                    'relative size-16 flex-shrink-0 overflow-hidden rounded-lg border border-transparent bg-gray-100',
+                    index === activeImage && 'border-primary'
                   )}
                 >
                   <Image
@@ -195,7 +209,7 @@ export const AdDetail = ({ ad: initialAd, categoryFeatures = [], categoryPath = 
                     alt={`${ad.title} — фото ${index + 1}`}
                     className='object-cover'
                     fill
-                    sizes='64px'
+                    sizes='260px'
                   />
                 </button>
               ))}
@@ -205,7 +219,9 @@ export const AdDetail = ({ ad: initialAd, categoryFeatures = [], categoryPath = 
         <div>
           <div className='relative mb-4 flex items-start justify-between gap-2'>
             <p className='text-2xl font-bold'>
-              {ad.price ? `${ad.price.toLocaleString('ru-RU')} ₽` : 'Цена договорная'}
+              <span className={cn(isPriceHighlighted && AD_PRICE_HIGHLIGHT_CLASS)}>
+                {ad.price ? `${ad.price.toLocaleString('ru-RU')} ₽` : 'Цена договорная'}
+              </span>
               {ad.price && ad.unit && PRICE_UNITS[ad.unit] && (
                 <span className='block text-sm font-normal text-gray-500'>за {PRICE_UNITS[ad.unit].toLowerCase()}</span>
               )}
@@ -345,11 +361,7 @@ export const AdDetail = ({ ad: initialAd, categoryFeatures = [], categoryPath = 
           slides={slides}
           plugins={[Zoom]}
           on={{ view: ({ index }) => setActiveImage(index) }}
-          // Ограничиваем шириной именно область самого фото (slide), а не
-          // весь лайтбокс — фон/контейнер остаются на всю ширину экрана,
-          // просто на широких мониторах фото не растягивается до огромных
-          // размеров. Внутренний <img> уже скейлится через object-fit
-          // относительно slide, так что этого достаточно.
+          animation={{ swipe: 0 }}
           styles={{ slide: { maxWidth: 1280, margin: '0 auto' } }}
         />
       )}

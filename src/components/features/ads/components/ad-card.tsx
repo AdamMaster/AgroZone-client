@@ -6,9 +6,15 @@ import Link from 'next/link'
 
 import { Heading } from '@/components/ui'
 
+import { isFutureDate, isPremiumActive } from '@/shared/utils'
+
+import { cn } from '@/lib/utils'
+
+import { AD_PRICE_HIGHLIGHT_CLASS } from '../constants/ad-services.constants'
 import { useAddFavorite } from '../hooks/use-add-favorite'
 import { useRemoveFavorite } from '../hooks/use-remove-favorite'
 import { type AdCardData } from '../types/ad.types'
+import { AdBadgeChip } from './ad-badge-chip'
 import { FavoriteButton } from './favorite-button'
 
 interface AdCardProps {
@@ -27,14 +33,18 @@ export const AdCard = ({ ad }: AdCardProps) => {
     }
   }
 
+  const isPriceHighlighted = isFutureDate(ad.priceHighlightUntil) || isPremiumActive(ad.user?.premiumUntil)
+  const isBadgeShown = isFutureDate(ad.badgeUntil) && !!ad.badge
+
   return (
-    <article className='flex flex-col gap-2 rounded-xl bg-gray-100 p-2'>
+    <article className='flex flex-col gap-2'>
       <Link href={`/ads/${ad.id}`} className='relative block overflow-hidden rounded-xl bg-gray-100 pt-[100%]'>
         {ad.images.length > 0 ? (
-          <Image src={ad.images[0]} alt={ad.title} className='h-full w-full object-cover mix-blend-darken' fill />
+          <Image src={ad.images[0]} alt={ad.title} className='h-full w-full object-cover' fill />
         ) : (
           <ImageIcon size={50} className='absolute top-[50%] left-[50%] translate-[-50%] text-gray-500' />
         )}
+        {isBadgeShown && <AdBadgeChip badge={ad.badge!} className='absolute top-1 left-1' />}
       </Link>
       <div className='relative'>
         <Heading
@@ -44,7 +54,9 @@ export const AdCard = ({ ad }: AdCardProps) => {
           <Link href={`/ads/${ad.id}`}>{ad.title}</Link>
         </Heading>
         <p>
-          <strong>{ad.price ? ad.price + '₽' : 'Цена договорная'}</strong>
+          <strong className={cn(isPriceHighlighted && AD_PRICE_HIGHLIGHT_CLASS)}>
+            {ad.price ? ad.price + '₽' : 'Цена договорная'}
+          </strong>
         </p>
         <address className='text-[13px] leading-4 not-italic'>{ad.address}</address>
         <FavoriteButton

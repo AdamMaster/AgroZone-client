@@ -94,6 +94,15 @@ export interface IAd {
   // это в будущем, объявление раз в сутки само поднимается в топ (см.
   // AdAutoBumpWorker). Null/дата в прошлом — услуга не куплена/закончилась.
   bumpServiceUntil?: Date | string | null
+  // До какого момента активна услуга "Выделить цену" — та же "лесенка",
+  // что и у bumpServiceUntil (см. AdServicesService.reconcilePayment на
+  // бэкенде). Null/дата в прошлом — услуга не куплена/закончилась.
+  priceHighlightUntil?: Date | string | null
+  // Значок объявления и до какого момента он активен — в отличие от
+  // bumpServiceUntil/priceHighlightUntil НЕ "лесенка": новая покупка
+  // заменяет текущий значок, а не продлевает его же (см. schema.prisma).
+  badge?: AdBadge | null
+  badgeUntil?: Date | string | null
 }
 
 // Значения — строго как в enum AdReportReason на бэкенде (prisma/schema.prisma).
@@ -162,10 +171,34 @@ export type IModerationAd = Omit<IAd, 'user' | 'category'> & {
   category: IPendingAdCategory
 }
 
-export type AdCardData = Pick<IAd, 'id' | 'title' | 'price' | 'images' | 'address' | 'createdAt' | 'isFavorite'>
+export type AdCardData = Pick<
+  IAd,
+  | 'id'
+  | 'title'
+  | 'price'
+  | 'images'
+  | 'address'
+  | 'createdAt'
+  | 'isFavorite'
+  | 'user'
+  | 'badge'
+  | 'badgeUntil'
+  | 'priceHighlightUntil'
+>
 export type AdCardListData = Pick<
   IAd,
-  'id' | 'title' | 'description' | 'price' | 'images' | 'address' | 'createdAt' | 'isFavorite' | 'user'
+  | 'id'
+  | 'title'
+  | 'description'
+  | 'price'
+  | 'images'
+  | 'address'
+  | 'createdAt'
+  | 'isFavorite'
+  | 'user'
+  | 'badge'
+  | 'badgeUntil'
+  | 'priceHighlightUntil'
 >
 
 // Ответ GET /ads — с приходом фильтра каталогу нужен total (количество
@@ -202,6 +235,35 @@ export interface IAdBump {
 export interface ICreateBumpCheckoutResponse {
   confirmationUrl: string
   bumpId: string
+}
+
+// Значения — строго как в enum AdServiceType на бэкенде (prisma/schema.prisma).
+// Единая страница "Поднять просмотры" — продавец может купить любой набор
+// сразу одним платежом (см. AdServicePurchase/AdServicesService на бэкенде).
+export type AdServiceType = 'BUMP' | 'PRICE_HIGHLIGHT' | 'BADGE'
+
+// Значения — строго как в enum AdBadge на бэкенде.
+export type AdBadge = 'URGENT' | 'NEGOTIABLE' | 'NEW'
+
+// Значения — строго как в enum AdServicePurchaseStatus на бэкенде.
+export type AdServicePurchaseStatus = 'PENDING' | 'SUCCEEDED' | 'CANCELED'
+
+export interface IAdServicePurchase {
+  id: string
+  adId: string
+  userId: string
+  amount: number
+  services: AdServiceType[]
+  badge?: AdBadge | null
+  status: AdServicePurchaseStatus
+  yookassaPaymentId?: string | null
+  createdAt: string
+  paidAt?: string | null
+}
+
+export interface ICreateAdServiceCheckoutResponse {
+  confirmationUrl: string
+  purchaseId: string
 }
 
 export type LocationOptionType = 'region' | 'locality'

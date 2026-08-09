@@ -173,5 +173,12 @@ button {
 
 .react-dadata__suggestion:hover {
   background: var(--color-gray-50);
+}
 
+.yarl__container {
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.yarl__button {
+  filter: none;
 }
