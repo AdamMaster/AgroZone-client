@@ -29,7 +29,7 @@ export const Footer = () => {
   const year = new Date().getFullYear()
 
   return (
-    <footer className='mt-16 border-gray-100 bg-gray-50'>
+    <footer className='mt-16 border-gray-100 bg-gray-100'>
       <Container>
         <div className='flex flex-wrap items-center gap-x-8 gap-y-3 py-10'>
           {FOOTER_LINKS.map(link => (
@@ -40,7 +40,7 @@ export const Footer = () => {
         </div>
 
         <div className='border-t border-gray-200 py-5'>
-          <p className='text-xs text-gray-500'>© {year} AgroZone. Все права защищены.</p>
+          <p className='text-xs text-gray-600'>© {year} AgroZone. Все права защищены.</p>
         </div>
       </Container>
     </footer>

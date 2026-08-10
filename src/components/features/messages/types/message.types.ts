@@ -1,16 +1,22 @@
+// id/slug — nullable: объявление могло быть физически удалено воркером
+// после архивации (см. AdsArchivePurgeWorker). Тогда сервер отдаёт снепшот
+// заголовка вместо живых данных объявления (см. ConversationsService.getConversations).
 export interface IMessageAd {
-  id: string
+  id: string | null
   title: string
   images: string[]
-  slug: string
+  slug: string | null
 }
 
 // displayName/picture — nullable, ровно как в модели User на бэкенде
-// (пользователь мог не заполнить профиль).
+// (пользователь мог не заполнить профиль). deletedAt — не null, если
+// собеседник удалил аккаунт (UI показывает явную подпись вместо пустого
+// имени, см. ChatHeader/ConversationListItem).
 export interface IMessageUser {
   id: string
   displayName: string | null
   picture: string | null
+  deletedAt?: string | null
 }
 
 export interface IMessage {

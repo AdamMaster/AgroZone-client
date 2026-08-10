@@ -209,7 +209,7 @@ export const PromoteAd = ({ id }: PromoteAdProps) => {
               ) : (
                 <ImageIcon size={40} className='absolute top-1/2 left-1/2 -translate-1/2 text-gray-400' />
               )}
-              {previewBadge && <AdBadgeChip badge={previewBadge} className='absolute top-0 left-0' />}
+              {previewBadge && <AdBadgeChip badge={previewBadge} className='absolute top-1 left-1' />}
             </div>
             <Skeleton className='mb-1.5 h-3.5 w-full' />
             <Skeleton className='mb-3 h-3.5 w-2/3' />

@@ -4,7 +4,7 @@ export const AboutFounder = () => {
   return (
     <section className='bg-white py-20'>
       <Container>
-        <div className='to-primary from-secondary relative mx-auto max-w-3xl overflow-hidden rounded-4xl bg-gradient-to-br p-8 text-white'>
+        <div className='to-primary relative mx-auto max-w-3xl overflow-hidden rounded-4xl bg-gradient-to-br from-emerald-700 p-8 text-white'>
           <div className='pointer-events-none absolute -top-16 -right-16 h-64 w-64 rounded-full bg-white/10 blur-3xl' />
 
           <span className='font-serif text-8xl leading-none text-white/20 select-none'>“</span>

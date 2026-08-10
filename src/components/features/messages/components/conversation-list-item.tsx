@@ -39,9 +39,9 @@ export const ConversationListItem = ({ conversation, isActive, onClick }: Conver
     >
       <div className='relative'>
         <UserAvatar user={counterpart} className='absolute -top-2 -left-2 z-10 size-9 border-2 border-white' />
-        <div className='relative size-15 overflow-hidden rounded-lg bg-gray-100'>
+        <div className='relative flex size-15 items-center justify-center overflow-hidden rounded-lg bg-gray-100'>
           {ad.images?.[0] ? (
-            <Image src={ad.images[0]} alt='' className='size-full object-cover' fill />
+            <Image src={ad.images[0]} alt='' sizes='200px' fill className='object-cover' />
           ) : (
             <ImageIcon className='size-5 text-gray-400' />
           )}
@@ -50,7 +50,9 @@ export const ConversationListItem = ({ conversation, isActive, onClick }: Conver
 
       <div className='flex min-w-0 flex-1 flex-col gap-0.5'>
         <div className='flex items-center justify-between gap-2'>
-          <p className={cn('text-[16px] leading-5 font-semibold')}>{counterpart.displayName ?? 'Пользователь'}</p>
+          <p className={cn('text-[16px] leading-5 font-semibold', counterpart.deletedAt && 'text-gray-400')}>
+            {counterpart.deletedAt ? 'Пользователь удалил аккаунт' : (counterpart.displayName ?? 'Пользователь')}
+          </p>
           {lastMessage && (
             <div className='flex gap-3'>
               <span className='shrink-0 text-xs text-gray-400'>{formatMessageTime(lastMessage.createdAt)}</span>

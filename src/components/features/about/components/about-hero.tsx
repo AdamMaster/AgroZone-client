@@ -14,17 +14,17 @@ const CATEGORIES_STRIP = [
 export const AboutHero = () => {
   return (
     <section className='relative mt-4 overflow-hidden bg-gradient-to-b from-[#f2f8ea] to-white'>
-      <div
+      {/* <div
         className='pointer-events-none absolute inset-0 opacity-[0.35]'
         style={{
           backgroundImage: 'radial-gradient(circle, #40a500 1px, transparent 1px)',
           backgroundSize: '26px 26px'
         }}
-      />
+      /> */}
       <div className='bg-primary/20 pointer-events-none absolute -top-32 -right-24 h-96 w-96 rounded-full blur-3xl' />
-      <div className='pointer-events-none absolute -bottom-40 -left-24 h-96 w-96 rounded-full bg-[#c99a4b]/25 blur-3xl' />
+      <div className='pointer-events-none absolute -bottom-40 -left-24 h-100 w-100 rounded-full bg-[#c99a4b]/25 blur-3xl' />
 
-      <Container className='relative pt-20 pb-14 md:pt-28'>
+      <Container className='relative pt-28 pb-14'>
         <div className='mx-auto max-w-3xl text-center'>
           <span className='mb-6 inline-block rounded-2xl bg-gray-900 px-3 py-1 text-xs font-semibold tracking-wide text-white uppercase'>
             О компании
@@ -35,13 +35,12 @@ export const AboutHero = () => {
           </h1>
 
           <p className='mx-auto mt-6 max-w-2xl text-lg leading-snug'>
-            Сельхозтехника, продукция, услуги и всё, что нужно для работы в агросекторе — в одном месте, с категориями и
-            поиском, устроенными именно под эти задачи.
+            Сельхозтехника, продукция, услуги и всё, что нужно для работы в агросекторе — в одном месте.
           </p>
         </div>
       </Container>
 
-      <div className='relative py-4 pb-8'>
+      <div className='relative py-4 pb-18'>
         <Container>
           <div className='flex flex-wrap items-center justify-center gap-x-3 gap-y-1.5'>
             {CATEGORIES_STRIP.map((category, index) => (
