@@ -34,6 +34,7 @@ import { findCategoryById, formatPhoneNumber, getPathToCategory } from '@/shared
 
 import { CreateAdSchema, TypeCreateAdSchema } from '../schemes'
 import { ICategory, ICategoryFeature } from '../types/ad.types'
+import { normalizeFeatureUnits } from '../utils/normalize-feature-units'
 import { CategoryBreadcrumbs } from './category-breadcrumbs'
 import { CategoryCascader } from './category-cascader'
 import { DynamicField } from './dynamic-field'
@@ -108,6 +109,18 @@ export const AdForm = ({
     form.setValue('categoryId', '')
     form.setValue('categoryFeatures', {})
   }
+
+  // Числовые поля с несколькими единицами измерения (например "Мощность"
+  // -> кВт/л.с.) DynamicField пишет в форму как есть, плюс отдельное поле
+  // `${name}__unit` с выбранной единицей — сам DynamicField ничего не
+  // конвертирует (иначе значение "прыгало" бы прямо во время ввода).
+  // Приводим к канонической единице тут, один раз, прямо перед отправкой
+  // (см. normalize-feature-units.ts) — features хранит определения фич
+  // текущей категории (name/units), без них конвертировать нечего.
+  const withNormalizedUnits = <T extends { categoryFeatures?: Record<string, unknown> }>(values: T): T => ({
+    ...values,
+    categoryFeatures: normalizeFeatureUnits(values.categoryFeatures, features)
+  })
 
   useEffect(() => {
     if (isEdit && initialData?.categoryId) {
@@ -365,7 +378,7 @@ export const AdForm = ({
                 size='lg'
                 type='button'
                 disabled={isSubmitting}
-                onClick={form.handleSubmit(onSubmit)}
+                onClick={form.handleSubmit(values => onSubmit(withNormalizedUnits(values)))}
               >
                 {submitButtonText}
               </Button>
@@ -376,7 +389,7 @@ export const AdForm = ({
                   size='lg'
                   type='button'
                   disabled={isSaveDrafting}
-                  onClick={onSaveDraft && form.handleSubmit(onSaveDraft)}
+                  onClick={onSaveDraft && form.handleSubmit(values => onSaveDraft(withNormalizedUnits(values)))}
                 >
                   Сохранить черновик
                 </Button>

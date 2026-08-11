@@ -47,11 +47,19 @@ const formatDate = (value: Date | string | null) => {
   return new Intl.DateTimeFormat('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' }).format(new Date(value))
 }
 
-const formatFeatureValue = (feature: ICategoryFeature, value: unknown): string | null => {
+// unit — раньше числовые характеристики показывались голым числом без
+// единицы измерения вообще ("Мощность: 500" — 500 чего? см. обсуждение с
+// пользователем). Берётся из companion-поля "${name}__unit" в
+// Ad.features (см. normalize-feature-units.ts) с фолбэком на
+// каноническую единицу самой фичи — для объявлений, сохранённых до этого
+// исправления, companion-поля ещё нет, но так хотя бы предполагаемая
+// единица покажется, а не полное отсутствие единицы.
+const formatFeatureValue = (feature: ICategoryFeature, value: unknown, unit?: string): string | null => {
   if (value === null || value === undefined || value === '') return null
 
   if (feature.type === 'BOOLEAN') return value ? 'Да' : 'Нет'
   if (Array.isArray(value)) return value.length ? value.join(', ') : null
+  if (feature.type === 'NUMBER' && unit) return `${value} ${unit}`
 
   return String(value)
 }
@@ -121,10 +129,15 @@ export const AdDetail = ({ ad: initialAd, categoryFeatures = [], categoryPath = 
   const features = (ad.features as unknown as Record<string, unknown>) || {}
 
   const filledFeatures = categoryFeatures
-    .map(feature => ({
-      feature,
-      value: formatFeatureValue(feature, features[feature.name])
-    }))
+    .map(feature => {
+      const storedUnit = features[`${feature.name}__unit`]
+      const unit = typeof storedUnit === 'string' ? storedUnit : feature.units?.[0]
+
+      return {
+        feature,
+        value: formatFeatureValue(feature, features[feature.name], unit)
+      }
+    })
     .filter((item): item is { feature: ICategoryFeature; value: string } => item.value !== null)
 
   const publishedDate = formatDate(ad.publishedAt)

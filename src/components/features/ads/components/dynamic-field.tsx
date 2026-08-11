@@ -83,15 +83,70 @@ export const DynamicField = ({ feature, control }: DynamicFieldProps) => {
                 <Checkbox checked={!!field.value} onCheckedChange={field.onChange} className='size-5' />
                 <span className='text-sm'>{feature.label}</span>
               </label>
+            ) : feature.type === 'NUMBER' ? (
+              // Раньше числовое поле не показывало единицу измерения вообще
+              // (см. обсуждение с пользователем про "Мощность" — просто
+              // "500" без "кг" или "кВт"). Если у фичи одна единица —
+              // показываем её подписью рядом, если несколько на выбор
+              // (например кВт/л.с.) — рядом переключатель; выбранная
+              // единица уходит в отдельное поле формы
+              // `${feature.name}__unit`, откуда её потом читает
+              // normalize-feature-units.ts перед отправкой (конвертирует в
+              // каноническую, если единицы физически совместимы — см.
+              // shared/utils/unit-conversion.ts).
+              <div className='flex items-center gap-2'>
+                <Input
+                  className='h-13'
+                  {...field}
+                  type='number'
+                  value={field.value === null || field.value === undefined ? '' : String(field.value)}
+                  onChange={e => {
+                    const val = e.target.value
+                    field.onChange(val === '' ? null : Number(val))
+                  }}
+                />
+                {!!feature.units?.length &&
+                  (feature.units.length === 1 ? (
+                    <span className='shrink-0 text-sm text-gray-500'>{feature.units[0]}</span>
+                  ) : (
+                    <Controller
+                      name={`categoryFeatures.${feature.name}__unit`}
+                      control={control}
+                      defaultValue={feature.units[0]}
+                      render={({ field: unitField }) => (
+                        <div className='flex shrink-0 gap-1'>
+                          {feature.units!.map(u => {
+                            const selected = (unitField.value ?? feature.units![0]) === u
+
+                            return (
+                              <button
+                                key={u}
+                                type='button'
+                                onClick={() => unitField.onChange(u)}
+                                className={`size-10 rounded-full border px-3 py-2 text-sm whitespace-nowrap transition-colors ${
+                                  selected
+                                    ? 'border-secondary bg-secondary text-white'
+                                    : 'border-border bg-background hover:bg-muted'
+                                }`}
+                              >
+                                {u}
+                              </button>
+                            )
+                          })}
+                        </div>
+                      )}
+                    />
+                  ))}
+              </div>
             ) : (
               <Input
                 className='h-13'
                 {...field}
-                type={feature.type === 'NUMBER' ? 'number' : 'text'}
+                type='text'
                 value={field.value === null || field.value === undefined ? '' : String(field.value)}
                 onChange={e => {
                   const val = e.target.value
-                  field.onChange(val === '' ? null : feature.type === 'NUMBER' ? Number(val) : val)
+                  field.onChange(val === '' ? null : val)
                 }}
               />
             )}
