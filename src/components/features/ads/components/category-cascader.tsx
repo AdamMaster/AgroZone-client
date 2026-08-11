@@ -28,6 +28,20 @@ export const CategoryCascader = ({ categories, form, onCategorySelect }: Categor
   const flatCategories = useMemo(() => flattenCategories(categories), [categories])
   const listRef = useRef<HTMLDivElement>(null)
   const setCategoryPath = useAdStore(state => state.setCategoryPath)
+  const categoryPath = useAdStore(state => state.categoryPath)
+  const categoryId = form.watch('categoryId')
+  // Категория-предохранитель для тех, кто не нашёл товар в поиске (см.
+  // обсуждение с пользователем — "медный купорос" никак не совпадёт по
+  // названию ни с одной категорией). Матчим по названию, а не по id —
+  // в этом проекте так же завязаны на русские названия и другие спец-случаи
+  // (см. FEDERAL_CITY_REGION_NAMES на бэкенде), стабильного отдельного кода
+  // "это категория-корзина" в схеме нет.
+  const otherCategory = useMemo(() => categories.find(c => c.name === 'Прочее'), [categories])
+  // Кнопки категорий в колонках — чтобы можно было доскроллить до выбранной,
+  // если она за пределами видимой области ScrollArea (см. ниже). Карта, а
+  // не один ref: выбранных кнопок сразу несколько — по одной в каждой
+  // колонке пути.
+  const categoryButtonRefs = useRef<Map<string, HTMLButtonElement>>(new Map())
 
   const columns = useMemo(() => {
     const result: ICategory[][] = [categories]
@@ -49,7 +63,10 @@ export const CategoryCascader = ({ categories, form, onCategorySelect }: Categor
 
     if (fullCategory && (!fullCategory.children || fullCategory.children.length === 0)) {
       form.setValue('categoryId', catId, { shouldValidate: true })
-      onCategorySelect(fullCategory.categoryFeatures || [], fullCategory.priceUnits?.length ? fullCategory.priceUnits : ['ITEM'])
+      onCategorySelect(
+        fullCategory.categoryFeatures || [],
+        fullCategory.priceUnits?.length ? fullCategory.priceUnits : ['ITEM']
+      )
       const pathNames = path.map(id => findCategoryById(categories, id)?.name).filter(Boolean) as string[]
       setCategoryPath(pathNames)
     } else {
@@ -66,30 +83,72 @@ export const CategoryCascader = ({ categories, form, onCategorySelect }: Categor
     }
   }, [searchTerm])
 
+  useEffect(() => {
+    selectedPath.forEach(id => {
+      categoryButtonRefs.current.get(id)?.scrollIntoView({ block: 'nearest' })
+    })
+  }, [selectedPath])
+
   return (
     <div>
       <Command className={cn('overflow-initial relative mb-3 rounded-lg border', open ? 'focus-input' : 'border')}>
         <CommandInput
-          className='p-0 placeholder:text-gray-500'
+          className='text-md p-0 placeholder:text-gray-500'
           placeholder='Начните вводить название товара, например "Яблоки"'
-          onFocus={() => setOpen(true)}
+          onFocus={() => {
+            if (searchTerm.trim().length > 0) setOpen(true)
+          }}
           onBlur={() => setTimeout(() => setOpen(false), 200)}
           onValueChange={val => {
             setSearchTerm(val)
-            setOpen(true)
+            setOpen(val.trim().length > 0)
           }}
         />
-        {open && (
-          <div className='absolute top-[calc(100%+10px)] left-0 z-10 w-full overflow-hidden rounded-lg border bg-white shadow-[0_4px_16px_rgba(0,0,0,0.08)]'>
-            <CommandList className='rounded-0 py-2' ref={listRef}>
-              <CommandEmpty>Категории не найдены.</CommandEmpty>
-              <CommandGroup>
-                {flatCategories.map(cat => (
-                  <CommandItem
-                    className='flex cursor-pointer gap-2 px-3.5 py-1 hover:bg-gray-50'
-                    key={cat.id}
-                    onSelect={() => handleCategorySelect(cat.id)}
-                  >
+        {/* Блок держим смонтированным ВСЕГДА (не {open && (...)}) — cmdk
+            регистрирует каждый Command.Item и считает его текстовое
+            значение для фильтрации в момент монтирования; если монтировать
+            список только когда searchTerm уже непустой (то есть регистрация
+            пунктов происходит ПОСЛЕ того как поиск стал непустым), первая
+            фильтрация у cmdk может не сработать — список остаётся пустым,
+            хотя совпадения есть (баг, замеченный пользователем). Поэтому
+            пункты регистрируются сразу при монтировании компонента, ещё при
+            пустом поиске, а видимость блока переключаем просто классом
+            hidden, не трогая DOM-дерево cmdk. */}
+        <div
+          className={cn(
+            'absolute top-[calc(100%+10px)] left-0 z-10 w-full overflow-hidden rounded-lg border bg-white shadow-[0_4px_16px_rgba(0,0,0,0.08)]',
+            !open && 'hidden'
+          )}
+        >
+          <CommandList className='rounded-0 py-2' ref={listRef}>
+            {/* Раньше тут был просто текст "Категории не найдены" — тупик
+                без единой подсказки, что делать дальше (см. обсуждение:
+                "медный купорос" не совпадёт с названием ни одной категории,
+                хотя он реально продаётся в "Агрохимии"). Даём два выхода:
+                попробовать другое слово и/или сразу заглянуть в "Прочее" —
+                категорию-корзину для того, что не подошло больше никуда. */}
+            <CommandEmpty className='flex flex-col items-center gap-2 px-3.5 py-6 text-center text-sm'>
+              <span className='text-gray-500'>
+                Ничего не нашли. Попробуйте более простое или общее название товара.
+              </span>
+              {otherCategory && (
+                <button
+                  type='button'
+                  className='text-primary underline underline-offset-2 hover:no-underline'
+                  onClick={() => handleCategorySelect(otherCategory.id)}
+                >
+                  Или посмотрите категорию «Прочее»
+                </button>
+              )}
+            </CommandEmpty>
+            <CommandGroup>
+              {flatCategories.map(cat => (
+                <CommandItem
+                  className='flex w-full cursor-pointer items-center justify-between gap-2 px-3.5 py-1 hover:bg-gray-50'
+                  key={cat.id}
+                  onSelect={() => handleCategorySelect(cat.id)}
+                >
+                  <div className='flex flex-wrap items-center gap-2.5'>
                     {cat.path.map((name, index) => (
                       <div key={index} className='flex items-center gap-2.5'>
                         {name}
@@ -98,13 +157,38 @@ export const CategoryCascader = ({ categories, form, onCategorySelect }: Categor
                         )}
                       </div>
                     ))}
-                  </CommandItem>
-                ))}
-              </CommandGroup>
-            </CommandList>
-          </div>
-        )}
+                  </div>
+                  {/* У категории есть подкатегории — клик по ней не
+                      выбирает её как итоговую, а раскрывает колонки ниже
+                      для уточнения (см. handleCategorySelect). Явно
+                      подписываем это, иначе выглядит так, будто клик
+                      ничего не сделал. */}
+                  {cat.hasChildren && (
+                    <span className='flex shrink-0 items-center gap-1 text-xs text-gray-400'>
+                      Уточнить
+                      <ChevronRight className='size-3.5' />
+                    </span>
+                  )}
+                </CommandItem>
+              ))}
+            </CommandGroup>
+          </CommandList>
+        </div>
       </Command>
+      {/* Раньше единственным подтверждением выбора была серая подсветка
+          кнопки в одной из колонок — не видно, если список длинный и
+          выбранный пункт прокручен за пределы 400px-области, а на первом
+          шаге хлебные крошки (CategoryBreadcrumbs) ещё не показываются —
+          они появляются только на шаге 2 (см. AdForm). Показываем текстом
+          сразу здесь; categoryPath синхронно проставляется в сторе именно
+          в момент выбора ЛИСТОВОЙ категории (см. handleCategorySelect), так
+          что и то и другое условие — categoryId и categoryPath.length —
+          гарантированно совпадают. */}
+      {categoryId && categoryPath.length > 0 && (
+        <p className='mb-3 text-sm text-gray-500'>
+          Выбрано: <span className='font-medium text-gray-900'>{categoryPath.join(' → ')}</span>
+        </p>
+      )}
       <div className='space-y-2'>
         <div className='grid grid-cols-3 gap-1'>
           {columns.map((columnCategories, columnIndex) => (
@@ -116,6 +200,10 @@ export const CategoryCascader = ({ categories, form, onCategorySelect }: Categor
                 return (
                   <button
                     key={cat.id}
+                    ref={el => {
+                      if (el) categoryButtonRefs.current.set(cat.id, el)
+                      else categoryButtonRefs.current.delete(cat.id)
+                    }}
                     type='button'
                     onClick={() => {
                       const newPath = [...selectedPath.slice(0, columnIndex), cat.id]

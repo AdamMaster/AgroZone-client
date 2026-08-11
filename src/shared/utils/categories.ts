@@ -5,20 +5,29 @@ export interface IFlatCategory {
   name: string
   path: string[]
   categoryFeatures: ICategoryFeature[]
+  // Есть ли у категории подкатегории — раньше подсказки поиска в
+  // CategoryCascader не различали листовые и промежуточные категории:
+  // клик по категории с детьми молча закрывал список и ничего не выбирал
+  // (categoryId оставался пустым), выглядело как будто клик не сработал.
+  // Теперь по этому флагу рендерим разное поведение/подсказку для таких
+  // пунктов (см. CategoryCascader).
+  hasChildren: boolean
 }
 
 export const flattenCategories = (cats: ICategory[], parentPath: string[] = []): IFlatCategory[] => {
   return cats.flatMap((cat): IFlatCategory[] => {
     const currentPath = [...parentPath, cat.name]
+    const hasChildren = !!cat.children?.length
 
     const current: IFlatCategory = {
       id: cat.id,
       name: cat.name,
       path: currentPath,
-      categoryFeatures: cat.categoryFeatures || []
+      categoryFeatures: cat.categoryFeatures || [],
+      hasChildren
     }
 
-    const children = cat.children ? flattenCategories(cat.children, currentPath) : []
+    const children = hasChildren ? flattenCategories(cat.children!, currentPath) : []
 
     return [current, ...children]
   })
