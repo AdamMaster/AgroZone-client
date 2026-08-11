@@ -266,6 +266,22 @@ export interface ICreateAdServiceCheckoutResponse {
   purchaseId: string
 }
 
+// Статистика просмотров — приватная, только для владельца объявления (и
+// админа), см. AdsController.getMyAdViewStats/getAdViewStatsForAdmin.
+export interface IAdViewStatsDay {
+  date: string
+  views: number
+}
+
+export interface IAdViewStats {
+  weekStart: string
+  weekEnd: string
+  weekOffset: number
+  maxWeekOffset: number
+  total: number
+  days: IAdViewStatsDay[]
+}
+
 export type LocationOptionType = 'region' | 'locality'
 
 export interface ILocationOption {

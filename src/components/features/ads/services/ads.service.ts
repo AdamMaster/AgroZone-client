@@ -3,6 +3,7 @@ import { api } from '@/shared/api'
 import {
   IAd,
   IAdsListResponse,
+  IAdViewStats,
   ICreateAdReportDto,
   ILocationOption,
   IModerationAd,
@@ -76,8 +77,16 @@ class AdsService {
 
   // Публичная карточка объявления — доступна без авторизации, сервер сам
   // отдаёт 404, если объявление не опубликовано/просрочено/не существует.
-  async findOne(id: string): Promise<IAd> {
-    const response = await api.get<IAd>(`${this.URL}/${id}`)
+  // trackView: true — только для настоящего клиентского запроса (см.
+  // useAd), у него есть реальные кука сессии и IP/UA браузера, которые
+  // нужны бэкенду для записи статистики просмотров (см.
+  // AdsController.findOne/AdsService.findOne). SSR-вызов этого же метода
+  // в client/src/app/(main)/ads/[id]/page.tsx передавать trackView не
+  // должен — там нет ни того, ни другого.
+  async findOne(id: string, options?: { trackView?: boolean }): Promise<IAd> {
+    const response = await api.get<IAd>(`${this.URL}/${id}`, {
+      params: { trackView: options?.trackView }
+    })
     return response
   }
 
@@ -131,6 +140,13 @@ class AdsService {
   // ограничена статусом PUBLISHED.
   async findOneForModeration(id: string): Promise<IModerationAd> {
     return api.get<IModerationAd>(`${this.URL}/${id}/moderation`)
+  }
+
+  // Статистика просмотров объявления — приватная, только для владельца
+  // (см. AdsController.getMyAdViewStats). weekOffset — 0 текущая неделя, 1
+  // прошлая и так далее.
+  async getViewStats(id: string, weekOffset: number): Promise<IAdViewStats> {
+    return api.get<IAdViewStats>(`${this.URL}/my/${id}/views`, { params: { weekOffset } })
   }
 }
 

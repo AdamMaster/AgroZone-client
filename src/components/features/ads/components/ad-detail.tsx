@@ -23,6 +23,7 @@ import { useAd, useAddFavorite, useRemoveFavorite } from '../hooks'
 import { IAd, ICategoryFeature } from '../types/ad.types'
 import { AdBadgeChip } from './ad-badge-chip'
 import { AdServicesStatusHandler } from './ad-services-status-handler'
+import { AdViewsStats } from './ad-views-stats'
 import { BumpStatusHandler } from './bump-status-handler'
 import { CategoryBreadcrumbItem, CategoryBreadcrumbs } from './category-breadcrumbs'
 import { FavoriteButton } from './favorite-button'
@@ -71,7 +72,10 @@ export const AdDetail = ({ ad: initialAd, categoryFeatures = [], categoryPath = 
 
   const scrollToImage = (index: number) => {
     const slide = galleryRef.current?.children[index] as HTMLElement | undefined
-    slide?.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' })
+    // behavior: 'auto' — без плавной прокрутки (аналог swipe: 0 в
+    // Lightbox выше), клик по миниатюре сразу переключает фото, без
+    // анимации скольжения.
+    slide?.scrollIntoView({ behavior: 'auto', inline: 'center', block: 'nearest' })
   }
 
   useEffect(() => {
@@ -132,16 +136,7 @@ export const AdDetail = ({ ad: initialAd, categoryFeatures = [], categoryPath = 
     scrollToImage(activeImage)
   }
 
-  // Бейдж "Премиум" рядом с именем продавца — намеренно не "проверенный
-  // пользователь" и т.п.: премиум означает только оплаченную подписку, а
-  // не реальную верификацию личности/документов, называть его как-то
-  // иначе было бы вводящим в заблуждение обещанием.
   const isSellerPremium = isPremiumActive(ad.user?.premiumUntil)
-
-  // Значок и выделение цены — платные услуги со страницы "Поднять
-  // просмотры" (см. PromoteAd), тот же приём проверки срока, что и везде
-  // в этой фиче (isFutureDate). Выделение цены дополнительно включено в
-  // премиум (см. AdCard) — значок премиум не покрывает.
   const isPriceHighlighted = isFutureDate(ad.priceHighlightUntil) || isSellerPremium
   const isBadgeShown = isFutureDate(ad.badgeUntil) && !!ad.badge
 
@@ -157,6 +152,7 @@ export const AdDetail = ({ ad: initialAd, categoryFeatures = [], categoryPath = 
       <Heading level={1} className='mb-6'>
         {ad.title}
       </Heading>
+      {isOwner && <AdViewsStats adId={ad.id} />}
 
       <div className='mb-8 grid grid-cols-1 gap-10 lg:grid-cols-[1fr_360px]'>
         <div>
@@ -179,7 +175,7 @@ export const AdDetail = ({ ad: initialAd, categoryFeatures = [], categoryPath = 
                       alt={`${ad.title} — фото ${index + 1}`}
                       className='h-full w-full object-cover'
                       fill
-                      sizes='(min-width: 1024px) 900px, 100vw'
+                      sizes='(min-width: 1024px) 640px, 100vw'
                       priority={index === 0}
                     />
                   </button>
@@ -209,7 +205,7 @@ export const AdDetail = ({ ad: initialAd, categoryFeatures = [], categoryPath = 
                     alt={`${ad.title} — фото ${index + 1}`}
                     className='object-cover'
                     fill
-                    sizes='260px'
+                    sizes='64px'
                   />
                 </button>
               ))}
@@ -250,32 +246,15 @@ export const AdDetail = ({ ad: initialAd, categoryFeatures = [], categoryPath = 
                   size='lg'
                   className='grow px-8'
                   onClick={() => setIsPhoneRevealed(true)}
-                  // Пока телефон скрыт, это обычная <button> (клик просто
-                  // раскрывает номер), а после раскрытия render подменяет её
-                  // на <a href='tel:...'>, чтобы можно было сразу позвонить —
-                  // то есть реальный рендерящийся элемент меняется вместе с
-                  // isPhoneRevealed, и nativeButton должен меняться синхронно
-                  // с ним (не статичное true/false), иначе Base UI ругается
-                  // в консоль в одном из двух состояний.
                   nativeButton={!isPhoneRevealed}
                   render={isPhoneRevealed ? <a href={`tel:+${ad.phone}`} /> : undefined}
                 >
                   {isPhoneRevealed ? formatPhoneNumber(ad.phone) : 'Показать телефон'}
                 </Button>
-                {/* /profile/settings/messages защищена middleware'ом — незалогиненного
-                    просто отправит на /?auth=true, отдельно проверять авторизацию тут
-                    не нужно (та же логика, что уже работает для остальных /profile
-                    страниц). */}
                 <Button
                   size='lg'
                   variant='secondary'
                   className='px-8'
-                  // Эта кнопка ВСЕГДА рендерится как <Link> (= <a>), никогда
-                  // как настоящий <button> — в отличие от кнопки телефона
-                  // выше, тут нет условия. nativeButton по умолчанию true —
-                  // отсюда то же предупреждение Base UI, только теперь на
-                  // этой кнопке, и оно всегда актуально, а не только в одном
-                  // из состояний.
                   nativeButton={false}
                   render={<Link href={`/profile/settings/messages?ad=${ad.id}`} />}
                 >
@@ -359,7 +338,6 @@ export const AdDetail = ({ ad: initialAd, categoryFeatures = [], categoryPath = 
           close={closeLightbox}
           index={activeImage}
           slides={slides}
-          plugins={[Zoom]}
           on={{ view: ({ index }) => setActiveImage(index) }}
           animation={{ swipe: 0 }}
           styles={{ slide: { maxWidth: 1280, margin: '0 auto' } }}

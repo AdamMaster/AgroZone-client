@@ -20,7 +20,12 @@ import { IAd } from '../types/ad.types'
 export function useAd(id: string, initialData: IAd) {
   const { data: ad, isLoading } = useQuery({
     queryKey: ['ad-public', id],
-    queryFn: () => adsService.findOne(id),
+    // trackView: true — это и есть настоящий визит браузера (реальная кука
+    // сессии, реальные IP/UA), в отличие от SSR-вызова adsService.findOne в
+    // page.tsx (см. комментарий там же). staleTime в TanstackQueryProvider
+    // выставлен в 0, так что несмотря на initialData этот запрос всё равно
+    // уйдёт при монтировании — на нём и держится запись просмотра.
+    queryFn: () => adsService.findOne(id, { trackView: true }),
     initialData,
     enabled: !!id
   })
