@@ -23,7 +23,7 @@ export const CategoryItem = ({ category, href, className, onClick }: CategoryIte
   // названия slug пересчитывается заново), значения — пути к уже
   // существующим файлам картинок, их переименовывать не понадобилось.
   const icons: Record<string, string> = {
-    agrohimiya: '/images/categories/agrohimiya.jpg',
+    agrohimiya: '/images/categories/agrohimiya.png',
     'sh-zhivotnye-i-ptica': '/images/categories/selskohozyajstvennye-zhivotnye-ptica-i-akvakultura.jpg',
     'korma-i-komponenty': '/images/categories/korma-i-kormovye-komponenty.jpg',
     oborudovanie: '/images/categories/oborudovanie.jpg',
@@ -32,7 +32,8 @@ export const CategoryItem = ({ category, href, className, onClick }: CategoryIte
     agrokultury: '/images/categories/selhozprodukciya-i-rastitelnoe-syryo.jpg',
     'sh-tehnika': '/images/categories/selskohozyajstvennaya-tehnika.jpg',
     'tara-i-upakovka': '/images/categories/tara-i-upakovka.jpg',
-    prochee: '/images/categories/prochee.jpg'
+    prochee: '/images/categories/prochee.jpg',
+    veterinariya: '/images/categories/veterinariya.png'
     // 'zhivotnoe-syryo' (бывш. «Сырьё животного происхождения») — картинки для
     // этой категории пока нет вообще, ни под старым, ни под новым именем.
   }

@@ -231,7 +231,9 @@ export const AdDetail = ({ ad: initialAd, categoryFeatures = [], categoryPath = 
               <span className={cn(isPriceHighlighted && AD_PRICE_HIGHLIGHT_CLASS)}>
                 {ad.price ? `${ad.price.toLocaleString('ru-RU')} ₽` : 'Цена договорная'}
               </span>
-              {ad.price && ad.unit && PRICE_UNITS[ad.unit] && (
+              {/* ITEM ("Целиком") — цена без разбивки на единицы измерения,
+                  суффикс "за X" для него не нужен (см. shared/constants/units.ts) */}
+              {ad.price && ad.unit && ad.unit !== 'ITEM' && PRICE_UNITS[ad.unit] && (
                 <span className='block text-sm font-normal text-gray-500'>за {PRICE_UNITS[ad.unit].toLowerCase()}</span>
               )}
             </p>

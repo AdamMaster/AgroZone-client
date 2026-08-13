@@ -1,8 +1,25 @@
 'use client'
 
-import { ImagePlus, X } from 'lucide-react'
+import {
+  DndContext,
+  DragEndEvent,
+  KeyboardSensor,
+  PointerSensor,
+  closestCenter,
+  useSensor,
+  useSensors
+} from '@dnd-kit/core'
+import {
+  SortableContext,
+  arrayMove,
+  rectSortingStrategy,
+  sortableKeyboardCoordinates,
+  useSortable
+} from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
+import { GripVertical, ImagePlus, X } from 'lucide-react'
 import Image from 'next/image'
-import { ChangeEvent, useRef } from 'react'
+import { ChangeEvent, useEffect, useRef } from 'react'
 import { Control, useController } from 'react-hook-form'
 import { toast } from 'sonner'
 
@@ -18,16 +35,123 @@ interface PhotoUploaderProps {
   isPremium?: boolean
 }
 
+// Элементы `images` — File (новые фото) вперемешку со строками-URL (уже
+// загруженные, см. ad-edit.tsx) без собственного id. Раньше React key был
+// индексом в массиве — это ломает drag-n-drop: после перестановки React не
+// может понять, какой DOM-узел к какому файлу относится (dnd-kit сверяет
+// элементы по стабильному id, а не по позиции). Для строки id — она сама
+// (уже уникальна и стабильна). Для File — генерируем один раз при первой
+// встрече и держим в Map на время жизни компонента (см. resolveItem).
+type PhotoItem = File | string
+
+interface SortablePhotoTileProps {
+  id: string
+  url: string
+  onRemove: () => void
+}
+
+const SortablePhotoTile = ({ id, url, onRemove }: SortablePhotoTileProps) => {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id })
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={{ transform: CSS.Transform.toString(transform), transition }}
+      className={`relative aspect-square touch-none overflow-hidden rounded-lg border ${
+        isDragging ? 'z-10 opacity-70' : ''
+      }`}
+      {...attributes}
+      {...listeners}
+    >
+      <Image src={url} alt='preview' className='h-full w-full object-cover' fill />
+      <div className='absolute top-1 left-1 rounded-full bg-black/50 p-1 text-white'>
+        <GripVertical size={14} />
+      </div>
+      {/* activationConstraint у PointerSensor (см. ниже) не даёт обычному тапу
+          запустить драг, так что клик по крестику проходит как обычно —
+          stopPropagation тут просто на всякий случай, а не для обхода dnd-kit */}
+      <button
+        type='button'
+        onClick={e => {
+          e.stopPropagation()
+          onRemove()
+        }}
+        className='absolute top-1 right-1 rounded-full bg-black/50 p-1 text-white hover:bg-black/70'
+      >
+        <X size={14} />
+      </button>
+    </div>
+  )
+}
+
 export const PhotoUploader = ({ control, name, maxFiles, isPremium }: PhotoUploaderProps) => {
   const { field } = useController<TypeCreateAdSchema, 'images'>({
     name,
     control
   })
   const inputRef = useRef<HTMLInputElement>(null)
-  const currentFiles = field.value ?? []
+  const currentFiles: PhotoItem[] = field.value ?? []
   const count = currentFiles.length
 
   const isLimitReached = count >= maxFiles
+
+  // id + blob-URL на File считаем один раз и переиспользуем, а не на каждый
+  // рендер (было раньше: URL.createObjectURL(file) прямо в JSX) — иначе при
+  // каждом ре-рендере (в т.ч. во время драга) плодятся blob-URL, которые
+  // никогда не освобождаются. Удалённые файлы освобождаем в useEffect ниже.
+  const fileMetaRef = useRef(new Map<File, { id: string; url: string }>())
+  const idCounterRef = useRef(0)
+
+  const resolveItem = (item: PhotoItem): { id: string; url: string } => {
+    if (typeof item === 'string') return { id: item, url: item }
+
+    const existing = fileMetaRef.current.get(item)
+    if (existing) return existing
+
+    const meta = { id: `file_${idCounterRef.current++}`, url: URL.createObjectURL(item) }
+    fileMetaRef.current.set(item, meta)
+    return meta
+  }
+
+  const items = currentFiles.map(item => ({ item, ...resolveItem(item) }))
+
+  useEffect(() => {
+    const stillPresent = new Set(currentFiles.filter((item): item is File => item instanceof File))
+
+    for (const [file, meta] of fileMetaRef.current) {
+      if (!stillPresent.has(file)) {
+        URL.revokeObjectURL(meta.url)
+        fileMetaRef.current.delete(file)
+      }
+    }
+  }, [currentFiles])
+
+  useEffect(() => {
+    const metaMap = fileMetaRef.current
+    return () => {
+      metaMap.forEach(meta => URL.revokeObjectURL(meta.url))
+    }
+  }, [])
+
+  const sensors = useSensors(
+    // distance-порог — иначе обычный тап по фото (например, чтобы попасть по
+    // крестику удаления) на телефоне может быть ошибочно принят за начало
+    // драга.
+    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
+  )
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event
+    if (!over || active.id === over.id) return
+
+    const ids = items.map(i => i.id)
+    const oldIndex = ids.indexOf(String(active.id))
+    const newIndex = ids.indexOf(String(over.id))
+    if (oldIndex === -1 || newIndex === -1) return
+
+    field.onChange(arrayMove(currentFiles, oldIndex, newIndex))
+  }
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     const newFiles = Array.from(e.target.files || [])
@@ -62,40 +186,37 @@ export const PhotoUploader = ({ control, name, maxFiles, isPremium }: PhotoUploa
       <Label>
         Фотографии{' '}
         <span className='font-normal text-gray-500'>
-          (Объявления с фотографиями получают больше просмотров и откликов.)
+          (Объявления с фотографиями получают больше просмотров и откликов. Перетащите, чтобы изменить порядок.)
         </span>
       </Label>
-      <div className='grid grid-cols-5 gap-4'>
-        {currentFiles.map((file: File, index: number) => (
-          <div key={index} className='relative aspect-square overflow-hidden rounded-lg border'>
-            <Image
-              src={file instanceof File ? URL.createObjectURL(file) : file}
-              alt='preview'
-              className='h-full w-full object-cover'
-              fill
+      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+        <SortableContext items={items.map(i => i.id)} strategy={rectSortingStrategy}>
+          <div className='grid grid-cols-5 gap-4'>
+            {items.map(({ id, url }, index) => (
+              <SortablePhotoTile key={id} id={id} url={url} onRemove={() => removeFile(index)} />
+            ))}
+
+            {currentFiles.length < maxFiles && (
+              <button
+                type='button'
+                onClick={() => inputRef.current?.click()}
+                className='hover:border-primary flex aspect-square flex-col items-center justify-center rounded-lg border-2 border-dashed text-sm text-gray-500 transition-colors'
+              >
+                <ImagePlus className='text-gray-900' />
+              </button>
+            )}
+
+            <input
+              ref={inputRef}
+              type='file'
+              multiple
+              accept='image/*'
+              className='hidden'
+              onChange={handleFileChange}
             />
-            <button
-              type='button'
-              onClick={() => removeFile(index)}
-              className='absolute top-1 right-1 rounded-full bg-black/50 p-1 text-white hover:bg-black/70'
-            >
-              <X size={14} />
-            </button>
           </div>
-        ))}
-
-        {currentFiles.length < maxFiles && (
-          <button
-            type='button'
-            onClick={() => inputRef.current?.click()}
-            className='hover:border-primary flex aspect-square flex-col items-center justify-center rounded-lg border-2 border-dashed text-sm text-gray-500 transition-colors'
-          >
-            <ImagePlus className='text-gray-900' />
-          </button>
-        )}
-
-        <input ref={inputRef} type='file' multiple accept='image/*' className='hidden' onChange={handleFileChange} />
-      </div>
+        </SortableContext>
+      </DndContext>
       {!isPremium && isLimitReached && (
         <div className='mt-3 rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800'>
           Вы достигли лимита в {maxFiles} фото. Приобретите
