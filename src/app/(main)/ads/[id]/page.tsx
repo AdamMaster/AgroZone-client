@@ -4,9 +4,9 @@ import { cache } from 'react'
 
 import { AdDetail } from '@/components/features/ads/components'
 import { adsService } from '@/components/features/ads/services'
+import { categoriesService } from '@/components/features/categories/services'
 import { Container } from '@/components/layout'
 
-import { getCategories } from '@/shared/services'
 import { findCategoryById, getPathToCategory } from '@/shared/utils'
 
 interface AdPageProps {
@@ -43,7 +43,7 @@ export async function generateMetadata({ params }: AdPageProps): Promise<Metadat
 export default async function AdPage({ params }: AdPageProps) {
   const { id } = await params
 
-  const [ad, categories] = await Promise.all([getAd(id), getCategories().catch(() => [])])
+  const [ad, categories] = await Promise.all([getAd(id), categoriesService.findAll().catch(() => [])])
 
   if (!ad) {
     return notFound()

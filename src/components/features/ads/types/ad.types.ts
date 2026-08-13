@@ -1,42 +1,15 @@
 import { UserType } from '../../auth/types'
 
-export interface ICategoryFeature {
-  id: string
-  categoryId: string
-  name: string
-  label: string
-  type: 'TEXT' | 'NUMBER' | 'SELECT' | 'MULTI_SELECT' | 'BOOLEAN'
-  options?: string[]
-  // Единицы измерения для type = NUMBER. Первый элемент — каноническая
-  // единица: именно в ней значение хранится в Ad.features (см.
-  // dynamic-field.tsx — при вводе в другой единице значение
-  // конвертируется в каноническую перед сохранением). Если элементов
-  // больше одного — пользователь выбирает нужную при заполнении поля,
-  // если один — просто показывается подписью рядом с полем. Пустой
-  // массив/undefined — у поля нет единицы измерения вовсе.
-  units?: string[]
-  // Отдаётся бэкендом (CategoryFeature.filterable), нужно для сайдбара
-  // фильтра каталога.
-  filterable: boolean
-  createdAt: Date
-  updatedAt: Date
-}
+import { ICategory, ICategoryFeature } from '../../categories/types/categories.types'
 
-export interface ICategory {
-  id: string
-  name: string
-  slug: string
-  code: string
-  iconId: string | null
-  parentId: string | null
-  level: number
-  sortOrder: number
-  path: string[]
-  fullPath: string
-  categoryFeatures: ICategoryFeature[]
-  priceUnits: string[]
-  children?: ICategory[]
-}
+// ICategory/ICategoryFeature раньше были продублированы здесь и в
+// categories/types/categories.types.ts — два независимых определения с
+// одинаковым именем успели разойтись по составу полей (тут был units,
+// там — isBack, и наоборот). Категория — сущность фичи categories, так что
+// каноническое определение теперь там; тут импортируем его и тут же
+// ре-экспортируем — второе нужно для обратной совместимости всех мест,
+// которые до сих пор импортируют ICategory именно отсюда.
+export type { ICategory, ICategoryFeature }
 
 export interface IAdUser {
   id: string

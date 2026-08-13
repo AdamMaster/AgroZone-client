@@ -1,7 +1,6 @@
 import { AdEdit } from '@/components/features/ads/components/ad-edit'
+import { categoriesService } from '@/components/features/categories/services'
 import { Container } from '@/components/layout'
-
-import { getCategories } from '@/shared/services'
 
 interface AdEditPageProps {
   params: Promise<{ id: string }>
@@ -10,7 +9,7 @@ interface AdEditPageProps {
 export default async function AdEditPage({ params }: AdEditPageProps) {
   const { id } = await params
 
-  const categories = await getCategories()
+  const categories = await categoriesService.findAll()
 
   return (
     <div className='py-10'>
