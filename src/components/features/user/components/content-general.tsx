@@ -3,7 +3,7 @@
 import { useAppModal } from '@/store'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { CameraIcon } from 'lucide-react'
-import { ChangeEvent } from 'react'
+import { ChangeEvent, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 
 import { UserType } from '@/components/features/auth/types'
@@ -36,7 +36,7 @@ import { formatPhoneNumber, getPrimaryPhone } from '@/shared/utils'
 
 import { cn } from '@/lib/utils'
 
-import { useUpdateAvatarMutation } from '../hooks'
+import { useUpdateAvatarMutation, useVerifyBusinessMutation } from '../hooks'
 import { useUpdateProfileMutation } from '../hooks/use-update-profile-mutation'
 import { SettingsSchema, TypeSettingsSchema } from '../schemes'
 import { UserAvatar } from './user-avatar'
@@ -57,9 +57,22 @@ export const ContentGeneral = () => {
 
   const { update, isLoadingUpdate } = useUpdateProfileMutation()
   const { updateAvatar, isLoadingUpdateAvatar } = useUpdateAvatarMutation()
+  const { verifyBusiness, isLoadingVerifyBusiness } = useVerifyBusinessMutation()
+
+  // Выбранный в форме тип — не user?.type: до нажатия "Сохранить" это
+  // просто локальный черновик формы (см. Controller name='type' ниже),
+  // ИНН-поле должно появляться сразу при выборе "ИП"/"Компания", ещё до
+  // сохранения.
+  const selectedType = form.watch('type')
+  const [inn, setInn] = useState('')
 
   const onSubmit = (values: TypeSettingsSchema) => {
     update(values)
+  }
+
+  const onVerifyBusiness = () => {
+    if (!inn.trim()) return
+    verifyBusiness(inn.trim())
   }
 
   const onFileChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -166,6 +179,34 @@ export const ContentGeneral = () => {
                 </Field>
               )}
             />
+            {selectedType !== UserType.Individual && (
+              <Field>
+                <Label>ИНН</Label>
+                <FieldDescription>
+                  Подтвердите {selectedType === UserType.Business ? 'компанию' : 'ИП'} по ИНН — данные проверяются через
+                  DaData, а подтверждённое название вместо просто &quot;{USER_TYPE_LABELS[selectedType]}&quot; будет
+                  показано на ваших объявлениях.
+                </FieldDescription>
+                {isLoading ? (
+                  <Skeleton className='rounded-1 h-10 w-full' />
+                ) : (
+                  <div className='relative'>
+                    <Input
+                      value={inn}
+                      onChange={e => setInn(e.target.value.replace(/\D/g, '').slice(0, 12))}
+                      placeholder='ИНН'
+                      disabled={isLoadingVerifyBusiness}
+                    />
+                    <FieldButton onClick={onVerifyBusiness} disabled={isLoadingVerifyBusiness || !inn.trim()}>
+                      Подтвердить
+                    </FieldButton>
+                  </div>
+                )}
+                {user?.businessVerifiedAt && (
+                  <p className='mt-1.5 text-xs text-green-600'>Подтверждено: {user.businessName}</p>
+                )}
+              </Field>
+            )}
             <Field>
               <Label>Почта</Label>
               {isLoading ? (

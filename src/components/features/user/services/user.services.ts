@@ -20,6 +20,16 @@ class UserServices {
     return response
   }
 
+  // Подтверждение ИП/компании по ИНН — сервер сам проверяет ИНН через
+  // DaData (см. UserController.verifyBusiness) и, если всё сошлось,
+  // возвращает обновлённого пользователя с заполненными businessName/
+  // businessVerifiedAt.
+  async verifyBusiness(inn: string) {
+    const response = await api.post<IUser>('users/profile/business-verification', { inn })
+
+    return response
+  }
+
   async updateAvatar(file: File) {
     const formData = new FormData()
     formData.append('file', file)

@@ -76,6 +76,7 @@ export function AdsClient({ serverSlug, layout, className, locationOverride }: A
     maxPrice: filters.maxPrice,
     regionIsoCode,
     localityFiasId,
+    sellerType: filters.sellerType,
     features: Object.keys(filters.features).length ? JSON.stringify(filters.features) : undefined
   })
 

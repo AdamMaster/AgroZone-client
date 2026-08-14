@@ -5,7 +5,9 @@ import { useEffect, useState } from 'react'
 import { Input, Label, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui'
 
 import { PRICE_UNITS } from '@/shared/constants/units'
+import { USER_TYPE_LABELS, USER_TYPE_OPTIONS } from '@/shared/constants/user-types'
 
+import { UserType } from '../../auth/types'
 import { useCurrentCategory } from '../../categories/hooks/use-current-category'
 import { ICategory } from '../../categories/types'
 import { useCatalogFilters } from '../hooks/use-catalog-filters'
@@ -54,6 +56,8 @@ export const Filter = ({ categories }: FilterProps) => {
         value={{ regionIsoCode: filters.regionIsoCode, localityFiasId: filters.localityFiasId }}
         onChange={patch => filters.update(patch)}
       />
+
+      <SellerTypeFilter value={filters.sellerType} onChange={sellerType => filters.update({ sellerType })} />
 
       {filterableFeatures.map(feature => (
         <FilterFeatureField
@@ -161,6 +165,36 @@ const PriceRangeFilter = ({ priceUnits }: PriceRangeFilterProps) => {
           </SelectContent>
         </Select>
       )}
+    </div>
+  )
+}
+
+interface SellerTypeFilterProps {
+  value?: string
+  onChange: (value: string | undefined) => void
+}
+
+const SellerTypeFilter = ({ value, onChange }: SellerTypeFilterProps) => {
+  return (
+    <div className='flex flex-col gap-2'>
+      <Label>Тип продавца</Label>
+      <Select value={value ?? ''} onValueChange={(val: string | null) => onChange(val || undefined)}>
+        <SelectTrigger className='h-11! px-4'>
+          <SelectValue placeholder='Все продавцы'>
+            {(v: string | null) => (v ? (USER_TYPE_LABELS[v as UserType] ?? v) : 'Все продавцы')}
+          </SelectValue>
+        </SelectTrigger>
+        <SelectContent alignItemWithTrigger={false} align='start'>
+          <SelectItem value='' className='rounded-none px-4'>
+            Все продавцы
+          </SelectItem>
+          {USER_TYPE_OPTIONS.map(option => (
+            <SelectItem key={option.value} value={option.value} className='rounded-none px-4'>
+              {option.label}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
     </div>
   )
 }

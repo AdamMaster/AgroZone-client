@@ -8,6 +8,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import Lightbox from 'yet-another-react-lightbox'
 import Zoom from 'yet-another-react-lightbox/plugins/zoom'
 
+import { UserType } from '@/components/features/auth/types'
 import { Avatar, AvatarFallback, AvatarImage, Button, ButtonBack, Heading } from '@/components/ui'
 
 import { PRICE_UNITS } from '@/shared/constants/units'
@@ -295,10 +296,20 @@ export const AdDetail = ({ ad: initialAd, categoryFeatures = [], categoryPath = 
             </div>
           </div>
           <div className='mb-6 flex gap-2'>
-            {ad.user?.type && (
+            {/* "Частное лицо" — просто самозаявленный тип, показываем всегда.
+                ИП/Компания — без подтверждения ИНН это ничем не обеспеченное
+                заявление продавца о себе, поэтому бейдж для них показываем,
+                только когда businessVerifiedAt подтверждён через DaData (см.
+                UserService.verifyBusiness), и тогда используем реальное
+                название вместо общей подписи ("ИП Иванов И.И." вместо
+                просто "ИП"). */}
+            {ad.user?.type === UserType.Individual && (
               <span className='rounded-full bg-gray-100 px-2.5 py-1 text-xs text-gray-600'>
                 {USER_TYPE_LABELS[ad.user.type]}
               </span>
+            )}
+            {ad.user?.type !== UserType.Individual && ad.user?.businessVerifiedAt && ad.user?.businessName && (
+              <span className='rounded-full bg-gray-100 px-2.5 py-1 text-xs text-gray-600'>{ad.user.businessName}</span>
             )}
             {isSellerPremium && (
               <span className='flex items-center gap-1 rounded-full bg-amber-100 px-2.5 py-1 text-xs text-amber-700'>

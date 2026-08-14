@@ -20,5 +20,10 @@ export interface CatalogFiltersState {
   // см. LocationFilter.
   regionIsoCode?: string
   localityFiasId?: string
+  // Частное лицо / ИП / компания — как и regionIsoCode/localityFiasId,
+  // действует на любом уровне каталога независимо от выбранной категории
+  // (в отличие от features). Значение — UserType с бэкенда (см.
+  // FindAdsQueryDto.sellerType на сервере).
+  sellerType?: string
   features: FeatureFiltersMap
 }
