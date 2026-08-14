@@ -76,10 +76,6 @@ export const CategoryGrid = ({ categories, className }: CategoryGridProps) => {
     return categories.filter(item => !item.parentId)
   }, [categories, params.slug, categoryMap, isCatalog])
 
-  // Страницы, на которых сетка вообще не должна отображаться (например,
-  // страница объявления /ads/[id]) — тот же признак, что и в финальном
-  // `if` ниже перед рендером. Вынесен отдельно и добавлен в зависимости
-  // эффекта — см. причину в комментарии внутри эффекта.
   const shouldRender = Boolean(pathname) && (pathname === '/' || isCatalog) && itemsToRender.length > 0
 
   useLayoutEffect(() => {
@@ -87,30 +83,6 @@ export const CategoryGrid = ({ categories, className }: CategoryGridProps) => {
     const container = containerRef.current
 
     if (!shouldRender || !measureContainer || !container) {
-      // Раньше здесь просто был return без сброса visibleCount — если по
-      // какой-то причине (страница, где сетка временно не рендерится, гонка
-      // при переходе и т.п.) этот эффект не мог посчитать раскладку, в
-      // useState оставалось ЧИСЛО с прошлого расчёта (например, с другой
-      // страницы каталога). Компонент CategoryGrid не размонтируется при
-      // переходах между страницами (он часть общего layout), поэтому его
-      // локальный state переживает переходы.
-      //
-      // Но этого было недостаточно (баг сохранялся). Настоящая причина: на
-      // странице, где сетка скрыта (например /ads/[id]), компонент рендерит
-      // null — контейнеры не существуют в DOM, а itemsToRender при этом
-      // всё равно равен списку категорий верхнего уровня (он не завязан на
-      // видимость). А на главной странице ('/') itemsToRender — ТОТ ЖЕ
-      // самый список (categories.filter(!parentId)), с тем же
-      // идентификатором объекта (categoryMap/categories не пересчитываются
-      // между этими двумя страницами). Из-за этого при переходе
-      // /ads/[id] → '/' значение itemsToRender не меняется, и React не
-      // перезапускает этот эффект (зависимость [itemsToRender] визуально
-      // "не изменилась") — расчёт так и не происходит, хотя контейнеры уже
-      // появились в DOM, и сетка навсегда остаётся с opacity-0 (место
-      // зарезервировано, плиток не видно). Добавление shouldRender в
-      // зависимости эффекта чинит именно этот случай: смена видимости
-      // (скрыта → показана) сама по себе триггерит эффект заново, даже
-      // если список категорий для расчёта не изменился.
       setVisibleCount(null)
       return
     }
@@ -217,16 +189,18 @@ export const CategoryGrid = ({ categories, className }: CategoryGridProps) => {
             !isCalculated ? 'opacity-0' : 'opacity-100'
           )}
         >
-          {visibleItems.map(item => (
-            <CategoryItem
-              key={item.id}
-              category={{
-                ...item,
-                isSelected: item.fullPath === params.slug?.join('/')
-              }}
-              href={getCategoryHref(item)}
-            />
-          ))}
+          {visibleItems.map(item => {
+            return (
+              <CategoryItem
+                key={item.id}
+                category={{
+                  ...item,
+                  isSelected: item.fullPath === params.slug?.join('/')
+                }}
+                href={getCategoryHref(item)}
+              />
+            )
+          })}
 
           {hiddenCount > 0 && (
             <button
