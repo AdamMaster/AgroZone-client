@@ -44,7 +44,13 @@ export const AdCardList = ({ ad }: AdCardListProps) => {
         <div>
           <div className='relative block w-59 max-w-59 overflow-hidden rounded-xl bg-gray-100 pt-[100%]'>
             {ad.images.length > 0 ? (
-              <Image src={ad.images[0]} alt={ad.title} className='h-full w-full object-cover mix-blend-darken' fill />
+              <Image
+                src={ad.images[0]}
+                alt={ad.title}
+                className='h-full w-full object-cover mix-blend-darken'
+                fill
+                sizes='236px'
+              />
             ) : (
               <ImageIcon size={50} className='absolute top-[50%] left-[50%] translate-[-50%] text-gray-500' />
             )}

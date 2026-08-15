@@ -1,6 +1,6 @@
 'use client'
 
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useRouter } from 'next/navigation'
 import { Dispatch, SetStateAction } from 'react'
 import { toast } from 'sonner'
@@ -12,6 +12,7 @@ import { authService } from '../services'
 
 export function useLoginMutation(setIsShowTwoFactor: Dispatch<SetStateAction<boolean>>) {
   const router = useRouter()
+  const queryClient = useQueryClient()
 
   const { mutate: login, isPending: isLoadingLogin } = useMutation({
     mutationKey: ['login user'],
@@ -28,6 +29,12 @@ export function useLoginMutation(setIsShowTwoFactor: Dispatch<SetStateAction<boo
         return data
       } else {
         toast.success('Вы успешно вошли в аккаунт!')
+        // Раньше глобальный staleTime: 0 сам форсировал рефетч профиля
+        // при монтировании /profile/settings. Теперь глобальный
+        // staleTime не 0, так что если ['profile'] уже был закэширован
+        // (например, до логина как unauthenticated-состояние), страница
+        // могла бы мигнуть старыми данными — инвалидируем явно.
+        queryClient.invalidateQueries({ queryKey: ['profile'] })
         router.push('/profile/settings')
 
         return data
