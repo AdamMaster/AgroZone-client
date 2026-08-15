@@ -32,11 +32,12 @@ export const CategoryItem = ({ category, href, className, onClick }: CategoryIte
     agrokultury: '/images/categories/selhozprodukciya-i-rastitelnoe-syryo.jpg',
     'sh-tehnika': '/images/categories/sh-tehnika.png',
     'tara-i-upakovka': '/images/categories/tara-i-upakovka.png',
-    prochee: '/images/categories/prochee.jpg',
     veterinariya: '/images/categories/veterinariya.png',
     'polevye-kultury': '/images/categories/polevye-kultury.png',
     'zhivotnoe-syryo': '/images/categories/zhivotnoe-syryo.png',
-    'posadochnyj-material': '/images/categories/posadochnyj-material.png'
+    'posadochnyj-material': '/images/categories/posadochnyj-material.png',
+    'zemli-i-obuekty-sh-nedvizhimosti': '/images/categories/zemli-i-obuekty-sh-nedvizhimosti.png',
+    prochee: '/images/categories/prochee.png'
   }
 
   const isTopLevelCard = category.level === 0 && !category.isParent
@@ -47,8 +48,8 @@ export const CategoryItem = ({ category, href, className, onClick }: CategoryIte
       href={href}
       onClick={onClick}
       className={cn(
-        'relative flex max-w-[300px] gap-1 overflow-hidden rounded-lg bg-gray-100 hover:bg-gray-200',
-        isTopLevelCard ? 'h-[100px] px-5 py-4 pr-12' : 'px-4 py-2.5',
+        'relative flex max-w-[260px] gap-1 overflow-hidden rounded-lg bg-gray-100 text-[13px] leading-tight hover:bg-gray-200',
+        isTopLevelCard ? 'h-[100px] px-3.5 py-2.5 pr-12' : 'px-4 py-2.5',
         category.isSelected && 'bg-secondary hover:bg-secondary-foreground text-white',
         category.isParent && 'bg-primary hover:bg-primary-foreground text-white',
         className

@@ -126,87 +126,84 @@ export const ContentGeneral = () => {
       <div className='relative'>
         <form id='form-rhf-demo' onSubmit={form.handleSubmit(onSubmit)}>
           <FieldGroup className='flex flex-col gap-5'>
-            <div className='mb-4 flex items-end gap-3'>
-              <Controller
-                name='name'
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid} className={cn('group')}>
-                    <Label>Имя</Label>
-                    {isLoading ? (
-                      <Skeleton className='rounded-1 h-10 w-full' />
-                    ) : (
-                      <Input {...field} type='name' placeholder='Имя' />
-                    )}
-                    {fieldState.invalid && (
-                      <FieldError errors={[fieldState.error]} className='absolute -bottom-5 left-0' />
-                    )}
-                  </Field>
-                )}
-              />
+            <div className='mb-4 flex flex-col gap-3'>
+              <div className='flex items-end gap-3'>
+                <Controller
+                  name='name'
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <Field data-invalid={fieldState.invalid} className={cn('group')}>
+                      <Label>Имя</Label>
+                      {isLoading ? (
+                        <Skeleton className='rounded-1 h-10 w-full' />
+                      ) : (
+                        <Input {...field} type='name' placeholder='Имя' />
+                      )}
+                      {fieldState.invalid && (
+                        <FieldError errors={[fieldState.error]} className='absolute -bottom-5 left-0' />
+                      )}
+                    </Field>
+                  )}
+                />
+                <Controller
+                  name='type'
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <Field data-invalid={fieldState.invalid} isInvalid={fieldState.invalid}>
+                      <Label>Тип продавца</Label>
+                      {isLoading ? (
+                        <Skeleton className='rounded-1 h-10 w-full' />
+                      ) : (
+                        <Select items={USER_TYPE_LABELS} value={field.value} onValueChange={field.onChange}>
+                          <SelectTrigger className='w-full px-4'>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent alignItemWithTrigger={false} align='start'>
+                            {USER_TYPE_OPTIONS.map(option => (
+                              <SelectItem key={option.value} value={option.value} className='rounded-none px-4'>
+                                {option.label}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      )}
+                      {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                    </Field>
+                  )}
+                />
+              </div>
+              {selectedType !== UserType.Individual && (
+                <Field>
+                  <Label>ИНН</Label>
+                  <FieldDescription>
+                    Подтвердите {selectedType === UserType.Business ? 'компанию ' : 'ИП '} по ИНН — данные проверяются
+                    через сервис DaData. Подтверждённое название будет показано на ваших объявлениях.
+                  </FieldDescription>
+                  {isLoading ? (
+                    <Skeleton className='rounded-1 h-10 w-full' />
+                  ) : (
+                    <div className='relative'>
+                      <Input
+                        value={inn}
+                        onChange={e => setInn(e.target.value.replace(/\D/g, '').slice(0, 12))}
+                        placeholder='ИНН'
+                        disabled={isLoadingVerifyBusiness}
+                      />
+                      <FieldButton onClick={onVerifyBusiness} disabled={isLoadingVerifyBusiness || !inn.trim()}>
+                        Подтвердить
+                      </FieldButton>
+                    </div>
+                  )}
+                  {user?.businessVerifiedAt && (
+                    <p className='mt-1.5 text-xs text-green-600'>Подтверждено: {user.businessName}</p>
+                  )}
+                </Field>
+              )}
               <Button variant='secondary' size='lg' type='submit' className='h-12 w-fit'>
                 Сохранить
               </Button>
             </div>
-            <Controller
-              name='type'
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid} isInvalid={fieldState.invalid}>
-                  <Label>Тип продавца</Label>
-                  {isLoading ? (
-                    <Skeleton className='rounded-1 h-10 w-full' />
-                  ) : (
-                    // items — не просто данные для рендера пунктов, а способ для
-                    // Select.Value узнать подпись выбранного значения (сама
-                    // Popup-часть со SelectItem может быть ещё не смонтирована).
-                    // Без этого в триггере показывался бы сырой enum-value
-                    // ('INDIVIDUAL') вместо 'Частное лицо'.
-                    <Select items={USER_TYPE_LABELS} value={field.value} onValueChange={field.onChange}>
-                      <SelectTrigger className='w-full px-4'>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent alignItemWithTrigger={false} align='start'>
-                        {USER_TYPE_OPTIONS.map(option => (
-                          <SelectItem key={option.value} value={option.value} className='rounded-none px-4'>
-                            {option.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  )}
-                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                </Field>
-              )}
-            />
-            {selectedType !== UserType.Individual && (
-              <Field>
-                <Label>ИНН</Label>
-                <FieldDescription>
-                  Подтвердите {selectedType === UserType.Business ? 'компанию' : 'ИП'} по ИНН — данные проверяются через
-                  DaData, а подтверждённое название вместо просто &quot;{USER_TYPE_LABELS[selectedType]}&quot; будет
-                  показано на ваших объявлениях.
-                </FieldDescription>
-                {isLoading ? (
-                  <Skeleton className='rounded-1 h-10 w-full' />
-                ) : (
-                  <div className='relative'>
-                    <Input
-                      value={inn}
-                      onChange={e => setInn(e.target.value.replace(/\D/g, '').slice(0, 12))}
-                      placeholder='ИНН'
-                      disabled={isLoadingVerifyBusiness}
-                    />
-                    <FieldButton onClick={onVerifyBusiness} disabled={isLoadingVerifyBusiness || !inn.trim()}>
-                      Подтвердить
-                    </FieldButton>
-                  </div>
-                )}
-                {user?.businessVerifiedAt && (
-                  <p className='mt-1.5 text-xs text-green-600'>Подтверждено: {user.businessName}</p>
-                )}
-              </Field>
-            )}
+
             <Field>
               <Label>Почта</Label>
               {isLoading ? (
