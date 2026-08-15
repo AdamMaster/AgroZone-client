@@ -3,7 +3,7 @@
 import { useAppModal } from '@/store'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { CameraIcon } from 'lucide-react'
-import { ChangeEvent, useState } from 'react'
+import { ChangeEvent, useEffect, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 
 import { UserType } from '@/components/features/auth/types'
@@ -66,13 +66,27 @@ export const ContentGeneral = () => {
   const selectedType = form.watch('type')
   const [inn, setInn] = useState('')
 
+  // Подставляем уже подтверждённый ИНН при загрузке профиля (и при любом
+  // его обновлении, например сразу после успешного verifyBusiness) — без
+  // этого поле оставалось пустым после обновления страницы, хотя ИНН уже
+  // сохранён в базе (user.businessInn), и была видна только строка
+  // "Подтверждено: ..." под полем, а не сам ИНН.
+  useEffect(() => {
+    if (user?.businessInn) {
+      setInn(user.businessInn)
+    }
+  }, [user?.businessInn])
+
   const onSubmit = (values: TypeSettingsSchema) => {
     update(values)
   }
 
   const onVerifyBusiness = () => {
     if (!inn.trim()) return
-    verifyBusiness(inn.trim())
+    // expectedType — то, что сейчас выбрано в форме, а не user?.type: нужно
+    // хуку, чтобы сравнить с тем, что реально найдёт DaData, и явно
+    // предупредить, если они разошлись (см. useVerifyBusinessMutation).
+    verifyBusiness({ inn: inn.trim(), expectedType: selectedType })
   }
 
   const onFileChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -126,14 +140,14 @@ export const ContentGeneral = () => {
       <div className='relative'>
         <form id='form-rhf-demo' onSubmit={form.handleSubmit(onSubmit)}>
           <FieldGroup className='flex flex-col gap-5'>
-            <div className='mb-4 flex flex-col gap-3'>
+            <div className='mb-4 flex flex-col gap-5'>
               <div className='flex items-end gap-3'>
                 <Controller
                   name='name'
                   control={form.control}
                   render={({ field, fieldState }) => (
                     <Field data-invalid={fieldState.invalid} className={cn('group')}>
-                      <Label>Имя</Label>
+                      <Label className='mb-1'>Имя</Label>
                       {isLoading ? (
                         <Skeleton className='rounded-1 h-10 w-full' />
                       ) : (
@@ -150,7 +164,7 @@ export const ContentGeneral = () => {
                   control={form.control}
                   render={({ field, fieldState }) => (
                     <Field data-invalid={fieldState.invalid} isInvalid={fieldState.invalid}>
-                      <Label>Тип продавца</Label>
+                      <Label className='mb-1'>Тип продавца</Label>
                       {isLoading ? (
                         <Skeleton className='rounded-1 h-10 w-full' />
                       ) : (
@@ -174,7 +188,7 @@ export const ContentGeneral = () => {
               </div>
               {selectedType !== UserType.Individual && (
                 <Field>
-                  <Label>ИНН</Label>
+                  <Label className='mb-0'>ИНН</Label>
                   <FieldDescription>
                     Подтвердите {selectedType === UserType.Business ? 'компанию ' : 'ИП '} по ИНН — данные проверяются
                     через сервис DaData. Подтверждённое название будет показано на ваших объявлениях.
@@ -205,7 +219,7 @@ export const ContentGeneral = () => {
             </div>
 
             <Field>
-              <Label>Почта</Label>
+              <Label className='mb-1'>Почта</Label>
               {isLoading ? (
                 <Skeleton className='rounded-1 h-10 w-full' />
               ) : (
@@ -219,7 +233,7 @@ export const ContentGeneral = () => {
               )}
             </Field>
             <Field>
-              <Label>Номер телефона</Label>
+              <Label className='mb-1'>Номер телефона</Label>
 
               {isLoading ? (
                 <Skeleton className='rounded-1 h-10 w-full' />
