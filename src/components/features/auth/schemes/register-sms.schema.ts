@@ -15,7 +15,12 @@ export const RegisterSmsFinalSchema = z
   .object({
     name: z.string().min(2, 'Имя обязательно'),
     password: z.string().min(6, 'Минимум 6 символов'),
-    passwordRepeat: z.string()
+    passwordRepeat: z.string(),
+    // 152-ФЗ: без согласия на обработку персональных данных регистрация
+    // невозможна — см. чекбокс в FormRegisterSms (шаг 3).
+    personalDataConsent: z
+      .boolean()
+      .refine(value => value === true, { message: 'Необходимо дать согласие на обработку персональных данных' })
   })
   .refine(data => data.password === data.passwordRepeat, {
     message: 'Пароли не совпадают',

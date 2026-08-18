@@ -3,13 +3,24 @@
 import { useAppModal } from '@/store'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Eye, EyeOff } from 'lucide-react'
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import React, { useState } from 'react'
 import { useGoogleReCaptcha } from 'react-google-recaptcha-v3'
 import { Controller, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 
-import { Button, Field, FieldError, FieldGroup, Input, InputGroup, Loading, PasswordToggle } from '@/components/ui'
+import {
+  Button,
+  Checkbox,
+  Field,
+  FieldError,
+  FieldGroup,
+  Input,
+  InputGroup,
+  Loading,
+  PasswordToggle
+} from '@/components/ui'
 
 import { formatPhoneNumber } from '@/shared/utils'
 
@@ -55,7 +66,7 @@ export const FormRegisterSms = () => {
 
   const formFinal = useForm<TypeRegisterSmsFinalSchema>({
     resolver: zodResolver(RegisterSmsFinalSchema),
-    defaultValues: { name: '', password: '', passwordRepeat: '' }
+    defaultValues: { name: '', password: '', passwordRepeat: '', personalDataConsent: false }
   })
 
   const onFormPhoneSubmit = async (data: TypeRegisterSmsPhoneSchema) => {
@@ -215,6 +226,29 @@ export const FormRegisterSms = () => {
               )}
             />
           </FieldGroup>
+          <Controller
+            name='personalDataConsent'
+            control={formFinal.control}
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid} className='mt-4'>
+                <label className='flex items-start gap-2 text-left'>
+                  <Checkbox
+                    checked={!!field.value}
+                    onCheckedChange={field.onChange}
+                    className='mt-0.5 size-4 shrink-0'
+                  />
+                  <span className='text-sm text-gray-500'>
+                    Я даю согласие на{' '}
+                    <Link href='/privacy' target='_blank' className='text-primary underline'>
+                      обработку персональных данных
+                    </Link>{' '}
+                    в соответствии с политикой конфиденциальности
+                  </span>
+                </label>
+                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+              </Field>
+            )}
+          />
           <Button variant='secondary' size='lg' type='submit' className='mt-8 w-full'>
             Завершить регистрацию
           </Button>

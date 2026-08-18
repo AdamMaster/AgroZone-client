@@ -15,6 +15,12 @@ interface AuthFormWrapperProps {
   switchButtonLabel?: ReactNode
   isShowSocial?: boolean
   onSwitchButtonClick?: () => void
+  // Текст под кнопками входа через соцсети — используем на формах
+  // регистрации для уведомления о согласии на обработку персональных данных
+  // (152-ФЗ): у OAuth нет отдельного шага с чекбоксом, поэтому согласие
+  // подразумевается продолжением через Google/Яндекс, о чём и предупреждает
+  // этот текст (см. AuthService.extractProfileFromCode на сервере).
+  socialsFooterNotice?: ReactNode
 }
 
 export const AuthFormWrapper = ({
@@ -24,10 +30,11 @@ export const AuthFormWrapper = ({
   description,
   switchButtonLabel,
   onSwitchButtonClick,
-  isShowSocial = true
+  isShowSocial = true,
+  socialsFooterNotice
 }: PropsWithChildren<AuthFormWrapperProps>) => {
   return (
-    <div className={cn('flex w-full flex-col', className)}>
+    <div className={cn('flex w-full flex-col text-center', className)}>
       <div className='mb-8 flex flex-col gap-2'>
         <Heading level={2}>{heading}</Heading>
         {description && <p className='text-gray-500'>{description}</p>}
@@ -45,6 +52,9 @@ export const AuthFormWrapper = ({
       )}
 
       <div>{isShowSocial && <AuthSocials />}</div>
+      {isShowSocial && socialsFooterNotice && (
+        <p className='text-muted-foreground mt-3 text-xs'>{socialsFooterNotice}</p>
+      )}
       {switchButtonLabel && (
         <button className='mt-4 block w-full text-center hover:opacity-80' onClick={onSwitchButtonClick}>
           {switchButtonLabel}

@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { Google_Sans, Inter } from 'next/font/google'
 
+import { CookieConsentBanner } from '@/components/layout'
 import { AppModal } from '@/components/modals/app'
 import { CategoriesModal } from '@/components/modals/categories'
 import { MainProvider } from '@/components/providers'
@@ -41,6 +42,7 @@ export default function RootLayout({
           {children}
           <AppModal />
           <CategoriesModal />
+          <CookieConsentBanner />
         </MainProvider>
       </body>
     </html>
