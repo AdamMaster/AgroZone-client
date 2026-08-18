@@ -123,7 +123,7 @@ export const FormRegisterSms = () => {
     <AuthFormWrapper
       heading='Регистрация'
       isShowSocial={false}
-      description={step === 1 ? 'Введите номер телефона' : step === 2 ? 'Введите код из СМС' : 'Придумайте пароль'}
+      description={step === 1 ? 'Введите номер телефона' : step === 2 ? 'Введите код из звонка' : 'Придумайте пароль'}
       switchButtonLabel={
         <>
           Уже есть аккаунт? <span className='text-primary'>Войти</span>
@@ -165,7 +165,7 @@ export const FormRegisterSms = () => {
             control={formCode.control}
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid} className={cn(fieldState.invalid && 'pb-5', 'group')}>
-                <Input {...field} placeholder='Код из СМС (6 цифр)' maxLength={6} />
+                <Input {...field} placeholder='Последние 4 цифры номера' maxLength={4} />
                 {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
               </Field>
             )}
