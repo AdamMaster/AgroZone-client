@@ -49,7 +49,7 @@ export const AdCardList = ({ ad }: AdCardListProps) => {
                 alt={ad.title}
                 className='h-full w-full object-cover mix-blend-darken'
                 fill
-                sizes='236px'
+                sizes='400px'
               />
             ) : (
               <ImageIcon size={50} className='absolute top-[50%] left-[50%] translate-[-50%] text-gray-500' />

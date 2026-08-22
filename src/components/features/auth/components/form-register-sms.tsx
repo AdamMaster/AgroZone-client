@@ -245,7 +245,7 @@ export const FormRegisterSms = () => {
                     в соответствии с политикой конфиденциальности
                   </span>
                 </label>
-                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                {fieldState.invalid && <FieldError errors={[fieldState.error]} className='relative' />}
               </Field>
             )}
           />

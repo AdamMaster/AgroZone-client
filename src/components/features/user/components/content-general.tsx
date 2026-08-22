@@ -209,7 +209,7 @@ export const ContentGeneral = () => {
                     </div>
                   )}
                   {user?.businessVerifiedAt && (
-                    <p className='text-xs text-green-600'>Подтверждено: {user.businessName}</p>
+                    <p className='text-primary text-xs'>Подтверждено: {user.businessName}</p>
                   )}
                 </Field>
               )}
