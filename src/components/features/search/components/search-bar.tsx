@@ -1,6 +1,6 @@
 'use client'
 
-import { ChevronLeft, ChevronRight, Search, X } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Search, SlidersHorizontal, X } from 'lucide-react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { useState } from 'react'
 
@@ -61,22 +61,38 @@ export const SearchBar = ({ className }: SearchBarProps) => {
     setIsFocus(false)
   }
 
+  // Мобильная версия: вместо кнопки submit (лупа) — кнопка фильтра (см.
+  // обсуждение с пользователем: поиск на всю ширину, кнопки «Найти»
+  // отдельно не нужно — пользователь просто кликает пункт из списка
+  // подсказок). Полноэкранная панель фильтра — отдельный, следующий шаг,
+  // здесь пока только закрываем подсказки.
+  const onClickFilter = () => {
+    setIsFocus(false)
+  }
+
   const onClickInput = () => {
     setIsFocus(true)
   }
 
   return (
     <div className={cn(className)}>
-      <form className='bg-primary relative z-100 flex items-center rounded-lg p-[2px]' onSubmit={handleSearch}>
+      <form
+        className={cn(
+          'md:bg-primary relative z-100 flex items-center rounded-lg bg-gray-100 p-[2px]',
+          isFocus && 'bg-white'
+        )}
+        onSubmit={handleSearch}
+      >
         <div className='relative w-full'>
           <Input
             value={query}
             placeholder='Поиск по объявлениям'
             onChange={e => handleInputChange(e.target.value)}
             onClick={() => onClickInput()}
-            className='h-12 w-full rounded-[10px] border-0 pl-5 text-[15px]! focus-visible:border-transparent'
+            className='md:bg-50 h-11 w-full rounded-[10px] border-0 bg-gray-100 pl-9.5 text-[15px]! transition-none focus-visible:border-transparent md:h-12 md:pl-4 md:pl-5 md:transition-colors!'
             autoComplete='off'
           />
+          <Search className='absolute top-[50%] left-3 size-4.5 translate-y-[-50%] text-gray-500 md:hidden' />
 
           {query.length > 0 && (
             <button
@@ -92,11 +108,20 @@ export const SearchBar = ({ className }: SearchBarProps) => {
         <Button
           type='submit'
           variant='default'
-          className='text-md h-12! px-5 font-normal'
+          className='text-md hidden h-12! px-5 font-normal md:flex'
           onClick={() => onClickButton()}
         >
           <Search className={cn('size-5 text-white')} />
         </Button>
+
+        <button
+          type='button'
+          aria-label='Открыть фильтр'
+          onClick={() => onClickFilter()}
+          className='flex h-11 shrink-0 items-center justify-center bg-transparent px-3 md:hidden'
+        >
+          <SlidersHorizontal className='size-5 text-gray-500' />
+        </button>
 
         {isFocus && suggestions.length > 0 && (
           <div className='custom-shadow absolute top-[calc(100%+4px)] left-0 z-100 max-h-64 w-full overflow-hidden overflow-y-auto rounded-lg bg-white'>
