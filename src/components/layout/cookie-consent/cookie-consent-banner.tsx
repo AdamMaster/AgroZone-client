@@ -26,7 +26,10 @@ export const CookieConsentBanner = () => {
   }
 
   return (
-    <div className='bg-background fixed inset-x-0 bottom-0 z-50 border-t p-4 shadow-lg'>
+    // bottom-14 на мобилке — чтобы баннер не перекрывался нижней таб-
+    // панелью (MobileTabBar, h-14, z-40) и не перекрывал её сам; на md+
+    // панели нет, баннер прижат к самому низу как раньше.
+    <div className='bg-background fixed inset-x-0 bottom-14 z-50 border-t p-4 shadow-lg md:bottom-0'>
       <div className='mx-auto flex max-w-6xl flex-col items-center gap-4 sm:flex-row sm:justify-between'>
         <p className='text-sm text-gray-600'>
           Мы используем cookie для корректной работы сайта и авторизации. Продолжая пользоваться сайтом, вы соглашаетесь
