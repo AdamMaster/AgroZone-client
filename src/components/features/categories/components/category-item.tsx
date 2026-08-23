@@ -3,6 +3,7 @@
 import { ChevronLeft } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
+import { MouseEvent } from 'react'
 
 import { cn } from '@/lib/utils'
 
@@ -15,7 +16,7 @@ interface CategoryItemProps {
   }
   href: string
   className?: string
-  onClick?: () => void
+  onClick?: (event: MouseEvent<HTMLAnchorElement>) => void
 }
 
 export const CategoryItem = ({ category, href, className, onClick }: CategoryItemProps) => {
