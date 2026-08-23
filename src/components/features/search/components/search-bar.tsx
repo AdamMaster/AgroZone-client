@@ -75,10 +75,10 @@ export const SearchBar = ({ className }: SearchBarProps) => {
   }
 
   return (
-    <div className={cn(className)}>
+    <div className={cn(className, 'flex items-center')}>
       <form
         className={cn(
-          'md:bg-primary relative z-100 flex items-center rounded-lg bg-gray-100 p-[2px]',
+          'md:bg-primary relative z-100 flex w-full items-center rounded-lg bg-gray-100 p-[2px]',
           isFocus && 'bg-white'
         )}
         onSubmit={handleSearch}
@@ -89,10 +89,9 @@ export const SearchBar = ({ className }: SearchBarProps) => {
             placeholder='Поиск по объявлениям'
             onChange={e => handleInputChange(e.target.value)}
             onClick={() => onClickInput()}
-            className='md:bg-50 h-11 w-full rounded-[10px] border-0 bg-gray-100 pl-9.5 text-[15px]! transition-none focus-visible:border-transparent md:h-12 md:pl-4 md:pl-5 md:transition-colors!'
+            className='h-10 w-full rounded-[10px] border-0 bg-gray-100 pl-3 transition-none focus-visible:border-transparent md:h-12 md:bg-gray-50 md:bg-white md:pl-4 md:pl-5 md:text-[15px]! md:transition-colors!'
             autoComplete='off'
           />
-          <Search className='absolute top-[50%] left-3 size-4.5 translate-y-[-50%] text-gray-500 md:hidden' />
 
           {query.length > 0 && (
             <button
@@ -114,14 +113,14 @@ export const SearchBar = ({ className }: SearchBarProps) => {
           <Search className={cn('size-5 text-white')} />
         </Button>
 
-        <button
+        <Button
           type='button'
           aria-label='Открыть фильтр'
           onClick={() => onClickFilter()}
-          className='flex h-11 shrink-0 items-center justify-center bg-transparent px-3 md:hidden'
+          className='flex h-10 shrink-0 items-center justify-center bg-transparent px-2.5 md:hidden'
         >
           <SlidersHorizontal className='size-5 text-gray-500' />
-        </button>
+        </Button>
 
         {isFocus && suggestions.length > 0 && (
           <div className='custom-shadow absolute top-[calc(100%+4px)] left-0 z-100 max-h-64 w-full overflow-hidden overflow-y-auto rounded-lg bg-white'>
@@ -155,7 +154,13 @@ export const SearchBar = ({ className }: SearchBarProps) => {
           </div>
         )}
       </form>
-
+      <Button
+        variant='ghost'
+        className={cn('relative z-100 hidden bg-transparent pr-0 text-xs font-normal md:hidden', isFocus && 'block')}
+        onClick={() => setIsFocus(false)}
+      >
+        Отменить
+      </Button>
       {isFocus && <div className='fixed inset-0 z-50 h-full w-full bg-black/20' onClick={() => setIsFocus(false)} />}
     </div>
   )
