@@ -24,7 +24,7 @@ export default async function MainLayout({
     // отступ убираем.
     <div className='flex min-h-full flex-1 flex-col pb-14 md:pb-0'>
       <Header />
-      <CategoryGrid categories={categories} className='mb-12 pt-4' />
+      <CategoryGrid categories={categories} className='mb-12 md:pt-4' />
       <CategoryMenu />
       <main className='flex-1'>{children}</main>
       <Footer />
