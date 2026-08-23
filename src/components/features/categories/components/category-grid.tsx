@@ -3,7 +3,7 @@
 import { useCategoriesModal } from '@/store'
 import { ChevronRight } from 'lucide-react'
 import { useParams, usePathname } from 'next/navigation'
-import { useLayoutEffect, useMemo, useRef, useState } from 'react'
+import { MouseEvent, useLayoutEffect, useMemo, useRef, useState } from 'react'
 
 import { Container } from '@/components/layout'
 
@@ -38,6 +38,18 @@ export const CategoryGrid = ({ categories, className }: CategoryGridProps) => {
     const currentCategory = currentPath ? categoryMap.get(currentPath) : null
 
     return currentCategory?.parent ? `/catalog/${currentCategory.parent.fullPath}` : '/catalog'
+  }
+
+  // Мобилка, верхний уровень: тап по категории, у которой есть
+  // подкатегории, не уводит на страницу каталога, а открывает
+  // полноэкранное окно с её подкатегориями (см. CategoriesModal /
+  // CategoryList). Если подкатегорий нет — показывать в окне нечего,
+  // переход по ссылке остаётся обычным.
+  const handleTopLevelTap = (item: ICategory) => (event: MouseEvent<HTMLAnchorElement>) => {
+    if (item.children?.length) {
+      event.preventDefault()
+      onOpen(item.fullPath)
+    }
   }
 
   const itemsToRender = useMemo(() => {
@@ -167,7 +179,13 @@ export const CategoryGrid = ({ categories, className }: CategoryGridProps) => {
   const hiddenCount = itemsToRender.length - visibleItems.length
 
   return (
-    <div className={className}>
+    // mb-12 — только когда на мобилке реально что-то видно (верхний
+    // уровень, !isCatalog). На /catalog/... на мобилке весь контент этого
+    // компонента скрыт (см. ниже), поэтому отступ снизу тоже не нужен —
+    // иначе между Header и следующим блоком осталась бы пустая дыра. На
+    // десктопе чипсы подкатегорий видны всегда, поэтому там mb-12 —
+    // безусловно.
+    <div className={cn(className, !isCatalog && 'mb-12', 'md:mb-12 md:pt-4')}>
       <Container>
         <div ref={measureRef} className='pointer-events-none invisible absolute flex flex-wrap gap-2'>
           {itemsToRender.map(item => (
@@ -182,16 +200,6 @@ export const CategoryGrid = ({ categories, className }: CategoryGridProps) => {
           ))}
         </div>
 
-        {/* Мобилка, верхний уровень (категории с картинками, !isCatalog) —
-            вместо JS-подсчёта того, сколько влезает в 2 ряда, и обрезания
-            кнопкой «Все категории» — рендерим сразу ВСЕ категории в 2
-            фиксированных ряда через CSS Grid (grid-flow-col + grid-rows-2,
-            каждая следующая категория уходит в новую колонку) и даём
-            проскроллить лишнее пальцем по горизонтали, без видимого
-            скроллбара (см. обсуждение с пользователем). Подкатегории-чипсы
-            (isCatalog — когда уже находимся внутри категории) это не
-            затрагивает, для них поведение ниже осталось прежним на всех
-            экранах. */}
         {!isCatalog && (
           <div className='scrollbar-none overflow-auto'>
             <div className='flex w-270 flex-wrap gap-2 md:hidden'>
@@ -203,6 +211,7 @@ export const CategoryGrid = ({ categories, className }: CategoryGridProps) => {
                     isSelected: item.fullPath === params.slug?.join('/')
                   }}
                   href={getCategoryHref(item)}
+                  onClick={handleTopLevelTap(item)}
                 />
               ))}
             </div>
@@ -212,13 +221,8 @@ export const CategoryGrid = ({ categories, className }: CategoryGridProps) => {
         <div
           ref={containerRef}
           className={cn(
-            'w-full flex-wrap gap-2 transition-opacity duration-150',
-            !isCalculated ? 'opacity-0' : 'opacity-100',
-            // Десктоп — всегда этот вариант (JS-подсчёт + кнопка «Все
-            // категории»), как и было. На мобилке — только для
-            // подкатегорий-чипсов (isCatalog); верхний уровень на мобилке
-            // рендерится блоком выше, этот вариант там скрыт.
-            !isCatalog ? 'hidden md:flex' : 'flex'
+            'hidden w-full flex-wrap gap-2 transition-opacity duration-150 md:flex',
+            !isCalculated ? 'opacity-0' : 'opacity-100'
           )}
         >
           {visibleItems.map(item => {

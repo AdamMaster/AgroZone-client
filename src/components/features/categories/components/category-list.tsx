@@ -15,7 +15,7 @@ import { buildCategoryMap } from '../utils/category-utils'
 
 export const CategoryList = () => {
   const { categories } = useCategories()
-  const { onClose } = useCategoriesModal()
+  const { onClose, categoryPath: modalCategoryPath } = useCategoriesModal()
 
   const [expandedCategories, setExpandedCategories] = useState<(string | number)[]>([])
 
@@ -29,13 +29,16 @@ export const CategoryList = () => {
     return buildCategoryMap(categories)
   }, [categories])
 
+  // Путь категории берём либо из стора (явно передан при открытии окна —
+  // тап по плитке верхнего уровня на главной), либо, если явно не задан,
+  // как раньше — из URL (кнопка «Все категории» на /catalog/...).
   const currentCategoryData = useMemo(() => {
-    const fullPath = params.slug?.join('/')
+    const fullPath = modalCategoryPath ?? params.slug?.join('/')
 
     if (!fullPath) return null
 
     return categoryMap.get(fullPath) ?? null
-  }, [categoryMap, params.slug])
+  }, [categoryMap, params.slug, modalCategoryPath])
 
   const targetCategoryData = useMemo(() => {
     if (!currentCategoryData) return null
@@ -73,13 +76,13 @@ export const CategoryList = () => {
   }, [items])
 
   return (
-    <div className='flex h-full flex-col'>
-      <Heading level={2} className='mb-6 text-xl font-bold'>
+    <div className='flex h-full flex-col p-4 md:p-0'>
+      <Heading level={2} className='mb-6 pr-10 text-xl font-bold md:pr-0'>
         {targetCategoryData?.name ?? 'Все категории'}
       </Heading>
 
       <ScrollArea>
-        <div className='flex-1 columns-3'>
+        <div className='flex-1 columns-1 md:columns-3'>
           {items.map(category => {
             const children = category.children ?? []
             const isExpanded = expandedCategories.includes(category.id)
