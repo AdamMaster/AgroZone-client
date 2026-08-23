@@ -1,12 +1,18 @@
 'use client'
 
 import { useAppModal } from '@/store'
-import { Heart, Layers, LucideIcon, MessageCircle, User } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { MouseEvent } from 'react'
+import { JSX, MouseEvent, SVGProps } from 'react'
 
 import { useUnreadNotificationsCount } from '@/components/features/notifications/hooks'
+import {
+  ChatCircleFillIcon,
+  HeartFillIcon,
+  HouseFillIcon,
+  StackFillIcon,
+  UserFillIcon
+} from '@/components/icons/phosphor-fill-icons'
 
 import { useProfile } from '@/shared/hooks'
 
@@ -14,7 +20,7 @@ import { cn } from '@/lib/utils'
 
 interface TabItem {
   label: string
-  icon: LucideIcon
+  icon: (props: SVGProps<SVGSVGElement>) => JSX.Element
   href: string
 }
 
@@ -24,14 +30,19 @@ const PROFILE_HREF = '/profile/settings/general'
 // категории и поиск теперь всегда доступны через верхнюю мобильную панель
 // (поиск + фильтр) на любой странице, отдельная вкладка для этого не нужна
 // (см. обсуждение с пользователем про адаптив шапки — мегаменю на мобилке
-// убрано полностью). Роуты и иконки продублированы из SettingsNav
+// убрано полностью). Роуты продублированы из SettingsNav
 // (../../features/user/components/settings-nav.tsx) — это те же самые
 // разделы профиля, просто вынесенные в постоянно видимую нижнюю панель.
+// Иконки — закрашенные (Phosphor Fill, см. components/icons/phosphor-fill-icons.tsx),
+// а не lucide: контурные не понравились пользователю по виду, заливка
+// через fill у lucide тоже не понравилась. HouseFillIcon там же — готова
+// под будущую вкладку "Главная", которую пользователь добавит сам.
 const TABS: TabItem[] = [
-  { label: 'Избранное', icon: Heart, href: '/profile/settings/favorites' },
-  { label: 'Объявления', icon: Layers, href: '/profile/settings/ads' },
-  { label: 'Сообщения', icon: MessageCircle, href: '/profile/settings/messages' },
-  { label: 'Профиль', icon: User, href: PROFILE_HREF }
+  { label: 'Главная', icon: HouseFillIcon, href: '/' },
+  { label: 'Избранное', icon: HeartFillIcon, href: '/profile/settings/favorites' },
+  { label: 'Объявления', icon: StackFillIcon, href: '/profile/settings/ads' },
+  { label: 'Сообщения', icon: ChatCircleFillIcon, href: '/profile/settings/messages' },
+  { label: 'Профиль', icon: UserFillIcon, href: PROFILE_HREF }
 ]
 
 // Значок непрочитанных уведомлений — отдельный компонент, а не просто
@@ -72,7 +83,7 @@ export const MobileTabBar = () => {
 
   return (
     <nav
-      className='fixed inset-x-0 bottom-0 z-40 flex items-stretch justify-around border-t bg-neutral-900 pb-[env(safe-area-inset-bottom)] md:hidden'
+      className='fixed inset-x-0 bottom-0 z-40 flex items-stretch justify-around border-t bg-neutral-800 pb-[env(safe-area-inset-bottom)] md:hidden'
       aria-label='Основная навигация'
     >
       {TABS.map(tab => {
@@ -86,11 +97,11 @@ export const MobileTabBar = () => {
             onClick={handleClick}
             className={cn(
               'flex h-14 flex-1 flex-col items-center justify-center gap-0.5 text-[11px] text-white',
-              isActive && 'text-primary'
+              isActive && 'text-primary text-primary-light'
             )}
           >
             <span className='relative inline-flex'>
-              <Icon className={cn('size-5', isActive ? 'text-primary' : 'text-white')} />
+              <Icon className={cn('size-5', isActive ? 'text-primary-light' : 'text-white')} />
               {tab.href === PROFILE_HREF && user && <ProfileTabBadge />}
             </span>
             {tab.label}

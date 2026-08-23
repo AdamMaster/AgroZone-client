@@ -182,11 +182,43 @@ export const CategoryGrid = ({ categories, className }: CategoryGridProps) => {
           ))}
         </div>
 
+        {/* Мобилка, верхний уровень (категории с картинками, !isCatalog) —
+            вместо JS-подсчёта того, сколько влезает в 2 ряда, и обрезания
+            кнопкой «Все категории» — рендерим сразу ВСЕ категории в 2
+            фиксированных ряда через CSS Grid (grid-flow-col + grid-rows-2,
+            каждая следующая категория уходит в новую колонку) и даём
+            проскроллить лишнее пальцем по горизонтали, без видимого
+            скроллбара (см. обсуждение с пользователем). Подкатегории-чипсы
+            (isCatalog — когда уже находимся внутри категории) это не
+            затрагивает, для них поведение ниже осталось прежним на всех
+            экранах. */}
+        {!isCatalog && (
+          <div className='scrollbar-none overflow-auto'>
+            <div className='flex w-270 flex-wrap gap-2 md:hidden'>
+              {itemsToRender.map(item => (
+                <CategoryItem
+                  key={item.id}
+                  category={{
+                    ...item,
+                    isSelected: item.fullPath === params.slug?.join('/')
+                  }}
+                  href={getCategoryHref(item)}
+                />
+              ))}
+            </div>
+          </div>
+        )}
+
         <div
           ref={containerRef}
           className={cn(
-            'flex w-full flex-wrap gap-2 transition-opacity duration-150',
-            !isCalculated ? 'opacity-0' : 'opacity-100'
+            'w-full flex-wrap gap-2 transition-opacity duration-150',
+            !isCalculated ? 'opacity-0' : 'opacity-100',
+            // Десктоп — всегда этот вариант (JS-подсчёт + кнопка «Все
+            // категории»), как и было. На мобилке — только для
+            // подкатегорий-чипсов (isCatalog); верхний уровень на мобилке
+            // рендерится блоком выше, этот вариант там скрыт.
+            !isCatalog ? 'hidden md:flex' : 'flex'
           )}
         >
           {visibleItems.map(item => {

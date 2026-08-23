@@ -59,6 +59,7 @@
   --popover-foreground: oklch(0.145 0 0);
   --primary: #40a500;
   --primary-foreground: oklch(60.239% 0.18742 138.367);
+  --primary-light: oklch(90.482% 0.22207 135.668);
   --secondary: oklch(33.266% 0.07722 257.117);
   --secondary-foreground: oklch(30.556% 0.07032 257.882);
   --muted: oklch(0.97 0 0);
@@ -88,6 +89,7 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+  --text-base: 15px;
 }
 
 .dark {
@@ -186,4 +188,22 @@ button {
 
 .yarl__button {
   filter: none;
+}
+
+.text-primary-light {
+  color: var(--primary-light)
+}
+
+/* Скрыть скроллбар у горизонтально скроллящегося блока, но оставить сам
+   скролл (используется в CategoryGrid — плитки категорий верхнего уровня
+   на мобилке, см. обсуждение с пользователем: 2 ряда, скролл пальцем,
+   без видимой полосы прокрутки). scrollbar-width/-ms-overflow-style — для
+   Firefox/старого Edge, псевдоэлемент ниже — для Chrome/Safari (WebKit). */
+.scrollbar-none {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
 }
