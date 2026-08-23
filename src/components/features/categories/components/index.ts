@@ -1,3 +1,4 @@
+export * from './catalog-breadcrumbs'
 export * from './category-grid'
 export * from './category-item'
 export * from './category-menu'

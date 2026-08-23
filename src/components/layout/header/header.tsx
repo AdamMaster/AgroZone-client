@@ -19,7 +19,7 @@ import { HeaderActions } from './header-actions'
 // значении поля при ресайзе окна между брейкпоинтами.
 export const Header = () => {
   return (
-    <header className='relative bg-white pb-2'>
+    <header className='relative bg-white py-3 md:pt-0 md:pb-2'>
       <div className='hidden md:block'>
         <Container>
           <div className='flex h-14 items-center justify-between gap-6 py-4'>
@@ -28,7 +28,7 @@ export const Header = () => {
           </div>
         </Container>
       </div>
-      <div className='py-3 md:py-0'>
+      <div>
         <Container>
           <div className='flex items-center gap-3 md:gap-10'>
             <div className='hidden md:block'>

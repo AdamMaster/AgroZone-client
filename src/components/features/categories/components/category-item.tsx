@@ -48,7 +48,7 @@ export const CategoryItem = ({ category, href, className, onClick }: CategoryIte
       href={href}
       onClick={onClick}
       className={cn(
-        'relative flex max-w-[160px] gap-1 overflow-hidden rounded-lg bg-gray-100 text-[13px] leading-tight hover:bg-gray-200 md:max-w-[260px]',
+        'relative flex min-h-[53px] max-w-[160px] gap-1 overflow-hidden rounded-lg bg-gray-100 text-[13px] leading-tight hover:bg-gray-200 md:max-w-[260px]',
         isTopLevelCard ? 'h-19 px-3.5 py-2.5 pr-8 md:h-25 md:pr-12' : 'px-4 py-2.5',
         category.isSelected && 'bg-secondary hover:bg-secondary-foreground text-white',
         category.isParent && 'bg-primary hover:bg-primary-foreground text-white',

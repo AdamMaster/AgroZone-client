@@ -170,9 +170,9 @@ export const AdForm = ({
         </div>
       )}
 
-      <div className='mb-6 flex flex-col gap-2'>
+      <div className='mb-8 flex flex-col gap-2'>
         <Heading level={1}>{title}</Heading>
-        {step > 1 && <CategoryBreadcrumbs items={categoryPath.map(name => ({ name }))} />}
+        {step > 1 && <CategoryBreadcrumbs items={categoryPath.map(name => ({ name }))} className='py-0!' />}
         {rejectionReason && <RejectionReason className='mt-2' text={rejectionReason} />}
       </div>
 

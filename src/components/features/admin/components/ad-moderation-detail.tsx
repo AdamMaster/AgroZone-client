@@ -118,7 +118,7 @@ export const AdModerationDetail = ({ id }: AdModerationDetailProps) => {
     <div className='max-w-[950px]'>
       <ButtonBack className='absolute top-0 -left-18' onClick={() => router.back()} />
 
-      <CategoryBreadcrumbs className='mb-2' items={[{ name: 'Объявления', href: '/catalog' }, ...categoryPath]} />
+      <CategoryBreadcrumbs items={[{ name: 'Объявления', href: '/catalog' }, ...categoryPath]} />
 
       <div className='mb-6 flex items-center gap-2'>
         <Heading level={1}>{ad.title}</Heading>

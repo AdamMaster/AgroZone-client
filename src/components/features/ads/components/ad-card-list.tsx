@@ -33,13 +33,11 @@ export const AdCardList = ({ ad }: AdCardListProps) => {
     }
   }
 
-  // Премиум включает выделение цены — та же логика, что и в AdCard, см.
-  // комментарий там.
   const isPriceHighlighted = isFutureDate(ad.priceHighlightUntil) || isPremiumActive(ad.user?.premiumUntil)
   const isBadgeShown = isFutureDate(ad.badgeUntil) && !!ad.badge
 
   return (
-    <article className='relative before:absolute before:-inset-3 before:rounded-3xl before:bg-gray-100 before:opacity-0 before:content-[""] hover:before:opacity-100'>
+    <article className='relative before:absolute before:-inset-3 before:rounded-3xl before:bg-gray-100 before:opacity-0 before:transition-colors before:content-[""] hover:before:opacity-100'>
       <Link href={`/ads/${ad.id}`} className='grid w-full grid-cols-[236px_1fr_236px] gap-4'>
         <div>
           <div className='relative block w-59 max-w-59 overflow-hidden rounded-xl bg-gray-100 pt-[100%]'>

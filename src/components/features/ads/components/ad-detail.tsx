@@ -155,13 +155,13 @@ export const AdDetail = ({ ad: initialAd, categoryFeatures = [], categoryPath = 
   const isBadgeShown = isFutureDate(ad.badgeUntil) && !!ad.badge
 
   return (
-    <div className='relative mt-6 max-w-[950px]'>
+    <div className='relative max-w-[950px]'>
       <BumpStatusHandler adId={ad.id} />
       <AdServicesStatusHandler adId={ad.id} />
       <div className='absolute top-0 -left-18 h-full'>
         <ButtonBack onClick={() => router.back()} />
       </div>
-      <CategoryBreadcrumbs className='mb-2' items={[{ name: 'Объявления', href: '/catalog' }, ...categoryPath]} />
+      <CategoryBreadcrumbs items={[{ name: 'Объявления', href: '/catalog' }, ...categoryPath]} />
 
       <Heading level={1} className='mb-6'>
         {ad.title}

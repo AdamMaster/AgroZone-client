@@ -58,7 +58,7 @@ export default async function AdPage({ params }: AdPageProps) {
   const categoryPath = categoryChain.map(c => ({ name: c.name, href: `/catalog/${c.fullPath}` }))
 
   return (
-    <div className='py-4'>
+    <div>
       <Container>
         <AdDetail ad={ad} categoryFeatures={leafCategory?.categoryFeatures} categoryPath={categoryPath} />
       </Container>

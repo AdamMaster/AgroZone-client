@@ -21,7 +21,7 @@ export const CatalogContent = ({ serverSlug }: CatalogContentProps) => {
 
   return (
     <div>
-      <CategoryTitle categories={categories} className='mt-4 mb-6' />
+      <CategoryTitle categories={categories} className='mb-6' />
       <div className={cn('grid grid-cols-[320px_1fr] gap-8')}>
         <Filter categories={categories} />
         <div>

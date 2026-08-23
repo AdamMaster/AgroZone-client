@@ -40,11 +40,6 @@ export const CategoryGrid = ({ categories, className }: CategoryGridProps) => {
     return currentCategory?.parent ? `/catalog/${currentCategory.parent.fullPath}` : '/catalog'
   }
 
-  // Мобилка, верхний уровень: тап по категории, у которой есть
-  // подкатегории, не уводит на страницу каталога, а открывает
-  // полноэкранное окно с её подкатегориями (см. CategoriesModal /
-  // CategoryList). Если подкатегорий нет — показывать в окне нечего,
-  // переход по ссылке остаётся обычным.
   const handleTopLevelTap = (item: ICategory) => (event: MouseEvent<HTMLAnchorElement>) => {
     if (item.children?.length) {
       event.preventDefault()
@@ -179,13 +174,7 @@ export const CategoryGrid = ({ categories, className }: CategoryGridProps) => {
   const hiddenCount = itemsToRender.length - visibleItems.length
 
   return (
-    // mb-12 — только когда на мобилке реально что-то видно (верхний
-    // уровень, !isCatalog). На /catalog/... на мобилке весь контент этого
-    // компонента скрыт (см. ниже), поэтому отступ снизу тоже не нужен —
-    // иначе между Header и следующим блоком осталась бы пустая дыра. На
-    // десктопе чипсы подкатегорий видны всегда, поэтому там mb-12 —
-    // безусловно.
-    <div className={cn(className, !isCatalog && 'mb-12', 'md:mb-12 md:pt-4')}>
+    <div className={cn(className, !isCatalog && 'mb-7', 'pt-2 md:pt-4')}>
       <Container>
         <div ref={measureRef} className='pointer-events-none invisible absolute flex flex-wrap gap-2'>
           {itemsToRender.map(item => (

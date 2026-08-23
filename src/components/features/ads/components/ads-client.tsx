@@ -105,12 +105,10 @@ export function AdsClient({ serverSlug, layout, className, locationOverride }: A
   }
 
   return (
-    <div>
-      <div className={cn('grid gap-6', classNames, className)}>
-        {ads.map(ad => {
-          return layout === 'cols-1' ? <AdCardList key={ad.id} ad={ad} /> : <AdCard key={ad.id} ad={ad} />
-        })}
-      </div>
+    <div className={cn('grid gap-6', classNames, className)}>
+      {ads.map(ad => {
+        return layout === 'cols-1' ? <AdCardList key={ad.id} ad={ad} /> : <AdCard key={ad.id} ad={ad} />
+      })}
     </div>
   )
 }

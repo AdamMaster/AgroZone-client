@@ -1,4 +1,4 @@
-import { CategoryGrid, CategoryMenu } from '@/components/features/categories/components'
+import { CatalogBreadcrumbs, CategoryGrid, CategoryMenu } from '@/components/features/categories/components'
 import { categoriesService } from '@/components/features/categories/services'
 import { Footer, Header, MobileTabBar } from '@/components/layout'
 
@@ -10,10 +10,10 @@ export default async function MainLayout({
   const categories = await categoriesService.findAll()
 
   return (
-    // отступ убираем.
     <div className='flex min-h-full flex-1 flex-col pb-14 md:pb-0'>
       <Header />
       <CategoryGrid categories={categories} />
+      <CatalogBreadcrumbs />
       <CategoryMenu />
       <main className='flex-1'>{children}</main>
       <Footer />
