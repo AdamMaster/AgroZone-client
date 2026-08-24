@@ -26,10 +26,6 @@ export const FilterFeatureField = ({ feature, value, onChange }: FilterFeatureFi
     return <BooleanField feature={feature} value={value} onChange={onChange} />
   }
 
-  // TEXT сознательно не фильтруем (см. AdsService.resolveFeatureFilters на
-  // бэкенде) — до этой ветки в норме не должны дойти, т.к. filter.tsx уже
-  // отсеивает TEXT-поля, но на случай непредвиденного типа просто ничего
-  // не рендерим.
   return null
 }
 
@@ -39,8 +35,6 @@ const NumberRangeField = ({ feature, value, onChange }: FilterFeatureFieldProps)
   const [min, setMin] = useState(range?.min !== undefined ? String(range.min) : '')
   const [max, setMax] = useState(range?.max !== undefined ? String(range.max) : '')
 
-  // Держим локальные поля в синхронизации, если значение поменялось
-  // снаружи (например, кнопкой "Сбросить фильтры").
   useEffect(() => {
     setMin(range?.min !== undefined ? String(range.min) : '')
     setMax(range?.max !== undefined ? String(range.max) : '')
@@ -111,7 +105,7 @@ const OptionsField = ({ feature, value, onChange }: FilterFeatureFieldProps) => 
   return (
     <div className='flex flex-col gap-2'>
       <Label>{feature.label}</Label>
-      <div className='flex flex-col gap-2'>
+      <div className='xs:flex-col flex flex-wrap gap-x-4 gap-y-2'>
         {feature.options.map(option => (
           <label key={option} className='flex cursor-pointer items-center gap-2 text-sm'>
             <Checkbox
@@ -130,7 +124,7 @@ const BooleanField = ({ feature, value, onChange }: FilterFeatureFieldProps) => 
   const checked = value === true
 
   return (
-    <label className='flex cursor-pointer items-center justify-between gap-2'>
+    <label className='flex w-fit cursor-pointer items-center justify-between gap-x-3'>
       <span className='text-sm'>{feature.label}</span>
       <Switch checked={checked} onCheckedChange={next => onChange(next ? true : undefined)} />
     </label>

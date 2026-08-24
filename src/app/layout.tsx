@@ -4,6 +4,7 @@ import { Google_Sans, Inter } from 'next/font/google'
 import { CookieConsentBanner } from '@/components/layout'
 import { AppModal } from '@/components/modals/app'
 import { CategoriesModal } from '@/components/modals/categories'
+import { FilterModal } from '@/components/modals/filter'
 import { MainProvider } from '@/components/providers'
 
 import { cn } from '@/lib/utils'
@@ -42,6 +43,7 @@ export default function RootLayout({
           {children}
           <AppModal />
           <CategoriesModal />
+          <FilterModal />
           <CookieConsentBanner />
         </MainProvider>
       </body>

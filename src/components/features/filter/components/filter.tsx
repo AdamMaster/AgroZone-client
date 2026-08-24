@@ -25,49 +25,52 @@ export const Filter = ({ categories }: FilterProps) => {
   const filters = useCatalogFilters()
 
   if (!category) {
-    return <aside className='text-sm text-gray-500'>Выберите категорию слева, чтобы отфильтровать объявления.</aside>
+    return (
+      <aside className='hidden text-sm text-gray-500 sm:block'>
+        Выберите категорию слева, чтобы отфильтровать объявления.
+      </aside>
+    )
   }
 
   const isLeafCategory = !category.children || category.children.length === 0
 
-  // Динамические характеристики (CategoryFeature) осмысленны только для
-  // конкретного товара — родительская категория ("Фрукты и овощи") может
-  // объединять листья с совершенно разными наборами полей (сорт яблока и
-  // сорт винограда — разные характеристики), поэтому показываем их только
-  // на листе (как и на странице подачи объявления, см. ad-form.tsx). А вот
-  // цену и список подкатегорий — на любом уровне, включая родительский.
   const filterableFeatures = isLeafCategory
     ? (category.categoryFeatures ?? []).filter(f => f.filterable && f.type !== 'TEXT')
     : []
 
   return (
-    <aside className='flex flex-col gap-6'>
+    <div>
       {filters.hasActiveFilters && (
-        <button type='button' onClick={filters.reset} className='text-secondary self-start text-sm hover:underline'>
+        <button
+          type='button'
+          onClick={filters.reset}
+          className='text-secondary mb-6 self-start text-sm hover:underline'
+        >
           Сбросить фильтры
         </button>
       )}
+      <aside className='grid grid-cols-2 gap-6 xl:flex xl:flex-col'>
+        <PriceRangeFilter priceUnits={getEffectivePriceUnits(category)} />
 
-      <PriceRangeFilter priceUnits={getEffectivePriceUnits(category)} />
+        {!isLeafCategory && <SubcategoryList category={category} />}
 
-      {!isLeafCategory && <SubcategoryList category={category} />}
-
-      <LocationFilter
-        value={{ regionIsoCode: filters.regionIsoCode, localityFiasId: filters.localityFiasId }}
-        onChange={patch => filters.update(patch)}
-      />
-
-      <SellerTypeFilter value={filters.sellerType} onChange={sellerType => filters.update({ sellerType })} />
-
-      {filterableFeatures.map(feature => (
-        <FilterFeatureField
-          key={feature.id}
-          feature={feature}
-          value={filters.features[feature.name]}
-          onChange={value => filters.setFeatureValue(feature.name, value)}
+        <LocationFilter
+          value={{ regionIsoCode: filters.regionIsoCode, localityFiasId: filters.localityFiasId }}
+          onChange={patch => filters.update(patch)}
         />
-      ))}
-    </aside>
+
+        <SellerTypeFilter value={filters.sellerType} onChange={sellerType => filters.update({ sellerType })} />
+
+        {filterableFeatures.map(feature => (
+          <FilterFeatureField
+            key={feature.id}
+            feature={feature}
+            value={filters.features[feature.name]}
+            onChange={value => filters.setFeatureValue(feature.name, value)}
+          />
+        ))}
+      </aside>
+    </div>
   )
 }
 
@@ -103,7 +106,10 @@ const PriceRangeFilter = ({ priceUnits }: PriceRangeFilterProps) => {
     const parsedMin = nextMin.trim() === '' ? undefined : Number(nextMin)
     const parsedMax = nextMax.trim() === '' ? undefined : Number(nextMax)
 
-    if ((parsedMin !== undefined && !Number.isFinite(parsedMin)) || (parsedMax !== undefined && !Number.isFinite(parsedMax))) {
+    if (
+      (parsedMin !== undefined && !Number.isFinite(parsedMin)) ||
+      (parsedMax !== undefined && !Number.isFinite(parsedMax))
+    ) {
       return
     }
 

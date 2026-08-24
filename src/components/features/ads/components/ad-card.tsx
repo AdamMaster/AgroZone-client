@@ -37,10 +37,10 @@ export const AdCard = ({ ad }: AdCardProps) => {
   const isBadgeShown = isFutureDate(ad.badgeUntil) && !!ad.badge
 
   return (
-    <article className='flex flex-col rounded-md bg-gray-100 sm:gap-2 sm:rounded-none sm:bg-transparent'>
+    <article className='flex flex-col gap-2 sm:rounded-none'>
       <Link
         href={`/ads/${ad.id}`}
-        className='relative block overflow-hidden rounded-md bg-gray-100 pt-[100%] sm:rounded-xl'
+        className='relative block overflow-hidden rounded-lg bg-gray-100 pt-[100%] sm:rounded-xl'
       >
         {ad.images.length > 0 ? (
           <Image src={ad.images[0]} alt={ad.title} className='h-full w-full object-cover' fill sizes='400px' />
@@ -49,7 +49,7 @@ export const AdCard = ({ ad }: AdCardProps) => {
         )}
         {isBadgeShown && <AdBadgeChip badge={ad.badge!} className='absolute top-1 left-1' />}
       </Link>
-      <div className='relative p-1.5'>
+      <div className='relative'>
         <Heading
           level={2}
           className='hover:text-primary mb-0.5 line-clamp-2 w-fit pr-6 text-sm leading-snug font-medium transition-colors sm:text-base'

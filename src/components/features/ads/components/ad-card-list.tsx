@@ -38,14 +38,17 @@ export const AdCardList = ({ ad }: AdCardListProps) => {
 
   return (
     <article className='relative before:absolute before:-inset-3 before:rounded-3xl before:bg-gray-100 before:opacity-0 before:transition-colors before:content-[""] hover:before:opacity-100'>
-      <Link href={`/ads/${ad.id}`} className='grid w-full grid-cols-[236px_1fr_236px] gap-4'>
-        <div>
-          <div className='relative block w-59 max-w-59 overflow-hidden rounded-xl bg-gray-100 pt-[100%]'>
+      <Link
+        href={`/ads/${ad.id}`}
+        className='grid w-full grid-cols-[180px_1fr_180px] gap-4 lg:grid-cols-[236px_1fr_236px]'
+      >
+        <div className='overflow-hidden rounded-xl'>
+          <div className='relative block bg-gray-100 pt-[100%]'>
             {ad.images.length > 0 ? (
               <Image
                 src={ad.images[0]}
                 alt={ad.title}
-                className='h-full w-full object-cover mix-blend-darken'
+                className='h-full w-full object-cover object-center mix-blend-darken'
                 fill
                 sizes='400px'
               />

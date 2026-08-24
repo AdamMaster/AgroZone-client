@@ -1,5 +1,6 @@
 'use client'
 
+import { useFilterModal } from '@/store'
 import { ChevronLeft, ChevronRight, Search, SlidersHorizontal, X } from 'lucide-react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { useState } from 'react'
@@ -22,6 +23,7 @@ export const SearchBar = ({ className }: SearchBarProps) => {
   const [isFocus, setIsFocus] = useState<boolean>(false)
 
   const { query, setQuery, onSearch, suggestions } = useSearch()
+  const { onOpen: onOpenFilterModal } = useFilterModal()
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
@@ -64,10 +66,13 @@ export const SearchBar = ({ className }: SearchBarProps) => {
   // Мобильная версия: вместо кнопки submit (лупа) — кнопка фильтра (см.
   // обсуждение с пользователем: поиск на всю ширину, кнопки «Найти»
   // отдельно не нужно — пользователь просто кликает пункт из списка
-  // подсказок). Полноэкранная панель фильтра — отдельный, следующий шаг,
-  // здесь пока только закрываем подсказки.
+  // подсказок). Кнопка открывает FilterModal (@/components/modals/filter)
+  // — тот же <Filter>, что и в сайдбаре десктопного каталога, только во
+  // весь экран. Выше md кнопка скрыта (см. className ниже), поэтому окно
+  // физически не может открыться на широком экране.
   const onClickFilter = () => {
     setIsFocus(false)
+    onOpenFilterModal()
   }
 
   const onClickInput = () => {

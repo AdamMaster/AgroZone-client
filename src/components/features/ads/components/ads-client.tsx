@@ -84,8 +84,8 @@ export function AdsClient({ serverSlug, layout, className, locationOverride }: A
     layout === 'cols-1'
       ? 'grid-cols-1'
       : layout === 'cols-4'
-        ? 'grid-cols-4 gap-4'
-        : 'grid-cols-2 xl:grid-cols-5 lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-2 gap-x-2 gap-y-2'
+        ? 'grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-x-1 md:gap-y-4'
+        : 'grid-cols-2 xl:grid-cols-5 lg:grid-cols-4 md:grid-cols-4 sm:grid-cols-3 gap-x-1'
 
   if (isLoadingCategories || isLoadingAds) {
     return (
@@ -110,7 +110,7 @@ export function AdsClient({ serverSlug, layout, className, locationOverride }: A
   }
 
   return (
-    <div className={cn('grid gap-x-6 gap-y-6 sm:gap-x-2.5 md:gap-x-4 xl:gap-x-6', classNames, className)}>
+    <div className={cn('grid gap-x-6 gap-y-4 sm:gap-x-2.5 md:gap-x-2.5 xl:gap-x-6', classNames, className)}>
       {ads.map(ad => {
         return layout === 'cols-1' ? <AdCardList key={ad.id} ad={ad} /> : <AdCard key={ad.id} ad={ad} />
       })}

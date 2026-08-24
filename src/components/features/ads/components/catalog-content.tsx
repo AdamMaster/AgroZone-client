@@ -3,6 +3,8 @@
 import { LayoutGrid, LayoutList } from 'lucide-react'
 import { useState } from 'react'
 
+import { useMediaQuery } from '@/shared/hooks'
+
 import { cn } from '@/lib/utils'
 
 import { CategoryTitle } from '../../categories/components/category-title'
@@ -20,24 +22,36 @@ export const CatalogContent = ({ serverSlug }: CatalogContentProps) => {
   const { categories } = useCategories()
   const isTopLevelCategory = Boolean(serverSlug) && !serverSlug!.includes('/')
 
+  // На мобилках (< md, 768px) карточка списка (AdCardList) не помещается —
+  // её грид в три колонки (картинка/контент/продавец) требует минимум
+  // ~396px. Поэтому ниже md всегда показываем сеточную раскладку (как
+  // LayoutGrid), а сам переключатель раскладки скрываем — переключать там
+  // нечего.
+  const isMobile = useMediaQuery('(max-width: 767px)')
+  const effectiveGridLayout = isMobile ? 'cols-4' : gridLayout
+
   return (
     <div className={cn(!isTopLevelCategory && 'pt-6')}>
       <CategoryTitle categories={categories} className='mb-6' />
-      <div className={cn('grid grid-cols-[320px_1fr] gap-8')}>
+      <div className={cn('grid grid-cols-1 gap-8 xl:grid-cols-[320px_1fr]')}>
         <Filter categories={categories} />
         <div>
           <div className='mb-8 flex items-center justify-between gap-2.5'>
-            <div className='flex items-center gap-2.5'>
+            <div className='hidden items-center gap-2.5 md:flex'>
               <button aria-label='Вид списком' onClick={() => setGridLayout('cols-1')}>
-                <LayoutList className={cn('size-6', gridLayout === 'cols-1' ? 'text-gray-900' : 'text-gray-400')} />
+                <LayoutList
+                  className={cn('size-6', effectiveGridLayout === 'cols-1' ? 'text-gray-900' : 'text-gray-400')}
+                />
               </button>
               <button aria-label='Вид сеткой' onClick={() => setGridLayout('cols-4')}>
-                <LayoutGrid className={cn('size-6', gridLayout === 'cols-4' ? 'text-gray-900' : 'text-gray-400')} />
+                <LayoutGrid
+                  className={cn('size-6', effectiveGridLayout === 'cols-4' ? 'text-gray-900' : 'text-gray-400')}
+                />
               </button>
             </div>
             <CatalogSort />
           </div>
-          <AdsClient serverSlug={serverSlug} layout={gridLayout} />
+          <AdsClient serverSlug={serverSlug} layout={effectiveGridLayout} />
         </div>
       </div>
     </div>
