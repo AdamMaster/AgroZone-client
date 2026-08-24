@@ -37,8 +37,11 @@ export const AdCard = ({ ad }: AdCardProps) => {
   const isBadgeShown = isFutureDate(ad.badgeUntil) && !!ad.badge
 
   return (
-    <article className='flex flex-col gap-2'>
-      <Link href={`/ads/${ad.id}`} className='relative block overflow-hidden rounded-xl bg-gray-100 pt-[100%]'>
+    <article className='flex flex-col rounded-md bg-gray-100 sm:gap-2 sm:rounded-none sm:bg-transparent'>
+      <Link
+        href={`/ads/${ad.id}`}
+        className='relative block overflow-hidden rounded-md bg-gray-100 pt-[100%] sm:rounded-xl'
+      >
         {ad.images.length > 0 ? (
           <Image src={ad.images[0]} alt={ad.title} className='h-full w-full object-cover' fill sizes='400px' />
         ) : (
@@ -46,10 +49,10 @@ export const AdCard = ({ ad }: AdCardProps) => {
         )}
         {isBadgeShown && <AdBadgeChip badge={ad.badge!} className='absolute top-1 left-1' />}
       </Link>
-      <div className='relative'>
+      <div className='relative p-1.5'>
         <Heading
           level={2}
-          className='hover:text-primary mb-0.5 line-clamp-2 w-fit text-[15px] leading-5 font-medium transition-colors'
+          className='hover:text-primary mb-0.5 line-clamp-2 w-fit pr-6 text-sm leading-snug font-medium transition-colors sm:text-base'
         >
           <Link href={`/ads/${ad.id}`}>{ad.title}</Link>
         </Heading>
@@ -58,11 +61,15 @@ export const AdCard = ({ ad }: AdCardProps) => {
             {ad.price ? ad.price + '₽' : 'Цена договорная'}
           </strong>
         </p>
-        <address className='text-[13px] leading-4 not-italic'>{ad.address}</address>
+        <address className='line-clamp-2 text-[12px] leading-4 not-italic sm:text-[13px]'>
+          <span className='sm:hidden'>{ad.locality ?? ad.address}</span>
+          <span className='hidden sm:inline'>{ad.address}</span>
+        </address>
         <FavoriteButton
           onClick={() => onClickFavorite(ad.id, !!ad.isFavorite)}
           isFavorite={ad.isFavorite}
           isLoading={isAddingFavorite || isRemovingFavorite}
+          className='top-1.5 right-1.5 size-4 sm:size-5'
         />
       </div>
     </article>

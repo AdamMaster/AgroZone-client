@@ -3,7 +3,7 @@ import { Container } from '@/components/layout'
 
 export default async function Home() {
   return (
-    <div>
+    <div className='pt-0 sm:pt-4'>
       <Container>
         <HomeAdsFeed />
       </Container>

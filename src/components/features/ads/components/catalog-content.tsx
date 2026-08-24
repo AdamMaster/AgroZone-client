@@ -18,9 +18,10 @@ interface CatalogContentProps {
 export const CatalogContent = ({ serverSlug }: CatalogContentProps) => {
   const [gridLayout, setGridLayout] = useState<'cols-1' | 'cols-4'>('cols-1')
   const { categories } = useCategories()
+  const isTopLevelCategory = Boolean(serverSlug) && !serverSlug!.includes('/')
 
   return (
-    <div>
+    <div className={cn(!isTopLevelCategory && 'pt-6')}>
       <CategoryTitle categories={categories} className='mb-6' />
       <div className={cn('grid grid-cols-[320px_1fr] gap-8')}>
         <Filter categories={categories} />

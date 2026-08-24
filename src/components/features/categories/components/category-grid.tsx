@@ -174,7 +174,7 @@ export const CategoryGrid = ({ categories, className }: CategoryGridProps) => {
   const hiddenCount = itemsToRender.length - visibleItems.length
 
   return (
-    <div className={cn(className, !isCatalog && 'mb-7', 'pt-2 md:pt-4')}>
+    <div className={cn(className, !isCatalog && 'mb-7 pt-2', 'pt-0 md:pt-4')}>
       <Container>
         <div ref={measureRef} className='pointer-events-none invisible absolute flex flex-wrap gap-2'>
           {itemsToRender.map(item => (
@@ -191,7 +191,7 @@ export const CategoryGrid = ({ categories, className }: CategoryGridProps) => {
 
         {!isCatalog && (
           <div className='scrollbar-none overflow-auto'>
-            <div className='flex w-270 flex-wrap gap-2 md:hidden'>
+            <div className='flex w-270 flex-wrap gap-1 sm:gap-2 md:hidden'>
               {itemsToRender.map(item => (
                 <CategoryItem
                   key={item.id}

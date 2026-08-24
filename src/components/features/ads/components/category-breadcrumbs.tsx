@@ -25,7 +25,7 @@ interface CategoryBreadcrumbsProps {
 
 export const CategoryBreadcrumbs = ({ items, className }: CategoryBreadcrumbsProps) => {
   return (
-    <div className={cn('flex flex-wrap items-center gap-y-1 py-4! text-sm text-gray-500', className)}>
+    <div className={cn('flex flex-wrap items-center gap-y-1 pt-4 pb-7 text-sm text-gray-500', className)}>
       {items.map((item, index) => (
         <div key={index} className='flex items-center'>
           {item.href ? (

@@ -1,5 +1,4 @@
 import { UserType } from '../../auth/types'
-
 import { ICategory, ICategoryFeature } from '../../categories/types/categories.types'
 
 // ICategory/ICategoryFeature раньше были продублированы здесь и в
@@ -166,6 +165,7 @@ export type AdCardData = Pick<
   | 'price'
   | 'images'
   | 'address'
+  | 'locality'
   | 'createdAt'
   | 'isFavorite'
   | 'user'
@@ -181,6 +181,7 @@ export type AdCardListData = Pick<
   | 'price'
   | 'images'
   | 'address'
+  | 'locality'
   | 'createdAt'
   | 'isFavorite'
   | 'user'
