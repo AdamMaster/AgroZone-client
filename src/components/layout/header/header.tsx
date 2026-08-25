@@ -1,7 +1,13 @@
+'use client'
+
+import { usePathname } from 'next/navigation'
+
 import { CategoryMenuButton } from '@/components/features/categories/components'
 import { HomeLocationPicker } from '@/components/features/home/components'
 import { SearchBar } from '@/components/features/search/components'
 import { Logo } from '@/components/ui'
+
+import { cn } from '@/lib/utils'
 
 import { Container } from '../container'
 import { HeaderActions } from './header-actions'
@@ -17,9 +23,19 @@ import { HeaderActions } from './header-actions'
 // экранов, не дублируем компонент — внутри него живой запрос подсказок по
 // вводу, второй смонтированный инстанс удвоил бы запросы и мог разойтись в
 // значении поля при ресайзе окна между брейкпоинтами.
+//
+// В разделе профиля (/profile/settings/...) поиск по каталогу объявлений
+// не в тему (это не каталог), а на мобилке ещё и съедает ~76px высоты на
+// каждой из подстраниц — прячем мобильную строку шапки целиком (ниже md
+// там и так виден только SearchBar, остальное уже скрыто через
+// hidden md:block). На десктопе не трогаем — там строка с HeaderActions
+// уже накрывает навигацию, а поиск по каталогу с любой страницы уместен.
 export const Header = () => {
+  const pathname = usePathname()
+  const isProfileSection = pathname.startsWith('/profile')
+
   return (
-    <header className='relative bg-white py-3 md:pt-0 md:pb-2'>
+    <header className={cn('relative bg-white md:pt-0 md:pb-2', !isProfileSection && 'py-3')}>
       <div className='hidden md:block'>
         <Container>
           <div className='flex h-14 items-center justify-between gap-6 py-4'>
@@ -28,7 +44,7 @@ export const Header = () => {
           </div>
         </Container>
       </div>
-      <div>
+      <div className={cn(isProfileSection && 'hidden md:block')}>
         <Container>
           <div className='flex items-center gap-3 md:gap-10'>
             <div className='hidden md:block'>

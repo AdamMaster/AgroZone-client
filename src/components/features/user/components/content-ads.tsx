@@ -13,7 +13,7 @@ export const ContentAds = () => {
 
   if (isLoading)
     return (
-      <div className='m max-w-[800px]'>
+      <div className='max-w-[800px]'>
         <Heading level={2} className='mb-6'>
           Мои объявления
         </Heading>
@@ -71,14 +71,20 @@ export const ContentAds = () => {
         Мои объявления
       </Heading>
       <Tabs defaultValue='published'>
-        <TabsList className='mb-4' variant='line'>
-          {tabs.map(tab => (
-            <TabsTrigger key={tab.value} value={tab.value}>
-              {tab.label}
-              <ItemsCount count={tab.ads.length} />
-            </TabsTrigger>
-          ))}
-        </TabsList>
+        {/* Пять вкладок с текстовыми лейблами не влезают в ширину экрана на
+        мобилке — оборачиваем в свой скролл, а не даём странице ехать
+        вбок целиком (TabsList сам по себе не переносится и не сужается,
+        см. tabs.tsx). */}
+        <div className='mb-4 overflow-x-auto'>
+          <TabsList variant='line'>
+            {tabs.map(tab => (
+              <TabsTrigger key={tab.value} value={tab.value}>
+                {tab.label}
+                <ItemsCount count={tab.ads.length} />
+              </TabsTrigger>
+            ))}
+          </TabsList>
+        </div>
 
         {tabs.map(tab => (
           <TabsContent className='grid grid-cols-1 gap-6' key={tab.value} value={tab.value}>

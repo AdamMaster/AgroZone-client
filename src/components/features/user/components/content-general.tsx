@@ -139,9 +139,9 @@ export const ContentGeneral = () => {
       </div>
       <div className='relative'>
         <form id='form-rhf-demo' onSubmit={form.handleSubmit(onSubmit)}>
-          <FieldGroup className='flex flex-col gap-5'>
-            <div className='mb-4 flex flex-col gap-5'>
-              <div className='flex items-end gap-3'>
+          <FieldGroup className='flex flex-col gap-6'>
+            <div className='mb-4 flex flex-col gap-6'>
+              <div className='flex flex-col items-end gap-x-3 gap-y-6 sm:flex-row'>
                 <Controller
                   name='name'
                   control={form.control}

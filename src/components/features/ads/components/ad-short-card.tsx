@@ -17,10 +17,6 @@ import { AD_BADGE_LABELS } from '../constants/ad-services.constants'
 import { useActivateAd, useDraftAd, useRemoveAd, useRepublishAd } from '../hooks'
 import { useArchiveAd } from '../hooks/use-archive-ad'
 
-// Поднятие платное и без ограничения на повторный клик (см. обсуждение —
-// кнопка нарочно всегда активна, а не блокируется на N часов после
-// последнего поднятия), поэтому вместо "заблокировано до..." тут просто
-// показываем, когда объявление поднимали в последний раз.
 const formatBumpDate = (value: Date | string) => {
   const date = new Date(value)
   const now = new Date()
@@ -52,13 +48,6 @@ export const AdShortCard = ({ ad }: { ad: IAd }) => {
   const { draftAd, isLoadingDraft } = useDraftAd()
   const { republishAd, isLoadingRepublishAd } = useRepublishAd()
 
-  // Премиум и так поднимает ВСЕ опубликованные объявления владельца
-  // автоматически каждый день (см. AdAutoBumpWorker) и выделяет цену (см.
-  // AdCard/AdDetail) — только поясняем это рядом с кнопкой, саму кнопку не
-  // прячем, т.к. на странице "Поднять просмотры" остаётся ещё значок,
-  // который премиум не заменяет (см. обсуждение с пользователем — значок
-  // это утверждение про конкретное объявление, а не техническая
-  // надстройка вроде поднятия/выделения цены).
   const isOwnerPremiumActive = !!user?.premiumUntil && new Date(user.premiumUntil) > new Date()
   const isBumpServiceActive = !!ad.bumpServiceUntil && new Date(ad.bumpServiceUntil) > new Date()
   const isPriceHighlightActive = !!ad.priceHighlightUntil && new Date(ad.priceHighlightUntil) > new Date()
@@ -92,16 +81,8 @@ export const AdShortCard = ({ ad }: { ad: IAd }) => {
     republishAd({ id: ad.id })
   }
 
-  // Публичная страница объявления отдаёт 404 для всего, кроме PUBLISHED —
-  // так что для черновиков/на модерации/архива/просроченных ведём сразу
-  // на редактирование, чтобы клик по карточке никогда не был мёртвым.
   const detailHref = ad.status === 'PUBLISHED' ? `/ads/${ad.id}` : `/ads/${ad.id}/edit`
 
-  // Собираем в массив, а не рендерим условия подряд в JSX — так между
-  // соседними пунктами можно вставить разделитель (кружок), не думая
-  // заранее, сколько из них вообще активно и какой окажется последним:
-  // разделитель просто ставится ПЕРЕД каждым пунктом, кроме первого (см.
-  // index > 0 ниже), поэтому после последнего пункта его никогда не будет.
   const statusItems: { key: string; content: ReactNode }[] = []
 
   if (isOwnerPremiumActive) {
@@ -164,57 +145,72 @@ export const AdShortCard = ({ ad }: { ad: IAd }) => {
 
   return (
     <div>
-      <div className='flex gap-4'>
-        <Link
-          href={detailHref}
-          className='relative flex h-30 w-40 flex-shrink-0 items-center justify-center overflow-hidden rounded-lg bg-slate-100'
-        >
-          {ad.images.length ? (
-            <Image src={ad.images[0]} alt={ad.title} className='h-full w-full object-cover' fill sizes='160px' />
-          ) : (
-            <ImageIcon className='size-8 text-gray-400' />
-          )}
-        </Link>
+      {/* На мобилке колонка кнопок справа (w-48) вместе с картинкой и
+      текстом в один ряд физически не помещается — карточка вместо этого
+      составляется из двух блоков друг под другом: превью+текст (всегда
+      в ряд, см. вложенный flex ниже) сверху и кнопки на всю ширину снизу.
+      На md+ оба блока снова встают в один ряд, как и раньше. */}
+      <div className='flex flex-col gap-4 md:flex-row'>
+        <div className='flex gap-2.5 sm:gap-4'>
+          <Link
+            href={detailHref}
+            className='relative flex h-20 w-25 flex-shrink-0 items-center justify-center overflow-hidden rounded-lg bg-slate-100 sm:h-24 sm:w-32 md:h-30 md:w-40'
+          >
+            {ad.images.length ? (
+              <Image
+                src={ad.images[0]}
+                alt={ad.title}
+                className='h-full w-full object-cover'
+                fill
+                sizes='(min-width: 768px) 160px, 128px'
+              />
+            ) : (
+              <ImageIcon className='size-8 text-gray-400' />
+            )}
+          </Link>
 
-        <div className='flex flex-grow flex-col'>
-          <div className='mb-1 flex gap-3'>
-            <Heading level={4}>
-              <Link href={detailHref} className='hover:text-primary'>
-                {ad.title}
-              </Link>
-            </Heading>
-            {ad.status === 'PENDING' && (
-              <Tooltip>
-                <TooltipTrigger>
-                  <span className='flex w-fit items-center rounded-2xl bg-orange-200 px-2 py-0.5 text-xs'>
-                    На модерации
-                  </span>
-                </TooltipTrigger>
-                <TooltipContent>
-                  Мы проверяем объявление на соответствие правилам площадки. Обычно модерация занимает около 15 минут,
-                  но в отдельных случаях может занять до 24 часов.
-                </TooltipContent>
-              </Tooltip>
-            )}
-            {ad.status === 'EXPIRED' && (
-              <span className='flex w-fit items-center rounded-2xl bg-orange-200 px-2 py-0.5 text-xs'>
-                Срок действия истек
-              </span>
-            )}
-            {ad.status === 'REJECTED' && (
-              <Tooltip>
-                <TooltipTrigger>
-                  <CircleAlert className='size-4 cursor-pointer text-amber-500' />
-                </TooltipTrigger>
-                <TooltipContent className='line-clamp-2'>{ad.rejectionReason}</TooltipContent>
-              </Tooltip>
-            )}
+          <div className='flex flex-grow flex-col'>
+            <div className='mb-0 flex gap-3 sm:mb-1'>
+              <Heading level={4} className='font-normal sm:font-bold'>
+                <Link href={detailHref} className='hover:text-primary'>
+                  {ad.title}
+                </Link>
+              </Heading>
+              {ad.status === 'PENDING' && (
+                <Tooltip>
+                  <TooltipTrigger>
+                    <span className='flex w-fit items-center rounded-2xl bg-orange-200 px-2 py-0.5 text-xs'>
+                      На модерации
+                    </span>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    Мы проверяем объявление на соответствие правилам площадки. Обычно модерация занимает около 15 минут,
+                    но в отдельных случаях может занять до 24 часов.
+                  </TooltipContent>
+                </Tooltip>
+              )}
+              {ad.status === 'EXPIRED' && (
+                <span className='flex w-fit items-center rounded-2xl bg-orange-200 px-2 py-0.5 text-xs'>
+                  Срок действия истек
+                </span>
+              )}
+              {ad.status === 'REJECTED' && (
+                <Tooltip>
+                  <TooltipTrigger>
+                    <CircleAlert className='size-4 cursor-pointer text-amber-500' />
+                  </TooltipTrigger>
+                  <TooltipContent className='line-clamp-2'>{ad.rejectionReason}</TooltipContent>
+                </Tooltip>
+              )}
+            </div>
+            <p className='mb-0 text-[16px] font-bold sm:mb-3 sm:text-lg'>
+              {ad.price ? `${ad.price} ₽` : 'Цена договорная'}
+            </p>
+            <p className='text-[13px] text-gray-500'>{ad.address}</p>
           </div>
-          <p className='mb-3 text-lg font-bold'>{ad.price ? `${ad.price} ₽` : 'Цена договорная'}</p>
-          <p className='text-[13px] text-gray-500'>{ad.address}</p>
         </div>
 
-        <div className='flex w-48 flex-col gap-2'>
+        <div className='flex w-full flex-col gap-2 md:w-48'>
           {ad.status === 'DRAFT' ||
             (ad.status === 'ARCHIVED' && (
               <Button variant='outline' onClick={() => handlePublished()} disabled={isLoadingActivate}>

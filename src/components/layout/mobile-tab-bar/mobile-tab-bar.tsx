@@ -24,7 +24,12 @@ interface TabItem {
   href: string
 }
 
-const PROFILE_HREF = '/profile/settings/general'
+// На мобилке сайдбара (SettingsNav) в профиле нет вообще — весь список
+// разделов виден только тут либо на самой /profile/settings (см. её
+// page.tsx — там он же, во весь экран). Поэтому "Профиль" ведёт на
+// индекс, а не сразу на "Личные данные" — иначе с телефона было бы не
+// попасть в Безопасность, Организацию, Уведомления и Премиум.
+const PROFILE_HREF = '/profile/settings'
 
 // Пункты нижней панели — сознательно без "Главная"/"Поиск": вход в
 // категории и поиск теперь всегда доступны через верхнюю мобильную панель
@@ -88,7 +93,11 @@ export const MobileTabBar = () => {
     >
       {TABS.map(tab => {
         const Icon = tab.icon
-        const isActive = pathname === tab.href
+        // Для "Профиль" подсвечиваем вкладку на любом /profile/settings/...,
+        // а не только на самом индексе — иначе при переходе в конкретный
+        // раздел (например Безопасность) вкладка гасла бы, хотя
+        // пользователь всё ещё внутри профиля.
+        const isActive = tab.href === PROFILE_HREF ? pathname.startsWith('/profile/settings') : pathname === tab.href
 
         return (
           <Link

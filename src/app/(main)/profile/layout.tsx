@@ -10,11 +10,11 @@ export default function MainLayout({
   return (
     <div className='pt-10'>
       <Container>
-        <div className='grid grid-cols-[280px_1fr] gap-6'>
-          <div className='-ml-4 rounded-xl'>
+        <div className='grid grid-cols-1 gap-6 md:grid-cols-[280px_1fr]'>
+          <div className='-ml-4 hidden rounded-xl md:block'>
             <SettingsNav />
           </div>
-          <div className='relative w-[800px]'>{children}</div>
+          <div className='relative w-full md:w-[800px]'>{children}</div>
         </div>
       </Container>
     </div>
