@@ -31,12 +31,14 @@ export const CatalogContent = ({ serverSlug }: CatalogContentProps) => {
   const effectiveGridLayout = isMobile ? 'cols-4' : gridLayout
 
   return (
-    <div className={cn(!isTopLevelCategory && 'pt-6')}>
-      <CategoryTitle categories={categories} className='mb-6' />
+    <div className={cn(!isTopLevelCategory && 'pt-4 sm:pt-6')}>
+      <CategoryTitle categories={categories} className='mb-4 sm:mb-6' />
       <div className={cn('grid grid-cols-1 gap-8 xl:grid-cols-[320px_1fr]')}>
-        <Filter categories={categories} />
+        <div className='hidden md:block'>
+          <Filter categories={categories} />
+        </div>
         <div>
-          <div className='mb-8 flex items-center justify-between gap-2.5'>
+          <div className='mb-4 flex items-center justify-between gap-2.5 sm:mb-8'>
             <div className='hidden items-center gap-2.5 md:flex'>
               <button aria-label='Вид списком' onClick={() => setGridLayout('cols-1')}>
                 <LayoutList

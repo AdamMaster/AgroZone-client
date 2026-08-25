@@ -11,7 +11,7 @@ import { UserType } from '../../auth/types'
 import { useCurrentCategory } from '../../categories/hooks/use-current-category'
 import { ICategory } from '../../categories/types'
 import { useCatalogFilters } from '../hooks/use-catalog-filters'
-import { getEffectivePriceUnits } from '../utils/price-units'
+import { getEffectivePriceUnits, getEffectivePriceUnitsForAll } from '../utils/price-units'
 import { FilterFeatureField } from './filter-feature-field'
 import { LocationFilter } from './location-filter'
 import { SubcategoryList } from './subcategory-list'
@@ -26,9 +26,27 @@ export const Filter = ({ categories }: FilterProps) => {
 
   if (!category) {
     return (
-      <aside className='hidden text-sm text-gray-500 sm:block'>
-        Выберите категорию слева, чтобы отфильтровать объявления.
-      </aside>
+      <div>
+        {filters.hasActiveFilters && (
+          <button
+            type='button'
+            onClick={filters.reset}
+            className='text-secondary mb-6 self-start text-sm hover:underline'
+          >
+            Сбросить фильтры
+          </button>
+        )}
+        <aside className='grid grid-cols-1 gap-6 md:grid-cols-2 xl:flex xl:flex-col'>
+          <SubcategoryList categories={categories} />
+
+          <PriceRangeFilter priceUnits={getEffectivePriceUnitsForAll(categories)} />
+
+          <LocationFilter
+            value={{ regionIsoCode: filters.regionIsoCode, localityFiasId: filters.localityFiasId }}
+            onChange={patch => filters.update(patch)}
+          />
+        </aside>
+      </div>
     )
   }
 
@@ -49,10 +67,10 @@ export const Filter = ({ categories }: FilterProps) => {
           Сбросить фильтры
         </button>
       )}
-      <aside className='grid grid-cols-2 gap-6 xl:flex xl:flex-col'>
+      <aside className='grid grid-cols-1 gap-6 md:grid-cols-2 xl:flex xl:flex-col'>
         <PriceRangeFilter priceUnits={getEffectivePriceUnits(category)} />
 
-        {!isLeafCategory && <SubcategoryList category={category} />}
+        {!isLeafCategory && <SubcategoryList categories={category.children ?? []} />}
 
         <LocationFilter
           value={{ regionIsoCode: filters.regionIsoCode, localityFiasId: filters.localityFiasId }}

@@ -19,3 +19,15 @@ export const getEffectivePriceUnits = (category: ICategory): string[] => {
 
   return units.size ? Array.from(units) : ['ITEM']
 }
+
+// То же самое, но объединение сразу по всем категориям верхнего уровня —
+// для фильтра на /catalog, пока категория ещё не выбрана.
+export const getEffectivePriceUnitsForAll = (categories: ICategory[]): string[] => {
+  const units = new Set<string>()
+
+  for (const category of categories) {
+    getEffectivePriceUnits(category).forEach(unit => units.add(unit))
+  }
+
+  return units.size ? Array.from(units) : ['ITEM']
+}
