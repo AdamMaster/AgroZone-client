@@ -40,10 +40,6 @@ export const LocationFilter = ({ value, onChange }: LocationFilterProps) => {
   const [open, setOpen] = useState(false)
   const [search, setSearch] = useState('')
 
-  // Синхронизация отображаемого текста с активным фильтром — чтобы при
-  // загрузке страницы с уже применённым ?regionIsoCode=/?localityFiasId=
-  // (прямая ссылка, навигация назад) поле показывало название локации, а
-  // не выглядело пустым.
   useEffect(() => {
     if (!value.regionIsoCode && !value.localityFiasId) {
       setSearch('')
@@ -59,8 +55,6 @@ export const LocationFilter = ({ value, onChange }: LocationFilterProps) => {
     if (selected) setSearch(selected.label)
   }, [value, locations])
 
-  // Пока не опубликовано ни одного объявления с определённой локацией,
-  // фильтровать банально не по чему — не показываем пустой блок.
   if (!isLoadingLocations && !locations.length) return null
 
   const handleSelect = (option: ILocationOption) => {
@@ -82,7 +76,7 @@ export const LocationFilter = ({ value, onChange }: LocationFilterProps) => {
   const hasValue = Boolean(value.regionIsoCode || value.localityFiasId)
 
   return (
-    <div className='flex flex-col gap-2'>
+    <div className='flex h-auto flex-col gap-2'>
       <div className='flex items-center justify-between'>
         <Label>Локация</Label>
         {hasValue && (
@@ -91,9 +85,9 @@ export const LocationFilter = ({ value, onChange }: LocationFilterProps) => {
           </button>
         )}
       </div>
-      <Command className={cn('overflow-initial relative rounded-lg border', open ? 'focus-input' : 'border')}>
+      <Command className={cn('overflow-initial relative h-[46px] rounded-lg border', open ? 'focus-input' : 'border')}>
         <CommandInput
-          className='p-0 placeholder:text-gray-500'
+          className='h-full p-0 placeholder:text-gray-500'
           placeholder='Город, село, регион...'
           value={search}
           onValueChange={setSearch}

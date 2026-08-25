@@ -1,7 +1,6 @@
 'use client'
 
 import { CommandItem } from 'cmdk'
-import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandList, Label } from '@/components/ui'
@@ -12,6 +11,11 @@ import { ICategory } from '../../categories/types'
 
 interface SubcategoryListProps {
   categories: ICategory[]
+  // Переход по выбранной категории — решает вызывающая сторона (filter.tsx,
+  // через filters.selectCategory): в десктопном сайдбаре это обычная
+  // навигация сразу же, в мобильном окне фильтра — только запоминание
+  // выбора до нажатия "Показать" (см. useCatalogFilters).
+  onSelect: (fullPath: string) => void
   label?: string
   placeholder?: string
 }
@@ -27,25 +31,25 @@ interface SubcategoryListProps {
 // filter.tsx), сам компонент не знает, чей это список.
 export const SubcategoryList = ({
   categories,
+  onSelect,
   label = 'Категория',
   placeholder = 'Найти категорию'
 }: SubcategoryListProps) => {
-  const router = useRouter()
   const [open, setOpen] = useState(false)
 
   if (!categories.length) return null
 
   const handleSelect = (fullPath: string) => {
     setOpen(false)
-    router.push(`/catalog/${fullPath}`)
+    onSelect(fullPath)
   }
 
   return (
     <div className='flex flex-col gap-2'>
       <Label>{label}</Label>
-      <Command className={cn('overflow-initial relative rounded-lg border', open ? 'focus-input' : 'border')}>
+      <Command className={cn('overflow-initial relative h-[46px] rounded-lg border', open ? 'focus-input' : 'border')}>
         <CommandInput
-          className='p-0 placeholder:text-gray-500'
+          className='h-full p-0 placeholder:text-gray-500'
           placeholder={placeholder}
           onFocus={() => setOpen(true)}
           onBlur={() => setTimeout(() => setOpen(false), 200)}

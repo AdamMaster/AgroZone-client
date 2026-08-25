@@ -18,11 +18,15 @@ import { SubcategoryList } from './subcategory-list'
 
 interface FilterProps {
   categories: ICategory[]
+  // Прокидывается сверху, а не берётся тут же через useCatalogFilters() —
+  // Filter переиспользуется и в десктопном сайдбаре (там фильтры
+  // применяются сразу), и в мобильном полноэкранном окне (там — только по
+  // кнопке "Показать", см. FilterModal), и решает это вызывающая сторона.
+  filters: ReturnType<typeof useCatalogFilters>
 }
 
-export const Filter = ({ categories }: FilterProps) => {
+export const Filter = ({ categories, filters }: FilterProps) => {
   const category = useCurrentCategory(categories)
-  const filters = useCatalogFilters()
 
   if (!category) {
     return (
@@ -31,15 +35,15 @@ export const Filter = ({ categories }: FilterProps) => {
           <button
             type='button'
             onClick={filters.reset}
-            className='text-secondary mb-6 self-start text-sm hover:underline'
+            className='text-secondary mb-6 hidden self-start text-sm hover:underline sm:block'
           >
             Сбросить фильтры
           </button>
         )}
         <aside className='grid grid-cols-1 gap-6 md:grid-cols-2 xl:flex xl:flex-col'>
-          <SubcategoryList categories={categories} />
+          <SubcategoryList categories={categories} onSelect={filters.selectCategory} />
 
-          <PriceRangeFilter priceUnits={getEffectivePriceUnitsForAll(categories)} />
+          <PriceRangeFilter filters={filters} priceUnits={getEffectivePriceUnitsForAll(categories)} />
 
           <LocationFilter
             value={{ regionIsoCode: filters.regionIsoCode, localityFiasId: filters.localityFiasId }}
@@ -62,15 +66,15 @@ export const Filter = ({ categories }: FilterProps) => {
         <button
           type='button'
           onClick={filters.reset}
-          className='text-secondary mb-6 self-start text-sm hover:underline'
+          className='text-secondary mb-6 hidden self-start text-sm hover:underline sm:block'
         >
           Сбросить фильтры
         </button>
       )}
       <aside className='grid grid-cols-1 gap-6 md:grid-cols-2 xl:flex xl:flex-col'>
-        <PriceRangeFilter priceUnits={getEffectivePriceUnits(category)} />
+        <PriceRangeFilter filters={filters} priceUnits={getEffectivePriceUnits(category)} />
 
-        {!isLeafCategory && <SubcategoryList categories={category.children ?? []} />}
+        {!isLeafCategory && <SubcategoryList categories={category.children ?? []} onSelect={filters.selectCategory} />}
 
         <LocationFilter
           value={{ regionIsoCode: filters.regionIsoCode, localityFiasId: filters.localityFiasId }}
@@ -93,12 +97,11 @@ export const Filter = ({ categories }: FilterProps) => {
 }
 
 interface PriceRangeFilterProps {
+  filters: ReturnType<typeof useCatalogFilters>
   priceUnits: string[]
 }
 
-const PriceRangeFilter = ({ priceUnits }: PriceRangeFilterProps) => {
-  const filters = useCatalogFilters()
-
+const PriceRangeFilter = ({ filters, priceUnits }: PriceRangeFilterProps) => {
   const [unit, setUnit] = useState(filters.unit ?? priceUnits[0] ?? 'ITEM')
   const [min, setMin] = useState(filters.minPrice ?? '')
   const [max, setMax] = useState(filters.maxPrice ?? '')

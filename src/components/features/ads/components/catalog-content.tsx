@@ -10,6 +10,7 @@ import { cn } from '@/lib/utils'
 import { CategoryTitle } from '../../categories/components/category-title'
 import { useCategories } from '../../categories/hooks/use-categories'
 import { CatalogSort, Filter } from '../../filter/components'
+import { useCatalogFilters } from '../../filter/hooks/use-catalog-filters'
 import { AdCardList } from './ad-card-list'
 import { AdsClient } from './ads-client'
 
@@ -20,6 +21,10 @@ interface CatalogContentProps {
 export const CatalogContent = ({ serverSlug }: CatalogContentProps) => {
   const [gridLayout, setGridLayout] = useState<'cols-1' | 'cols-4'>('cols-1')
   const { categories } = useCategories()
+  // Сайдбар — сразу применяет каждое изменение (immediate: true по
+  // умолчанию), в отличие от мобильного окна фильтра (FilterModal), где
+  // фильтры копятся и применяются только по кнопке "Показать".
+  const filters = useCatalogFilters()
   const isTopLevelCategory = Boolean(serverSlug) && !serverSlug!.includes('/')
 
   // На мобилках (< md, 768px) карточка списка (AdCardList) не помещается —
@@ -35,7 +40,7 @@ export const CatalogContent = ({ serverSlug }: CatalogContentProps) => {
       <CategoryTitle categories={categories} className='mb-4 sm:mb-6' />
       <div className={cn('grid grid-cols-1 gap-8 xl:grid-cols-[320px_1fr]')}>
         <div className='hidden md:block'>
-          <Filter categories={categories} />
+          <Filter categories={categories} filters={filters} />
         </div>
         <div>
           <div className='mb-4 flex items-center justify-between gap-2.5 sm:mb-8'>
