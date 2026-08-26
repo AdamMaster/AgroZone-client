@@ -33,12 +33,15 @@ export const ConversationListItem = ({ conversation, isActive, onClick }: Conver
         }
       }}
       className={cn(
-        'ml relative flex w-full cursor-pointer items-center gap-3 rounded-lg px-3 py-3 text-left transition-colors hover:bg-gray-100',
+        'relative flex w-full cursor-pointer items-center gap-3 border-b border-gray-100 py-2 text-left transition-colors hover:bg-gray-100 sm:rounded-lg sm:px-3 sm:py-3',
         isActive && 'bg-gray-50'
       )}
     >
       <div className='relative'>
-        <UserAvatar user={counterpart} className='absolute -top-2 -left-2 z-10 size-9 border-2 border-white' />
+        <UserAvatar
+          user={counterpart}
+          className='absolute -top-2 -left-2 z-10 hidden size-9 border-2 border-white sm:block'
+        />
         <div className='relative flex size-15 items-center justify-center overflow-hidden rounded-lg bg-gray-100'>
           {ad.images?.[0] ? (
             <Image src={ad.images[0]} alt='' sizes='200px' fill className='object-cover' />
@@ -48,9 +51,11 @@ export const ConversationListItem = ({ conversation, isActive, onClick }: Conver
         </div>
       </div>
 
-      <div className='flex min-w-0 flex-1 flex-col gap-0.5'>
+      <div className='flex min-w-0 flex-1 flex-col sm:gap-0.5'>
         <div className='flex items-center justify-between gap-2'>
-          <p className={cn('text-[16px] leading-5 font-semibold', counterpart.deletedAt && 'text-gray-400')}>
+          <p
+            className={cn('text-base leading-5 font-semibold sm:text-[16px]', counterpart.deletedAt && 'text-gray-400')}
+          >
             {counterpart.deletedAt ? 'Пользователь удалил аккаунт' : (counterpart.displayName ?? 'Пользователь')}
           </p>
           {lastMessage && (

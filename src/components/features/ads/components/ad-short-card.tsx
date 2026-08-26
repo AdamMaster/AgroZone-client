@@ -171,7 +171,7 @@ export const AdShortCard = ({ ad }: { ad: IAd }) => {
 
           <div className='flex flex-grow flex-col'>
             <div className='mb-0 flex gap-3 sm:mb-1'>
-              <Heading level={4} className='font-normal sm:font-bold'>
+              <Heading level={4} className=''>
                 <Link href={detailHref} className='hover:text-primary'>
                   {ad.title}
                 </Link>

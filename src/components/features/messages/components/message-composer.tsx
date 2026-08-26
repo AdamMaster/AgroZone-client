@@ -23,8 +23,6 @@ export const MessageComposer = ({ onSend, isSending, placeholder = 'Сообще
     setText('')
   }
 
-  // Enter отправляет, Shift+Enter — перенос строки (привычное поведение
-  // почти в любом мессенджере).
   const handleKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {
     if (event.key === 'Enter' && !event.shiftKey) {
       event.preventDefault()

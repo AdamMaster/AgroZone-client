@@ -12,11 +12,11 @@ interface ConversationListProps {
 
 export const ConversationList = ({ conversations, activeId, isLoading, onSelect }: ConversationListProps) => {
   return (
-    <div className='-ml-3 flex w-full flex-col gap-3 overflow-y-auto'>
+    <div className='flex w-full flex-col gap-1 overflow-y-auto sm:-ml-3'>
       {isLoading &&
         Array.from({ length: 3 }).map((_, i) => (
           <div className='flex w-full items-center gap-3' key={i}>
-            <Skeleton className='size-15 min-w-15 rounded-full' />
+            <Skeleton className='size-15 min-w-15 rounded-lg' />
             <Skeleton className='h-15 w-full rounded-lg' />
           </div>
         ))}

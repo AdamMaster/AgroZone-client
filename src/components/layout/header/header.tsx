@@ -1,8 +1,8 @@
 'use client'
 
-import { Bell, Menu } from 'lucide-react'
+import { Bell, Ellipsis, Menu } from 'lucide-react'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { useState } from 'react'
 
 import { CategoryMenuButton } from '@/components/features/categories/components'
@@ -11,6 +11,7 @@ import { useUnreadNotificationsCount } from '@/components/features/notifications
 import { SearchBar } from '@/components/features/search/components'
 import { ProfileMenuSheet } from '@/components/modals/profile-menu'
 import { Logo } from '@/components/ui'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 
 import { useProfile } from '@/shared/hooks'
 
@@ -21,7 +22,10 @@ import { HeaderActions } from './header-actions'
 
 export const Header = () => {
   const pathname = usePathname()
-  const isProfileSection = pathname.startsWith('/profile')
+  const router = useRouter()
+  const isMessagesPage = pathname.startsWith('/profile/settings/messages')
+  const isProfileSection = pathname.startsWith('/profile/') && !isMessagesPage
+  const showCompactHeader = isProfileSection || isMessagesPage
   const { user } = useProfile()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
 
@@ -29,7 +33,7 @@ export const Header = () => {
     <header
       className={cn(
         'relative bg-white py-3 md:pt-0 md:pb-2',
-        isProfileSection ? 'absolute z-10 w-full bg-transparent sm:relative sm:bg-white' : 'relative'
+        showCompactHeader ? 'absolute z-10 w-full bg-transparent sm:relative sm:bg-white' : 'relative'
       )}
     >
       <div className='hidden md:block'>
@@ -60,10 +64,26 @@ export const Header = () => {
                     <Menu className='size-6 text-gray-700' />
                   </button>
                 </div>
+              ) : isMessagesPage ? (
+                <div className='flex w-full items-center justify-end gap-4 md:hidden'>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger
+                      className='flex size-9 items-center justify-center rounded-lg hover:bg-gray-100'
+                      aria-label='Ещё'
+                    >
+                      <Ellipsis className='size-5 text-gray-700' />
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align='end'>
+                      <DropdownMenuItem onClick={() => router.push('/profile/settings/blocked')}>
+                        Черный список
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
               ) : (
                 <SearchBar className='grow' />
               )}
-              {isProfileSection && (
+              {showCompactHeader && (
                 <div className='hidden md:block md:grow'>
                   <SearchBar className='grow' />
                 </div>

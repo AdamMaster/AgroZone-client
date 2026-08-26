@@ -27,10 +27,6 @@ interface ProfileMenuItem {
   icon: typeof Shield
 }
 
-// Только те разделы, которые на мобилке больше нигде не видны — то, что
-// уже есть в MobileTabBar (Личные данные/Объявления/Сообщения/Избранное),
-// сюда сознательно не дублируется. Уведомления тоже не дублируются —
-// для них теперь отдельный колокольчик в шапке (см. header.tsx).
 const ACCOUNT_ITEMS: ProfileMenuItem[] = [
   { label: 'Личные данные', href: '/profile/settings/general', icon: User },
   { label: 'Безопасность', href: '/profile/settings/security', icon: Shield },
