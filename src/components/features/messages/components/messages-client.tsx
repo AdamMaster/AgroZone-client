@@ -20,10 +20,6 @@ export const MessagesClient = () => {
 
   const { conversations, isLoading } = useConversations()
 
-  // Пришли по ссылке "Написать" с конкретного объявления, а диалог с этим
-  // продавцом по нему уже существует — не показываем экран "нового"
-  // диалога, а сразу открываем существующий (иначе первое сообщение,
-  // отправленное через форму "нового" диалога, ушло бы мимо истории).
   const existingForAd = useMemo(
     () => (newAdId ? conversations.find(item => item.ad.id === newAdId) : undefined),
     [conversations, newAdId]
@@ -47,16 +43,10 @@ export const MessagesClient = () => {
     router.replace(`/profile/settings/messages?c=${conversationId}`)
   }
 
-  // Возврат к списку — сбрасываем и c, и ad, а не router.back(): если сюда
-  // зашли по прямой ссылке "Написать" с объявления, "назад" в истории
-  // браузера увёл бы со страницы сообщений вообще, а не к списку диалогов.
   const handleBack = () => {
     router.back()
   }
 
-  // Как в Авито: список диалогов и открытая переписка не показываются
-  // одновременно — либо весь блок под список, либо весь блок под чат (с
-  // кнопкой "назад" в шапке — см. ChatHeader).
   const isChatOpen = !!activeConversationId || !!newAdId
 
   return (

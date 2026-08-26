@@ -8,7 +8,7 @@ export default function MainLayout({
   children: React.ReactNode
 }>) {
   return (
-    <div className='pt-10'>
+    <div className='pt-3 sm:pt-10'>
       <Container>
         <div className='grid grid-cols-1 gap-6 md:grid-cols-[280px_1fr]'>
           <div className='-ml-4 hidden rounded-xl md:block'>

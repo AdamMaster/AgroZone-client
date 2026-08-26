@@ -14,7 +14,7 @@ const items = [
   { label: 'Мои объявления', icon: Layers, id: 'ads', href: '/profile/settings/ads' },
   { label: 'Сообщения', icon: MessageCircle, id: 'messages', href: '/profile/settings/messages' },
   { label: 'Избранное', icon: Heart, id: 'favorites', href: '/profile/settings/favorites' },
-  { label: 'Организация', icon: Building2, id: 'company', href: '/profile/settings/company' },
+  // { label: 'Организация', icon: Building2, id: 'company', href: '/profile/settings/company' },
   { label: 'Уведомления', icon: Bell, id: 'notifications', href: '/profile/settings/notifications' },
   { label: 'Премиум', icon: Crown, id: 'premium', href: '/profile/settings/premium' }
 ]
