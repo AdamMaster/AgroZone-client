@@ -38,7 +38,7 @@ export const ContentSecurity = () => {
             Пароль
           </Heading>
           {isLoading ? (
-            <Skeleton className='rounded-1 h-10 w-full' />
+            <Skeleton className='rounded-1 h-11 w-full sm:h-12' />
           ) : (
             <Field>
               <div className='relative'>

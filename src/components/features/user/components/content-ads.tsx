@@ -17,10 +17,10 @@ export const ContentAds = () => {
         <Heading level={2} className='mb-6'>
           Мои объявления
         </Heading>
-        <div className='mb-4 flex gap-2'>
-          <Skeleton className='h-12 w-[150px] rounded-lg' />
-          <Skeleton className='h-12 w-[150px] rounded-lg' />
-          <Skeleton className='h-12 w-[150px] rounded-lg' />
+        <div className='mb-4 flex gap-3'>
+          <Skeleton className='h-11 w-[150px] rounded-lg' />
+          <Skeleton className='h-11 w-[150px] rounded-lg' />
+          <Skeleton className='h-11 w-[150px] rounded-lg' />
         </div>
         <div className='grid grid-cols-1 gap-6'>
           <AdShortCardSkeleton />

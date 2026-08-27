@@ -21,7 +21,7 @@ export const AdFavoriteCard = ({ favorite }: AdFavoriteCardProps) => {
   }
 
   return (
-    <div className='flex max-w-122 gap-4'>
+    <div className='flex max-w-122 gap-2.5 sm:gap-4'>
       <Link
         href={`/ads/${favorite.id}`}
         className='relative flex h-20 w-25 flex-shrink-0 items-center justify-center overflow-hidden rounded-lg bg-slate-100 sm:h-30 sm:w-40'

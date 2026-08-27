@@ -149,7 +149,7 @@ export const ContentGeneral = () => {
                     <Field data-invalid={fieldState.invalid} className={cn('group')}>
                       <Label className='mb-1'>Имя</Label>
                       {isLoading ? (
-                        <Skeleton className='rounded-1 h-10 w-full' />
+                        <Skeleton className='rounded-1 h-11 w-full sm:h-12' />
                       ) : (
                         <Input {...field} type='name' placeholder='Имя' />
                       )}
@@ -166,7 +166,7 @@ export const ContentGeneral = () => {
                     <Field data-invalid={fieldState.invalid} isInvalid={fieldState.invalid}>
                       <Label className='mb-1'>Тип продавца</Label>
                       {isLoading ? (
-                        <Skeleton className='rounded-1 h-10 w-full' />
+                        <Skeleton className='rounded-1 h-11 w-full sm:h-12' />
                       ) : (
                         <Select items={USER_TYPE_LABELS} value={field.value} onValueChange={field.onChange}>
                           <SelectTrigger className='w-full px-4'>
@@ -194,7 +194,7 @@ export const ContentGeneral = () => {
                     через сервис DaData. Подтверждённое название будет показано на ваших объявлениях.
                   </FieldDescription>
                   {isLoading ? (
-                    <Skeleton className='rounded-1 h-10 w-full' />
+                    <Skeleton className='rounded-1 h-11 w-full sm:h-12' />
                   ) : (
                     <div className='relative'>
                       <Input
@@ -221,7 +221,7 @@ export const ContentGeneral = () => {
             <Field>
               <Label className='mb-1'>Почта</Label>
               {isLoading ? (
-                <Skeleton className='rounded-1 h-10 w-full' />
+                <Skeleton className='rounded-1 h-11 w-full sm:h-12' />
               ) : (
                 <div className='relative'>
                   <Input type='email' value={user?.email || ''} placeholder='Почта' readOnly />
@@ -236,7 +236,7 @@ export const ContentGeneral = () => {
               <Label className='mb-1'>Номер телефона</Label>
 
               {isLoading ? (
-                <Skeleton className='rounded-1 h-10 w-full' />
+                <Skeleton className='rounded-1 h-11 w-full sm:h-12' />
               ) : (
                 <div className='relative'>
                   <Input
