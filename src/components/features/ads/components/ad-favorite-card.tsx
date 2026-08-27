@@ -24,7 +24,7 @@ export const AdFavoriteCard = ({ favorite }: AdFavoriteCardProps) => {
     <div className='flex max-w-122 gap-2.5 sm:gap-4'>
       <Link
         href={`/ads/${favorite.id}`}
-        className='relative flex h-20 w-25 flex-shrink-0 items-center justify-center overflow-hidden rounded-lg bg-slate-100 sm:h-30 sm:w-40'
+        className='relative flex h-20 w-22 flex-shrink-0 items-center justify-center overflow-hidden rounded-lg bg-slate-100 sm:h-30 sm:w-40'
       >
         {favorite.images.length ? (
           <Image
@@ -40,7 +40,7 @@ export const AdFavoriteCard = ({ favorite }: AdFavoriteCardProps) => {
       </Link>
 
       <div className='flex flex-grow flex-col'>
-        <div className='relative flex gap-3 sm:mb-1'>
+        <div className='relative mb-1 flex gap-3'>
           <Heading level={4}>
             <Link href={`/ads/${favorite.id}`} className='hover:text-primary'>
               {favorite.title}

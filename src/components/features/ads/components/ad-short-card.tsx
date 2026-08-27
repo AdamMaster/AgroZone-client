@@ -154,7 +154,7 @@ export const AdShortCard = ({ ad }: { ad: IAd }) => {
         <div className='flex gap-2.5 sm:gap-4'>
           <Link
             href={detailHref}
-            className='relative flex h-20 w-25 flex-shrink-0 items-center justify-center overflow-hidden rounded-lg bg-slate-100 sm:h-24 sm:w-32 md:h-30 md:w-40'
+            className='relative flex h-20 w-22 flex-shrink-0 items-center justify-center overflow-hidden rounded-lg bg-slate-100 sm:h-24 sm:w-32 md:h-30 md:w-40'
           >
             {ad.images.length ? (
               <Image
@@ -169,16 +169,16 @@ export const AdShortCard = ({ ad }: { ad: IAd }) => {
             )}
           </Link>
 
-          <div className='flex flex-grow flex-col'>
-            <div className='mb-0 flex gap-3 sm:mb-1'>
-              <Heading level={4} className=''>
+          <div className='flex flex-grow flex-col sm:flex'>
+            <div className='mb-0 flex flex-col gap-0 sm:mb-1'>
+              <Heading level={4} className='font-normal sm:text-lg sm:font-bold'>
                 <Link href={detailHref} className='hover:text-primary'>
                   {ad.title}
                 </Link>
               </Heading>
               {ad.status === 'PENDING' && (
                 <Tooltip>
-                  <TooltipTrigger>
+                  <TooltipTrigger className='-order-1'>
                     <span className='flex w-fit items-center rounded-2xl bg-orange-200 px-2 py-0.5 text-xs'>
                       На модерации
                     </span>
@@ -210,7 +210,7 @@ export const AdShortCard = ({ ad }: { ad: IAd }) => {
           </div>
         </div>
 
-        <div className='flex w-full flex-col gap-2 md:w-48'>
+        <div className='hidden w-full flex-col gap-2 sm:flex md:w-48'>
           {ad.status === 'DRAFT' ||
             (ad.status === 'ARCHIVED' && (
               <Button variant='outline' onClick={() => handlePublished()} disabled={isLoadingActivate}>
