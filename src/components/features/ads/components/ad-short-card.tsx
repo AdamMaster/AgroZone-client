@@ -7,7 +7,6 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { Fragment, ReactNode } from 'react'
 
-import { PencilFillIcon } from '@/components/icons/phosphor-fill-icons'
 import { Button, Heading, Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 

@@ -66,7 +66,7 @@ export const ContentAds = () => {
   }
 
   return (
-    <div className='m max-w-[800px]'>
+    <div className='m-full max-w-[800px]'>
       <Heading level={2} className='mb-4'>
         Мои объявления
       </Heading>
