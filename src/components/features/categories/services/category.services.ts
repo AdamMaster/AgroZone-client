@@ -1,9 +1,19 @@
 import { api } from '@/shared/api'
 
-import { ICategory } from '../types/categories.types'
+import { ICategory, ICategorySearchSuggestion } from '../types/categories.types'
 
 class CategoriesService {
   private URL = 'categories'
+
+  async searchSuggest(q: string): Promise<ICategorySearchSuggestion[]> {
+    const query = q?.trim()
+
+    if (!query || query.length < 2) return []
+
+    return api.get<ICategorySearchSuggestion[]>(`${this.URL}/search-suggest`, {
+      params: { q: query }
+    })
+  }
 
   async findAll() {
     // Список категорий рендерится в (main)/layout.tsx, который оборачивает

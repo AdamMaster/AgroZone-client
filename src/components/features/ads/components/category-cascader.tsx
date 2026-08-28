@@ -6,6 +6,7 @@ import { ChevronRight } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { UseFormReturn } from 'react-hook-form'
 
+import { useCategorySearchSuggest } from '@/components/features/categories/hooks/use-category-search-suggest'
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandList, ScrollArea } from '@/components/ui'
 
 import { findCategoryById, flattenCategories, getPathToCategory } from '@/shared/utils'
@@ -37,6 +38,30 @@ export const CategoryCascader = ({ categories, form, onCategorySelect }: Categor
   // (см. FEDERAL_CITY_REGION_NAMES на бэкенде), стабильного отдельного кода
   // "это категория-корзина" в схеме нет.
   const otherCategory = useMemo(() => categories.find(c => c.name === 'Прочее'), [categories])
+  // Семантические подсказки (см. useCategorySearchSuggest) — рендерятся
+  // внутри CommandEmpty ниже, то есть cmdk сам решает, когда их показывать:
+  // блок появляется только если по searchTerm нет ни одного буквального
+  // совпадения среди flatCategories. Хук вызывается всегда (а не только
+  // когда CommandEmpty видим) — это просто React-хук, а сам запрос на
+  // бэкенд не летит, пока searchTerm короче 2 символов (см. хук).
+  const { suggestions: semanticSuggestions, isLoading: isSemanticLoading } = useCategorySearchSuggest(searchTerm)
+  // Встроенный фильтр cmdk (shouldFilter по умолчанию) — нечёткий: ищет
+  // буквы запроса по тексту пункта в любом порядке/вразброс (алгоритм
+  // command-score), а не подряд как подстроку. На практике это значит, что
+  // почти ЛЮБОЙ короткий запрос находит хоть что-то — например "туи"
+  // "совпадало" с "Тара и упаковка" (буквы т/у/и просто где-то встречаются),
+  // и список у cmdk никогда не становился по-настоящему пустым — из-за
+  // этого блок с семантическими подсказками внутри CommandEmpty ниже
+  // фактически никогда не показывался (см. обсуждение с пользователем —
+  // баг замечен на реальном тесте). Отключаем shouldFilter у <Command> и
+  // сами решаем, что показывать — обычная строгая проверка на подстроку.
+  const filteredCategories = useMemo(() => {
+    const term = searchTerm.trim().toLowerCase()
+
+    if (!term) return flatCategories
+
+    return flatCategories.filter(cat => cat.path.join(' ').toLowerCase().includes(term))
+  }, [flatCategories, searchTerm])
   // Кнопки категорий в колонках — чтобы можно было доскроллить до выбранной,
   // если она за пределами видимой области ScrollArea (см. ниже). Карта, а
   // не один ref: выбранных кнопок сразу несколько — по одной в каждой
@@ -91,7 +116,10 @@ export const CategoryCascader = ({ categories, form, onCategorySelect }: Categor
 
   return (
     <div>
-      <Command className={cn('overflow-initial relative mb-3 rounded-lg border', open ? 'focus-input' : 'border')}>
+      <Command
+        shouldFilter={false}
+        className={cn('overflow-initial relative mb-3 rounded-lg border', open ? 'focus-input' : 'border')}
+      >
         <CommandInput
           className='text-md p-0 placeholder:text-gray-500'
           placeholder='Начните вводить название товара, например "Яблоки"'
@@ -128,9 +156,48 @@ export const CategoryCascader = ({ categories, form, onCategorySelect }: Categor
                 попробовать другое слово и/или сразу заглянуть в "Прочее" —
                 категорию-корзину для того, что не подошло больше никуда. */}
             <CommandEmpty className='flex flex-col items-center gap-2 px-3.5 py-6 text-center text-sm'>
-              <span className='text-gray-500'>
-                Ничего не нашли. Попробуйте более простое или общее название товара.
-              </span>
+              {/* Семантические подсказки — решают ровно ту проблему, из-за
+                  которой вообще затевался этот блок: буквальный поиск cmdk
+                  не находит "Саженцы" по запросу "Туи", хотя слова "туя" в
+                  описании категории теперь есть (см. обсуждение с
+                  пользователем и CategoriesService.searchBySemantic). Раз
+                  дошли до CommandEmpty — буквальных совпадений нет, значит
+                  самое время показать их, а не сразу сдаваться. */}
+              {semanticSuggestions.length > 0 ? (
+                <div className='w-full text-left'>
+                  {semanticSuggestions.map(suggestion => (
+                    // Те же классы и та же структура (родитель → чеврон →
+                    // имя), что и у обычного пункта буквального совпадения
+                    // ниже (CommandItem/cat.path.map) — раньше тут был
+                    // другой стиль и обратный порядок (сначала имя, потом
+                    // родитель), выглядело как отдельный, не связанный с
+                    // остальным списком блок (см. обсуждение с
+                    // пользователем).
+                    <button
+                      key={suggestion.id}
+                      type='button'
+                      onClick={() => handleCategorySelect(suggestion.id)}
+                      className='flex w-full cursor-pointer items-center justify-between gap-2 px-3.5 py-1 hover:bg-gray-50'
+                    >
+                      <div className='flex flex-wrap items-center gap-2.5'>
+                        {suggestion.parentName && (
+                          <div className='flex items-center gap-2.5'>
+                            {suggestion.parentName}
+                            <ChevronRight className='text-muted-foreground size-4 shrink-0' />
+                          </div>
+                        )}
+                        {suggestion.name}
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              ) : (
+                <span className='text-gray-500'>
+                  {isSemanticLoading
+                    ? 'Ищем подходящие категории...'
+                    : 'Ничего не нашли. Попробуйте более простое или общее название товара.'}
+                </span>
+              )}
               {otherCategory && (
                 <button
                   type='button'
@@ -142,7 +209,7 @@ export const CategoryCascader = ({ categories, form, onCategorySelect }: Categor
               )}
             </CommandEmpty>
             <CommandGroup>
-              {flatCategories.map(cat => (
+              {filteredCategories.map(cat => (
                 <CommandItem
                   className='flex w-full cursor-pointer items-center justify-between gap-2 px-3.5 py-1 hover:bg-gray-50'
                   key={cat.id}
@@ -189,8 +256,15 @@ export const CategoryCascader = ({ categories, form, onCategorySelect }: Categor
           Выбрано: <span className='font-medium text-gray-900'>{categoryPath.join(' → ')}</span>
         </p>
       )}
+      {/* На мобильном (см. обсуждение с пользователем про то, как это
+          устроено у Авито — там колонок с ручным уточнением нет вообще,
+          только поиск с подсказками) 3 колонки физически не помещаются на
+          узком экране, а сжимать их до нечитаемой ширины бессмысленно.
+          Оставляем колоночный браузер только от md и выше, на мобильном
+          выбор категории идёт целиком через поле поиска выше (буквальные
+          совпадения cmdk + семантические подсказки из CommandEmpty). */}
       <div className='space-y-2'>
-        <div className='grid grid-cols-3 gap-1'>
+        <div className='hidden grid-cols-3 gap-1 md:grid'>
           {columns.map((columnCategories, columnIndex) => (
             <ScrollArea key={columnIndex} className='h-[400px] pr-2.5'>
               {columnCategories.map(cat => {

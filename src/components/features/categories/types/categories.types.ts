@@ -21,6 +21,24 @@ export interface ICategoryFeature {
   updatedAt: Date
 }
 
+// Результат семантического поиска категории по свободному тексту (см.
+// CategoriesService.searchBySemantic на бэкенде) — например запрос "туи"
+// находит категорию "Саженцы хвойных пород", хотя слова "туя" нет ни в её
+// названии, ни в пути. matchedTerm — по какому конкретно слову/синониму
+// совпало (полезно для отладки и как подсказка в UI). Бэкенд отдаёт только
+// листовые категории (без детей) — это единственные категории, которые
+// вообще можно выбрать как итоговую категорию объявления (см.
+// CategoryCascader.handleCategorySelect), так что любой результат отсюда
+// сразу финализирует выбор, без дальнейшего уточнения по колонкам.
+export interface ICategorySearchSuggestion {
+  id: string
+  name: string
+  slug: string
+  parentName: string | null
+  matchedTerm: string
+  score: number
+}
+
 export interface ICategory {
   id: string
   name: string
