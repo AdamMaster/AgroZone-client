@@ -1,12 +1,13 @@
 'use client'
 
-import { CircleAlert, Ellipsis, ImageIcon } from 'lucide-react'
+import { CircleAlert, Edit, Ellipsis, ImageIcon } from 'lucide-react'
 import { Crown } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { Fragment, ReactNode } from 'react'
 
+import { PencilFillIcon } from '@/components/icons/phosphor-fill-icons'
 import { Button, Heading, Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 
@@ -144,14 +145,9 @@ export const AdShortCard = ({ ad }: { ad: IAd }) => {
   }
 
   return (
-    <div>
-      {/* На мобилке колонка кнопок справа (w-48) вместе с картинкой и
-      текстом в один ряд физически не помещается — карточка вместо этого
-      составляется из двух блоков друг под другом: превью+текст (всегда
-      в ряд, см. вложенный flex ниже) сверху и кнопки на всю ширину снизу.
-      На md+ оба блока снова встают в один ряд, как и раньше. */}
+    <div className='w-full'>
       <div className='flex flex-col gap-4 md:flex-row'>
-        <div className='flex gap-2.5 sm:gap-4'>
+        <div className='flex w-full gap-2.5 sm:gap-4'>
           <Link
             href={detailHref}
             className='relative flex h-20 w-22 flex-shrink-0 items-center justify-center overflow-hidden rounded-lg bg-slate-100 sm:h-24 sm:w-32 md:h-30 md:w-40'
@@ -169,7 +165,7 @@ export const AdShortCard = ({ ad }: { ad: IAd }) => {
             )}
           </Link>
 
-          <div className='flex flex-grow flex-col sm:flex'>
+          <div className='flex w-full max-w-90 flex-grow flex-col sm:flex'>
             <div className='mb-0 flex flex-col gap-0 sm:mb-1'>
               <Heading level={4} className='font-normal sm:text-lg sm:font-bold'>
                 <Link href={detailHref} className='hover:text-primary'>
@@ -208,6 +204,15 @@ export const AdShortCard = ({ ad }: { ad: IAd }) => {
             </p>
             <p className='text-[13px] text-gray-500'>{ad.address}</p>
           </div>
+
+          <button
+            type='button'
+            onClick={() => handleEdit()}
+            aria-label={ad.status === 'REJECTED' ? 'Исправить' : 'Редактировать'}
+            className='flex shrink-0 rounded-lg sm:hidden'
+          >
+            <Edit className='size-5 text-gray-950' />
+          </button>
         </div>
 
         <div className='hidden w-full flex-col gap-2 sm:flex md:w-48'>

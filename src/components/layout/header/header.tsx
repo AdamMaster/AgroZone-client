@@ -39,17 +39,16 @@ export const Header = () => {
       <div className='hidden md:block'>
         <Container>
           <div className='flex h-14 items-center justify-between gap-6 py-4'>
-            <p className='text-secondary text-sm leading-3'>Агропромышленная торговая площадка</p>
-            <HeaderActions />
+            <Logo className='block lg:hidden' />
+            <p className='text-secondary hidden text-sm leading-3 lg:inline'>Агропромышленная торговая площадка</p>
+            <HeaderActions className='ml-auto' />
           </div>
         </Container>
       </div>
       <div>
         <Container>
           <div className='flex items-center gap-3 md:gap-10'>
-            <div className='hidden md:block'>
-              <Logo />
-            </div>
+            <Logo className='hidden lg:block' />
             <div className='flex w-full items-center gap-2'>
               <div className='hidden md:block'>
                 <CategoryMenuButton />
@@ -88,7 +87,7 @@ export const Header = () => {
                   <SearchBar className='grow' />
                 </div>
               )}
-              <div className='ml-8 hidden md:block'>
+              <div className='ml-4 hidden md:block lg:ml-8'>
                 <HomeLocationPicker />
               </div>
             </div>
@@ -100,8 +99,6 @@ export const Header = () => {
   )
 }
 
-// Тот же приём, что и у ProfileTabBadge в MobileTabBar — хук с поллингом
-// монтируется только когда пользователь авторизован.
 const ProfileHeaderBellBadge = () => {
   const { unreadCount } = useUnreadNotificationsCount()
 

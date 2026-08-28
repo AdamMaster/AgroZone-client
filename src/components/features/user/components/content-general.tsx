@@ -116,7 +116,7 @@ export const ContentGeneral = () => {
                   isLoadingUpdateAvatar && 'pointer-events-none opacity-50'
                 )}
               >
-                <UserAvatar user={user} className='size-18' />
+                <UserAvatar user={user} className='size-15 sm:size-18' />
 
                 <div className='absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 transition-all duration-200 group-hover:opacity-100'>
                   <CameraIcon className='size-6 text-white' />
@@ -213,7 +213,7 @@ export const ContentGeneral = () => {
                   )}
                 </Field>
               )}
-              <Button variant='secondary' size='lg' type='submit' className='h-12 w-fit'>
+              <Button variant='secondary' size='lg' type='submit' className='h-11 w-fit sm:h-12'>
                 Сохранить
               </Button>
             </div>

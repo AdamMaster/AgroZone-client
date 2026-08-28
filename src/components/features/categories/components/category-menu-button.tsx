@@ -19,7 +19,7 @@ export const CategoryMenuButton = () => {
       onClick={handleClick}
     >
       <Menu className='size-6' />
-      Категории
+      <span className='hidden lg:inline'>Категории</span>
     </button>
   )
 }

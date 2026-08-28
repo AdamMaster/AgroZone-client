@@ -40,8 +40,8 @@ export const AdFavoriteCard = ({ favorite }: AdFavoriteCardProps) => {
       </Link>
 
       <div className='flex flex-grow flex-col'>
-        <div className='relative mb-1 flex gap-3'>
-          <Heading level={4}>
+        <div className='relative flex gap-3'>
+          <Heading level={4} className='font-normal sm:text-lg sm:font-bold'>
             <Link href={`/ads/${favorite.id}`} className='hover:text-primary'>
               {favorite.title}
             </Link>
@@ -52,7 +52,9 @@ export const AdFavoriteCard = ({ favorite }: AdFavoriteCardProps) => {
             isLoading={isRemovingFavorite}
           />
         </div>
-        <p className='text-lg font-bold sm:mb-3'>{favorite.price ? `${favorite.price} ₽` : 'Цена договорная'}</p>
+        <p className='text-[16px] font-bold sm:mb-3 sm:text-lg'>
+          {favorite.price ? `${favorite.price} ₽` : 'Цена договорная'}
+        </p>
         <p className='text-[13px] text-gray-500'>{favorite.address}</p>
       </div>
     </div>

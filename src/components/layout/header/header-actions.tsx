@@ -12,11 +12,13 @@ import { UserButton } from '@/components/features/user/components'
 
 import { useProfile } from '@/shared/hooks'
 
+import { cn } from '@/lib/utils'
+
 interface Props {
   className?: string
 }
 
-export const HeaderActions: React.FC<Props> = () => {
+export const HeaderActions: React.FC<Props> = ({ className }) => {
   const { onOpen } = useAppModal()
   const { user, isLoading } = useProfile()
 
@@ -38,7 +40,7 @@ export const HeaderActions: React.FC<Props> = () => {
   return (
     <>
       {!user ? (
-        <div className='flex items-center'>
+        <div className={cn('flex items-center', className)}>
           <ActionButton onClick={() => onOpen()}>
             <Lock className='h-4 w-4' />
             Вход и регистрация
@@ -49,7 +51,7 @@ export const HeaderActions: React.FC<Props> = () => {
           </ActionButton>
         </div>
       ) : (
-        <div className='flex items-center'>
+        <div className={cn('flex items-center', className)}>
           <ActionButton isLink={true} href='/ads/create'>
             <Plus className='h-4 w-4' />
             Разместить объявление

@@ -2,6 +2,7 @@
 
 import { Heading } from '@/components/ui'
 
+import { AdShortCardSkeleton } from '../../ads/components'
 import { AdFavoriteCard } from '../../ads/components/ad-favorite-card'
 import { useGetFavorites } from '../../ads/hooks'
 import { AdCardData } from '../../ads/types/ad.types'
@@ -14,8 +15,14 @@ export const ContentFavorites = () => {
       <Heading level={2} className='mb-8'>
         Избранное
       </Heading>
-      {favorites.length > 0 ? (
-        <div className='grid grid-cols-1 gap-6'>
+      {isLoadingFavorites ? (
+        <div className='grid grid-cols-1 gap-4 sm:gap-6'>
+          {Array.from({ length: 3 }).map((_, i) => (
+            <AdShortCardSkeleton key={i} />
+          ))}
+        </div>
+      ) : favorites.length > 0 ? (
+        <div className='grid grid-cols-1 gap-4 sm:gap-6'>
           {favorites.map(ad => (
             <AdFavoriteCard key={ad.id} favorite={ad} />
           ))}

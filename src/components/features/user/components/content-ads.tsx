@@ -17,7 +17,7 @@ export const ContentAds = () => {
         <Heading level={2} className='mb-6'>
           Мои объявления
         </Heading>
-        <div className='mb-4 flex gap-3'>
+        <div className='mb-5 flex gap-3'>
           <Skeleton className='h-11 w-[150px] rounded-lg' />
           <Skeleton className='h-11 w-[150px] rounded-lg' />
           <Skeleton className='h-11 w-[150px] rounded-lg' />
@@ -71,14 +71,10 @@ export const ContentAds = () => {
         Мои объявления
       </Heading>
       <Tabs defaultValue='published'>
-        {/* Пять вкладок с текстовыми лейблами не влезают в ширину экрана на
-        мобилке — оборачиваем в свой скролл, а не даём странице ехать
-        вбок целиком (TabsList сам по себе не переносится и не сужается,
-        см. tabs.tsx). */}
         <div className='mb-4 overflow-x-auto'>
           <TabsList variant='line'>
             {tabs.map(tab => (
-              <TabsTrigger key={tab.value} value={tab.value}>
+              <TabsTrigger key={tab.value} value={tab.value} className='p-0'>
                 {tab.label}
                 <ItemsCount count={tab.ads.length} />
               </TabsTrigger>
