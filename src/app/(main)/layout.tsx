@@ -1,3 +1,5 @@
+import { Suspense } from 'react'
+
 import { CatalogBreadcrumbs, CategoryGrid, CategoryMenu } from '@/components/features/categories/components'
 import { categoriesService } from '@/components/features/categories/services'
 import { Footer, Header, MobileTabBar } from '@/components/layout'
@@ -11,7 +13,9 @@ export default async function MainLayout({
 
   return (
     <>
-      <Header />
+      <Suspense fallback={null}>
+        <Header />
+      </Suspense>
       <CategoryGrid categories={categories} />
       <CatalogBreadcrumbs />
       <CategoryMenu />
