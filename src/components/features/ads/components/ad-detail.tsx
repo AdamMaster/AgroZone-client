@@ -5,6 +5,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { toast } from 'sonner'
 import Lightbox from 'yet-another-react-lightbox'
 import Zoom from 'yet-another-react-lightbox/plugins/zoom'
 
@@ -76,6 +77,11 @@ export const AdDetail = ({ ad: initialAd, categoryFeatures = [], categoryPath = 
   const [activeImage, setActiveImage] = useState(0)
   const [isLightboxOpen, setIsLightboxOpen] = useState(false)
   const [isPhoneRevealed, setIsPhoneRevealed] = useState(false)
+  // Контролируемое состояние для ReportAdDialog — пункт "Пожаловаться" в
+  // мобильном дропдауне "..." открывает тот же диалог, что и текстовая
+  // ссылка внизу страницы (см. ReportAdDialog: controlled-режим без
+  // собственного триггера).
+  const [isReportDialogOpen, setIsReportDialogOpen] = useState(false)
 
   const { addFavorite, isAddingFavorite } = useAddFavorite()
   const { removeFavorite, isRemovingFavorite } = useRemoveFavorite()
@@ -137,6 +143,33 @@ export const AdDetail = ({ ad: initialAd, categoryFeatures = [], categoryPath = 
   const handleArchive = () => archiveAd(ad.id)
   const handleRemove = () => removeAd(ad.id, { onSuccess: () => router.push('/profile/settings/ads') })
 
+  // "Поделиться" — в обоих меню (свой и чужой объявление, см. обсуждение с
+  // пользователем). navigator.share — системное меню шаринга, есть почти
+  // везде на мобилках; там, где его нет (десктоп/старые браузеры) —
+  // фолбэк на копирование ссылки в буфер. AbortError — пользователь просто
+  // закрыл системное меню, это не ошибка, тост не показываем.
+  const handleShare = async () => {
+    const url = window.location.href
+
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: ad.title, url })
+      } catch (error) {
+        if (error instanceof Error && error.name !== 'AbortError') {
+          toast.error('Не удалось поделиться объявлением')
+        }
+      }
+      return
+    }
+
+    try {
+      await navigator.clipboard.writeText(url)
+      toast.success('Ссылка скопирована')
+    } catch {
+      toast.error('Не удалось скопировать ссылку')
+    }
+  }
+
   const features = (ad.features as unknown as Record<string, unknown>) || {}
 
   const filledFeatures = categoryFeatures
@@ -168,6 +201,9 @@ export const AdDetail = ({ ad: initialAd, categoryFeatures = [], categoryPath = 
     <div className='max-w-[950px]'>
       <BumpStatusHandler adId={ad.id} />
       <AdServicesStatusHandler adId={ad.id} />
+      {!isOwner && user && (
+        <ReportAdDialog adId={ad.id} open={isReportDialogOpen} onOpenChange={setIsReportDialogOpen} />
+      )}
       <div className='sticky top-0 z-10 -mx-4 mb-4 flex items-center justify-between bg-white md:hidden'>
         <ButtonBack onClick={() => router.back()} className='rounded-none shadow-none!' />
         {isOwner ? (
@@ -185,6 +221,7 @@ export const AdDetail = ({ ad: initialAd, categoryFeatures = [], categoryPath = 
                 <Ellipsis size={20} />
               </DropdownMenuTrigger>
               <DropdownMenuContent className='w-48' align='end'>
+                <DropdownMenuItem onClick={handleShare}>Поделиться</DropdownMenuItem>
                 {ad.status === 'PUBLISHED' && (
                   <DropdownMenuItem onClick={() => router.push(`/ads/${ad.id}/promote`)}>
                     Поднять просмотры
@@ -206,18 +243,40 @@ export const AdDetail = ({ ad: initialAd, categoryFeatures = [], categoryPath = 
             </DropdownMenu>
           </div>
         ) : (
-          <button
-            type='button'
-            onClick={onClickFavorite}
-            disabled={isAddingFavorite || isRemovingFavorite}
-            className='flex size-13 items-center justify-center disabled:opacity-50'
-            aria-label={ad.isFavorite ? 'Убрать из избранного' : 'Добавить в избранное'}
-          >
-            <Heart
-              size={20}
-              className={cn('transition-colors', ad.isFavorite ? 'fill-current text-red-500' : 'text-gray-400')}
-            />
-          </button>
+          <div className='flex items-center'>
+            <button
+              type='button'
+              onClick={onClickFavorite}
+              disabled={isAddingFavorite || isRemovingFavorite}
+              className='flex size-13 items-center justify-center disabled:opacity-50'
+              aria-label={ad.isFavorite ? 'Убрать из избранного' : 'Добавить в избранное'}
+            >
+              <Heart size={20} className={cn('transition-colors', ad.isFavorite ? 'fill-current text-red-500' : '')} />
+            </button>
+            <DropdownMenu>
+              <DropdownMenuTrigger className='flex size-13 items-center justify-center' aria-label='Ещё'>
+                <Ellipsis size={20} />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className='w-48' align='end'>
+                <DropdownMenuItem onClick={handleShare}>Поделиться</DropdownMenuItem>
+                {user && (
+                  <DropdownMenuItem
+                    className='text-red-500 hover:text-red-500!'
+                    onClick={() => {
+                      // setTimeout — открываем диалог уже после того, как
+                      // дропдаун закроется и отпустит фокус, иначе они
+                      // конфликтуют (см. похожие места в проекте, где
+                      // диалог/поповер триггерится изнутри другого
+                      // оверлея).
+                      setTimeout(() => setIsReportDialogOpen(true), 0)
+                    }}
+                  >
+                    Пожаловаться
+                  </DropdownMenuItem>
+                )}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         )}
       </div>
       <div className='absolute top-0 -left-18 hidden h-full md:block'>
@@ -387,7 +446,15 @@ export const AdDetail = ({ ad: initialAd, categoryFeatures = [], categoryPath = 
               </span>
             )}
           </div>
-          {!isOwner && user && <ReportAdDialog adId={ad.id} />}
+          {/* На мобилке теперь то же самое действие есть в дропдауне "..."
+              в верхней панели (см. выше, isReportDialogOpen) — эта версия
+              с текстовой ссылкой становится дублем, прячем её на мобилке,
+              оставляем только на десктопе. */}
+          {!isOwner && user && (
+            <div className='hidden sm:block'>
+              <ReportAdDialog adId={ad.id} />
+            </div>
+          )}
         </div>
       </div>
 

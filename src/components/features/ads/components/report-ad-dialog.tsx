@@ -29,10 +29,19 @@ import { AdReportReason } from '../types/ad.types'
 
 interface ReportAdDialogProps {
   adId: string
+  // Контролируемый режим — без своего триггера (см. ad-detail.tsx: пункт
+  // "Пожаловаться" в мобильном дропдауне "..." открывает этот же диалог
+  // снаружи, вместо второго независимого триггера рядом с обычной
+  // текстовой ссылкой внизу страницы). Без этих пропсов компонент работает
+  // как раньше — сам управляет своим open и рисует собственный триггер.
+  open?: boolean
+  onOpenChange?: (open: boolean) => void
 }
 
-export const ReportAdDialog = ({ adId }: ReportAdDialogProps) => {
-  const [open, setOpen] = useState(false)
+export const ReportAdDialog = ({ adId, open: controlledOpen, onOpenChange }: ReportAdDialogProps) => {
+  const isControlled = controlledOpen !== undefined
+  const [internalOpen, setInternalOpen] = useState(false)
+  const open = isControlled ? controlledOpen : internalOpen
   const [reason, setReason] = useState<AdReportReason | null>(null)
   const [comment, setComment] = useState('')
 
@@ -44,7 +53,11 @@ export const ReportAdDialog = ({ adId }: ReportAdDialogProps) => {
   }
 
   const handleOpenChange = (value: boolean) => {
-    setOpen(value)
+    if (isControlled) {
+      onOpenChange?.(value)
+    } else {
+      setInternalOpen(value)
+    }
     if (!value) resetForm()
   }
 
@@ -64,10 +77,12 @@ export const ReportAdDialog = ({ adId }: ReportAdDialogProps) => {
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogTrigger className='flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700'>
-        <Flag className='size-4' />
-        Пожаловаться
-      </DialogTrigger>
+      {!isControlled && (
+        <DialogTrigger className='flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700'>
+          <Flag className='size-4' />
+          Пожаловаться
+        </DialogTrigger>
+      )}
 
       <DialogContent className='max-w-100 p-7'>
         <DialogHeader>
