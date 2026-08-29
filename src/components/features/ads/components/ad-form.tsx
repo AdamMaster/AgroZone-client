@@ -48,10 +48,6 @@ interface AdFormProps {
   isSubmitting?: boolean
   isSaveDrafting?: boolean
   rejectionReason?: string
-  // Отклонённое объявление при сохранении правок само уходит на повторную
-  // модерацию (см. AdsService.update на бэкенде) — кнопка должна честно
-  // говорить об этом, а не выглядеть как обычное "Сохранить", будто ничего
-  // особенного не произойдёт (см. обсуждение с пользователем).
   isRejected?: boolean
   onSubmit: (values: TypeCreateAdSchema) => void
   onSaveDraft?: (values: Partial<TypeCreateAdSchema>) => void
@@ -110,13 +106,6 @@ export const AdForm = ({
     form.setValue('categoryFeatures', {})
   }
 
-  // Числовые поля с несколькими единицами измерения (например "Мощность"
-  // -> кВт/л.с.) DynamicField пишет в форму как есть, плюс отдельное поле
-  // `${name}__unit` с выбранной единицей — сам DynamicField ничего не
-  // конвертирует (иначе значение "прыгало" бы прямо во время ввода).
-  // Приводим к канонической единице тут, один раз, прямо перед отправкой
-  // (см. normalize-feature-units.ts) — features хранит определения фич
-  // текущей категории (name/units), без них конвертировать нечего.
   const withNormalizedUnits = <T extends { categoryFeatures?: Record<string, unknown> }>(values: T): T => ({
     ...values,
     categoryFeatures: normalizeFeatureUnits(values.categoryFeatures, features)
@@ -170,9 +159,13 @@ export const AdForm = ({
         </div>
       )}
 
-      <div className='mb-8 flex flex-col gap-2'>
-        <Heading level={1}>{title}</Heading>
-        {step > 1 && <CategoryBreadcrumbs items={categoryPath.map(name => ({ name }))} className='py-0!' />}
+      <div className='mb-5 flex flex-col gap-2 md:mb-8'>
+        <Heading level={1} className='sm:text-[22px]'>
+          {title}
+        </Heading>
+        {step > 1 && (
+          <CategoryBreadcrumbs items={categoryPath.map(name => ({ name }))} className='hidden py-0! sm:flex' />
+        )}
         {rejectionReason && <RejectionReason className='mt-2' text={rejectionReason} />}
       </div>
 
@@ -184,10 +177,6 @@ export const AdForm = ({
             onCategorySelect={(selectedFeatures, selectedPriceUnits) => {
               setFeatures(selectedFeatures)
               setPriceUnits(selectedPriceUnits)
-              // Единица измерения зависит от категории — при выборе/смене
-              // категории подставляем первую (основную) из допустимых для
-              // неё, чтобы поле "Цена" сразу было согласовано с выбранным
-              // товаром.
               form.setValue('unit', selectedPriceUnits[0] ?? 'ITEM')
             }}
           />
@@ -202,7 +191,7 @@ export const AdForm = ({
                   <Field data-invalid={fieldState.invalid} isInvalid={fieldState.invalid}>
                     <InputGroup>
                       <Label>Название объявления</Label>
-                      <Input className='h-13' {...field} />
+                      <Input className='h-11 sm:h-12 md:h-13' {...field} />
                     </InputGroup>
                     {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                   </Field>
@@ -216,7 +205,13 @@ export const AdForm = ({
                     <Field data-invalid={fieldState.invalid} isInvalid={fieldState.invalid} className='flex-1'>
                       <InputGroup>
                         <Label>Цена</Label>
-                        <Input className='h-13' {...field} value={field.value ?? ''} type='number' placeholder='₽' />
+                        <Input
+                          className='h-11 sm:h-12 md:h-13'
+                          {...field}
+                          value={field.value ?? ''}
+                          type='number'
+                          placeholder='₽'
+                        />
                       </InputGroup>
                       {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                     </Field>
@@ -233,7 +228,7 @@ export const AdForm = ({
                           value={field.value ?? priceUnits[0] ?? 'ITEM'}
                           onValueChange={(val: string | null) => field.onChange(val ?? 'ITEM')}
                         >
-                          <SelectTrigger className='h-13! px-4'>
+                          <SelectTrigger className='h-11! px-4 sm:h-12! md:h-13!'>
                             <SelectValue placeholder='Единица цены'>
                               {(value: string | null) => (value ? (PRICE_UNITS[value] ?? value) : 'Единица цены')}
                             </SelectValue>
@@ -312,7 +307,7 @@ export const AdForm = ({
 
                       <div className='relative w-full'>
                         <Input
-                          className='h-13'
+                          className='h-11 sm:h-12 md:h-13'
                           {...field}
                           value={field.value ?? ''}
                           type='tel'
@@ -347,13 +342,19 @@ export const AdForm = ({
 
         <div className='flex gap-1'>
           {step > 1 && !isEdit && (
-            <Button className='h-13 px-5' variant='outline' size='lg' type='button' onClick={() => handleBack()}>
+            <Button
+              className='hidden h-11 px-5 sm:flex sm:h-12 md:h-13'
+              variant='outline'
+              size='lg'
+              type='button'
+              onClick={() => handleBack()}
+            >
               Назад
             </Button>
           )}
           {step === 1 && (
             <Button
-              className='h-13 px-5'
+              className='h-11 px-5 sm:h-12 md:h-13'
               variant='secondary'
               size='lg'
               type='button'
@@ -366,14 +367,14 @@ export const AdForm = ({
           {step === 2 && (
             <div className='flex gap-1'>
               {isEdit && (
-                <Button className='h-13 px-5' variant='outline'>
+                <Button className='h-11 px-5 sm:h-12 md:h-13' variant='outline'>
                   <Link className='flex h-full items-center justify-center' href='/profile/settings/ads'>
                     Отмена
                   </Link>
                 </Button>
               )}
               <Button
-                className='h-13 px-5'
+                className='h-11 px-5 sm:h-12 md:h-13'
                 variant='secondary'
                 size='lg'
                 type='button'
@@ -384,7 +385,7 @@ export const AdForm = ({
               </Button>
               {!isEdit && (
                 <Button
-                  className='h-13 px-5'
+                  className='h-11 px-5 sm:h-12 md:h-13'
                   variant='outline'
                   size='lg'
                   type='button'

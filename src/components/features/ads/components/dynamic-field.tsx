@@ -39,7 +39,7 @@ export const DynamicField = ({ feature, control }: DynamicFieldProps) => {
                 }}
                 value={field.value ? String(field.value) : null}
               >
-                <SelectTrigger className='h-13! px-4'>
+                <SelectTrigger className='h-11! px-4 sm:h-12! md:h-13!'>
                   <SelectValue placeholder='Не выбрано' />
                 </SelectTrigger>
                 <SelectContent alignItemWithTrigger={false} align='start'>
@@ -84,19 +84,9 @@ export const DynamicField = ({ feature, control }: DynamicFieldProps) => {
                 <span className='text-sm'>{feature.label}</span>
               </label>
             ) : feature.type === 'NUMBER' ? (
-              // Раньше числовое поле не показывало единицу измерения вообще
-              // (см. обсуждение с пользователем про "Мощность" — просто
-              // "500" без "кг" или "кВт"). Если у фичи одна единица —
-              // показываем её подписью рядом, если несколько на выбор
-              // (например кВт/л.с.) — рядом переключатель; выбранная
-              // единица уходит в отдельное поле формы
-              // `${feature.name}__unit`, откуда её потом читает
-              // normalize-feature-units.ts перед отправкой (конвертирует в
-              // каноническую, если единицы физически совместимы — см.
-              // shared/utils/unit-conversion.ts).
               <div className='flex items-center gap-2'>
                 <Input
-                  className='h-13'
+                  className='h-11! px-4 sm:h-12! md:h-13!'
                   {...field}
                   type='number'
                   value={field.value === null || field.value === undefined ? '' : String(field.value)}
@@ -140,7 +130,7 @@ export const DynamicField = ({ feature, control }: DynamicFieldProps) => {
               </div>
             ) : (
               <Input
-                className='h-13'
+                className='h-11! px-4 sm:h-12! md:h-13!'
                 {...field}
                 type='text'
                 value={field.value === null || field.value === undefined ? '' : String(field.value)}

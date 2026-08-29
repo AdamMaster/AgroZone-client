@@ -134,9 +134,6 @@ export const PhotoUploader = ({ control, name, maxFiles, isPremium }: PhotoUploa
   }, [])
 
   const sensors = useSensors(
-    // distance-порог — иначе обычный тап по фото (например, чтобы попасть по
-    // крестику удаления) на телефоне может быть ошибочно принят за начало
-    // драга.
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
   )
@@ -183,15 +180,15 @@ export const PhotoUploader = ({ control, name, maxFiles, isPremium }: PhotoUploa
 
   return (
     <div>
-      <Label>
+      <Label className='flex flex-col items-start sm:block'>
         Фотографии{' '}
-        <span className='font-normal text-gray-500'>
+        <span className='text-xs font-normal text-gray-500 sm:text-base'>
           (Объявления с фотографиями получают больше просмотров и откликов. Перетащите, чтобы изменить порядок.)
         </span>
       </Label>
       <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
         <SortableContext items={items.map(i => i.id)} strategy={rectSortingStrategy}>
-          <div className='grid grid-cols-5 gap-4'>
+          <div className='grid grid-cols-3 gap-1 sm:grid-cols-4 sm:gap-2 md:grid-cols-5 md:gap-4'>
             {items.map(({ id, url }, index) => (
               <SortablePhotoTile key={id} id={id} url={url} onRemove={() => removeFile(index)} />
             ))}

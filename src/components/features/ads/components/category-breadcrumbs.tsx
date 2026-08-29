@@ -21,25 +21,39 @@ export interface CategoryBreadcrumbItem {
 interface CategoryBreadcrumbsProps {
   items: CategoryBreadcrumbItem[]
   className?: string
+  // На мобильном показывать только последний пункт (саму выбранную
+  // категорию), без предков и без чеврона — полный путь на узком экране
+  // переносится на несколько строк и выглядит громоздко (см. обсуждение с
+  // пользователем — конкретно про CategoryCascader, где путь показывается
+  // после выбора категории). По умолчанию выключено (false/undefined) —
+  // остальные места использования (страница объявления, шаг 2 формы и т.д.)
+  // как показывали полный путь всегда, так и показывают. Реализовано чисто
+  // на CSS (hidden/md:flex у каждого промежуточного пункта), а не через JS
+  // проверку ширины экрана — не нужно ни доп. состояние, ни ресайз-листенер.
+  mobileCollapse?: boolean
 }
 
-export const CategoryBreadcrumbs = ({ items, className }: CategoryBreadcrumbsProps) => {
+export const CategoryBreadcrumbs = ({ items, className, mobileCollapse }: CategoryBreadcrumbsProps) => {
   return (
     <div
       className={cn('flex flex-wrap items-center gap-y-1 pt-0 pb-5 text-sm text-gray-500 sm:pt-4 sm:pb-7', className)}
     >
-      {items.map((item, index) => (
-        <div key={index} className='flex items-center'>
-          {item.href ? (
-            <Link href={item.href} className='hover:text-primary'>
-              {item.name}
-            </Link>
-          ) : (
-            <span>{item.name}</span>
-          )}
-          {index < items.length - 1 && <ChevronRight size={14} className='mx-0.5 ml-1' />}
-        </div>
-      ))}
+      {items.map((item, index) => {
+        const isLast = index === items.length - 1
+
+        return (
+          <div key={index} className={cn('items-center', mobileCollapse && !isLast ? 'hidden md:flex' : 'flex')}>
+            {item.href ? (
+              <Link href={item.href} className='hover:text-primary'>
+                {item.name}
+              </Link>
+            ) : (
+              <span>{item.name}</span>
+            )}
+            {!isLast && <ChevronRight size={14} className='mx-0.5 ml-1' />}
+          </div>
+        )
+      })}
     </div>
   )
 }

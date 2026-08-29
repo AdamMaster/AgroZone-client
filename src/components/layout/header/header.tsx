@@ -24,8 +24,10 @@ export const Header = () => {
   const pathname = usePathname()
   const router = useRouter()
   const isMessagesPage = pathname.startsWith('/profile/settings/messages')
-  const isProfileSection = pathname.startsWith('/profile/') && !isMessagesPage
-  const showCompactHeader = isProfileSection || isMessagesPage
+  const isAdsPage = pathname.startsWith('/ads/')
+  const isAdFormPage = isAdsPage && (pathname === '/ads/create' || pathname.endsWith('/edit'))
+  const isProfileSection = pathname.startsWith('/profile/') && !isMessagesPage && !isAdsPage
+  const showCompactHeader = isProfileSection || isMessagesPage || isAdsPage
   const { user } = useProfile()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
 
@@ -79,7 +81,7 @@ export const Header = () => {
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </div>
-              ) : (
+              ) : isAdFormPage ? null : (
                 <SearchBar className='grow' />
               )}
               {showCompactHeader && (
