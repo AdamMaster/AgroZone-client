@@ -21,11 +21,6 @@ interface AdEditProps {
 export const AdEdit = ({ id, categories }: AdEditProps) => {
   const { ad, isLoading: isLoadingAd } = useMyAd(id)
   const { updateAd, isLoadingUpdate } = useUpdateAd(id)
-  // Объявление ещё в статусе "черновик" — можно продолжать редактировать
-  // и снова уйти "сохранить и выйти", не публикуя (см. AdForm.isDraft и
-  // обсуждение с пользователем про кнопку в духе Авито). Для уже
-  // опубликованного/отклонённого объявления это не имеет смысла — там
-  // единственное осмысленное действие — обычное "Сохранить".
   const { saveDraft, isLoadingSaveDraft } = useSaveDraft(id)
   const router = useRouter()
 

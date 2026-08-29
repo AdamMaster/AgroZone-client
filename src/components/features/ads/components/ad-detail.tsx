@@ -1,6 +1,6 @@
 'use client'
 
-import { Crown, ImageIcon, MapPin, Phone } from 'lucide-react'
+import { Crown, Edit, Ellipsis, Heart, ImageIcon, MapPin, Pencil, Phone } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
@@ -10,6 +10,7 @@ import Zoom from 'yet-another-react-lightbox/plugins/zoom'
 
 import { UserType } from '@/components/features/auth/types'
 import { Avatar, AvatarFallback, AvatarImage, Button, ButtonBack, Heading } from '@/components/ui'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 
 import { PRICE_UNITS } from '@/shared/constants/units'
 import { USER_TYPE_LABELS } from '@/shared/constants/user-types'
@@ -20,7 +21,7 @@ import { cn } from '@/lib/utils'
 
 import { UserAvatar } from '../../user/components'
 import { AD_PRICE_HIGHLIGHT_CLASS } from '../constants/ad-services.constants'
-import { useAd, useAddFavorite, useRemoveFavorite } from '../hooks'
+import { useAd, useAddFavorite, useArchiveAd, useRemoveAd, useRemoveFavorite } from '../hooks'
 import { IAd, ICategoryFeature } from '../types/ad.types'
 import { AdBadgeChip } from './ad-badge-chip'
 import { AdServicesStatusHandler } from './ad-services-status-handler'
@@ -78,6 +79,8 @@ export const AdDetail = ({ ad: initialAd, categoryFeatures = [], categoryPath = 
 
   const { addFavorite, isAddingFavorite } = useAddFavorite()
   const { removeFavorite, isRemovingFavorite } = useRemoveFavorite()
+  const { archiveAd, isLoadingArchive } = useArchiveAd()
+  const { removeAd, isLoadingRemove } = useRemoveAd()
 
   const scrollToImage = (index: number) => {
     const slide = galleryRef.current?.children[index] as HTMLElement | undefined
@@ -127,6 +130,13 @@ export const AdDetail = ({ ad: initialAd, categoryFeatures = [], categoryPath = 
     }
   }
 
+  // Доп. меню владельца в мобильной верхней панели (см. ниже) — те же
+  // действия и хуки, что уже используются в списке "Мои объявления"
+  // (ad-short-card.tsx), просто без полного разбора по всем статусам:
+  // сюда обычно попадают через опубликованное объявление.
+  const handleArchive = () => archiveAd(ad.id)
+  const handleRemove = () => removeAd(ad.id, { onSuccess: () => router.push('/profile/settings/ads') })
+
   const features = (ad.features as unknown as Record<string, unknown>) || {}
 
   const filledFeatures = categoryFeatures
@@ -155,23 +165,78 @@ export const AdDetail = ({ ad: initialAd, categoryFeatures = [], categoryPath = 
   const isBadgeShown = isFutureDate(ad.badgeUntil) && !!ad.badge
 
   return (
-    <div className='relative max-w-[950px]'>
+    <div className='max-w-[950px]'>
       <BumpStatusHandler adId={ad.id} />
       <AdServicesStatusHandler adId={ad.id} />
-      <div className='absolute top-0 -left-18 h-full'>
+      <div className='sticky top-0 z-10 -mx-4 mb-4 flex items-center justify-between bg-white md:hidden'>
+        <ButtonBack onClick={() => router.back()} className='rounded-none shadow-none!' />
+        {isOwner ? (
+          <div className='flex items-center'>
+            <button
+              type='button'
+              onClick={() => router.push(`/ads/${ad.id}/edit`)}
+              className='flex size-13 items-center justify-center'
+              aria-label='Редактировать объявление'
+            >
+              <Edit size={20} />
+            </button>
+            <DropdownMenu>
+              <DropdownMenuTrigger className='flex size-13 items-center justify-center' aria-label='Ещё'>
+                <Ellipsis size={20} />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className='w-48' align='end'>
+                {ad.status === 'PUBLISHED' && (
+                  <DropdownMenuItem onClick={() => router.push(`/ads/${ad.id}/promote`)}>
+                    Поднять просмотры
+                  </DropdownMenuItem>
+                )}
+                {(ad.status === 'PUBLISHED' || ad.status === 'PENDING') && (
+                  <DropdownMenuItem onClick={handleArchive} disabled={isLoadingArchive}>
+                    Снять с публикации
+                  </DropdownMenuItem>
+                )}
+                <DropdownMenuItem
+                  className='text-red-500 hover:text-red-500!'
+                  disabled={isLoadingRemove}
+                  onClick={handleRemove}
+                >
+                  Удалить
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        ) : (
+          <button
+            type='button'
+            onClick={onClickFavorite}
+            disabled={isAddingFavorite || isRemovingFavorite}
+            className='flex size-13 items-center justify-center disabled:opacity-50'
+            aria-label={ad.isFavorite ? 'Убрать из избранного' : 'Добавить в избранное'}
+          >
+            <Heart
+              size={20}
+              className={cn('transition-colors', ad.isFavorite ? 'fill-current text-red-500' : 'text-gray-400')}
+            />
+          </button>
+        )}
+      </div>
+      <div className='absolute top-0 -left-18 hidden h-full md:block'>
         <ButtonBack onClick={() => router.back()} />
       </div>
-      <CategoryBreadcrumbs items={[{ name: 'Объявления', href: '/catalog' }, ...categoryPath]} />
+      <CategoryBreadcrumbs
+        items={[{ name: 'Объявления', href: '/catalog' }, ...categoryPath]}
+        className='hidden sm:flex'
+      />
 
-      <Heading level={1} className='mb-6'>
+      <Heading level={1} className='mb-6 hidden sm:block'>
         {ad.title}
       </Heading>
       {isOwner && <AdViewsStats adId={ad.id} />}
 
-      <div className='mb-8 grid grid-cols-1 gap-10 lg:grid-cols-[1fr_360px]'>
+      <div className='mb-8 grid grid-cols-1 gap-3 sm:grid-cols-[1fr_280px] lg:grid-cols-[1fr_360px] lg:gap-5 lg:gap-10'>
         <div>
           {ad.images.length > 0 ? (
-            <div className='relative mb-2'>
+            <div className='relative mb-0.5 sm:mb-2'>
               {isBadgeShown && <AdBadgeChip badge={ad.badge!} className='absolute top-2 left-2 z-10' />}
               <div
                 ref={galleryRef}
@@ -182,7 +247,7 @@ export const AdDetail = ({ ad: initialAd, categoryFeatures = [], categoryPath = 
                     key={image + index}
                     type='button'
                     onClick={() => setIsLightboxOpen(true)}
-                    className='relative w-full flex-shrink-0 snap-center pt-[66%]'
+                    className='relative w-full flex-shrink-0 snap-center pt-[76%] lg:pt-[66%]'
                   >
                     <Image
                       src={image}
@@ -197,20 +262,20 @@ export const AdDetail = ({ ad: initialAd, categoryFeatures = [], categoryPath = 
               </div>
             </div>
           ) : (
-            <div className='relative mb-2 overflow-hidden rounded-xl bg-gray-100 pt-[66%]'>
+            <div className='relative mb-2 overflow-hidden rounded-xl bg-gray-100 pt-[76%] lg:pt-[66%]'>
               <ImageIcon size={64} className='absolute top-1/2 left-1/2 -translate-1/2 text-gray-400' />
             </div>
           )}
 
           {ad.images.length > 1 && (
-            <div className='flex gap-2 overflow-x-auto'>
+            <div className='flex gap-0.5 overflow-x-auto sm:gap-2'>
               {ad.images.map((image, index) => (
                 <button
                   key={image + index}
                   type='button'
                   onClick={() => scrollToImage(index)}
                   className={cn(
-                    'relative size-16 flex-shrink-0 overflow-hidden rounded-lg border border-transparent bg-gray-100',
+                    'relative size-16 flex-shrink-0 overflow-hidden rounded-md border border-transparent bg-gray-100 sm:rounded-lg',
                     index === activeImage && 'border-primary'
                   )}
                 >
@@ -227,8 +292,11 @@ export const AdDetail = ({ ad: initialAd, categoryFeatures = [], categoryPath = 
           )}
         </div>
         <div>
+          <Heading level={1} className='mb-2 block text-lg sm:hidden'>
+            {ad.title}
+          </Heading>
           <div className='relative mb-4 flex items-start justify-between gap-2'>
-            <p className='text-2xl font-bold'>
+            <p className='text-xl font-bold sm:text-2xl'>
               <span className={cn(isPriceHighlighted && AD_PRICE_HIGHLIGHT_CLASS)}>
                 {ad.price ? `${ad.price.toLocaleString('ru-RU')} ₽` : 'Цена договорная'}
               </span>
@@ -242,13 +310,14 @@ export const AdDetail = ({ ad: initialAd, categoryFeatures = [], categoryPath = 
               onClick={onClickFavorite}
               isFavorite={!!ad.isFavorite}
               isLoading={isAddingFavorite || isRemovingFavorite}
+              className='hidden sm:block'
             />
           </div>
 
           <div className='mb-8'>
             {isOwner ? (
               <Button
-                className='w-full'
+                className='hidden w-full sm:flex'
                 variant='secondary'
                 size='lg'
                 onClick={() => router.push(`/ads/${ad.id}/edit`)}
@@ -256,7 +325,7 @@ export const AdDetail = ({ ad: initialAd, categoryFeatures = [], categoryPath = 
                 Редактировать объявление
               </Button>
             ) : (
-              <div className='flex gap-1.5'>
+              <div className='flex flex-col gap-1.5 lg:flex-row'>
                 <Button
                   variant='default'
                   size='lg'

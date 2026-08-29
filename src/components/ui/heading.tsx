@@ -12,7 +12,7 @@ export const Heading = ({ level = 1, children, className }: HeadingProps) => {
   const Tag: ElementType = `h${level}`
 
   const variants = {
-    1: 'md:text-3xl text-2xl font-bold tracking-tight text-gray-900 leading-tight',
+    1: 'md:text-3xl sm:text-2xl text-xl font-bold tracking-tight text-gray-900 leading-tight',
     2: 'sm:text-2xl text-xl font-bold tracking-tight text-gray-900 leading-tight',
     3: 'text-xl font-bold text-gray-800 leading-tight',
     4: 'font-bold text-gray-900 leading-tight sm:text-lg text-base',

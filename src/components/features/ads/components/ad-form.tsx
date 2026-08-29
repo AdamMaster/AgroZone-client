@@ -78,7 +78,7 @@ export const AdForm = ({
   const categoryPath = useAdStore(state => state.categoryPath)
   const setCategoryPath = useAdStore(state => state.setCategoryPath)
   const router = useRouter()
-  const title = isEdit ? 'Редактирование объявления' : 'Новое объявление'
+  const title = isEdit ? 'Редактирование' : 'Новое объявление'
   const submitButtonText = isRejected ? 'Сохранить и отправить на проверку' : isEdit ? 'Сохранить' : 'Опубликовать'
   const isPremium = user?.role === 'PREMIUM'
   const { onOpen } = useAppModal()
@@ -118,19 +118,10 @@ export const AdForm = ({
     categoryFeatures: normalizeFeatureUnits(values.categoryFeatures, features)
   })
 
-  // При создании "сохранить и выйти" осмысленно всегда (объявления ещё
-  // нет вообще), при редактировании — только пока это ещё черновик (см.
-  // isDraft/AdEdit). Используем и в верхней мобильной панели, и в кнопке
-  // внизу — раньше вариант "сохранить как черновик" был только при !isEdit.
   const canSaveDraft = (!isEdit || isDraft) && !!onSaveDraft
   const handleSaveDraft = onSaveDraft && form.handleSubmit(values => onSaveDraft(withNormalizedUnits(values)))
   const handleSubmitForm = form.handleSubmit(values => onSubmit(withNormalizedUnits(values)))
 
-  // Кнопка "назад" в верхней мобильной панели (см. ниже) должна работать
-  // и на первом шаге создания, где раньше кнопки назад вообще не было —
-  // плавающий ButtonBack ниже показывается только при step > 1. При
-  // редактировании шага 1 не существует (isEdit сразу открывает step 2),
-  // поэтому там всегда просто уходим со страницы.
   const handleTopBarBack = () => {
     if (isEdit) return router.push('/profile/settings/ads')
     if (step > 1) return handleBack()
@@ -172,7 +163,7 @@ export const AdForm = ({
   return (
     <div className='relative'>
       <div className='sticky z-10 -mx-4 mb-4 flex items-center justify-between bg-white px-4 md:hidden'>
-        <ButtonBack onClick={handleTopBarBack} className='rounded-none shadow-none!' />
+        <ButtonBack onClick={handleTopBarBack} className='-translate-x-4 rounded-none shadow-none!' />
         {step === 2 &&
           (canSaveDraft ? (
             <button
@@ -186,7 +177,7 @@ export const AdForm = ({
           ) : (
             <button
               type='button'
-              className='text-primary text-sm font-medium disabled:opacity-50'
+              className='text-sm font-medium text-gray-500 disabled:opacity-50'
               disabled={isSubmitting}
               onClick={handleSubmitForm}
             >
@@ -209,10 +200,8 @@ export const AdForm = ({
         </div>
       )}
 
-      <div className='mb-5 flex flex-col gap-2 md:mb-8'>
-        <Heading level={1} className='sm:text-[22px]'>
-          {title}
-        </Heading>
+      <div className='mb-6 flex flex-col gap-2 md:mb-8'>
+        <Heading level={1}>{title}</Heading>
         {step > 1 && (
           <CategoryBreadcrumbs items={categoryPath.map(name => ({ name }))} className='hidden py-0! sm:flex' />
         )}
@@ -247,12 +236,12 @@ export const AdForm = ({
                   </Field>
                 )}
               />
-              <div className='flex gap-3'>
+              <div className='grid grid-cols-[1fr_auto] gap-3'>
                 <Controller
                   name='price'
                   control={form.control}
                   render={({ field, fieldState }) => (
-                    <Field data-invalid={fieldState.invalid} isInvalid={fieldState.invalid} className='flex-1'>
+                    <Field data-invalid={fieldState.invalid} isInvalid={fieldState.invalid}>
                       <InputGroup>
                         <Label>Цена</Label>
                         <Input
@@ -271,7 +260,7 @@ export const AdForm = ({
                   name='unit'
                   control={form.control}
                   render={({ field }) => (
-                    <Field className='w-[220px]'>
+                    <Field>
                       <InputGroup>
                         <Label>Единица</Label>
                         <Select

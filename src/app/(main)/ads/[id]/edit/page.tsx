@@ -12,7 +12,7 @@ export default async function AdEditPage({ params }: AdEditPageProps) {
   const categories = await categoriesService.findAll()
 
   return (
-    <div className='py-10'>
+    <div className='sm:pt-10'>
       <Container>
         <AdEdit id={id} categories={categories} />
       </Container>

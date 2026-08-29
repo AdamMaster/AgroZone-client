@@ -1,15 +1,69 @@
 'use client'
 
+import { Plus } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
+import { useEffect, useRef, useState } from 'react'
 
 import { Button, Heading, Skeleton, Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui'
+
+import { cn } from '@/lib/utils'
 
 import { AdShortCard, AdShortCardSkeleton } from '../../ads/components'
 import { useMyAds } from '../../ads/hooks'
 
+// Прячем плавающую кнопку "Разместить объявление" (см. ниже) при скролле
+// вниз и возвращаем при скролле вверх — то же поведение, что у Авито,
+// чтобы кнопка не перекрывала объявления в длинном списке, но оставалась
+// под рукой, как только пользователь начинает скроллить назад. Слушаем
+// window.scroll (страница скроллится целиком, отдельного контейнера с
+// overflow тут нет), throttlим через requestAnimationFrame — тот же приём,
+// что и в ad-detail.tsx для скролла галереи.
+const useFabVisibleOnScroll = () => {
+  const [isVisible, setIsVisible] = useState(true)
+  const lastScrollYRef = useRef(0)
+
+  useEffect(() => {
+    let frame = 0
+    let ticking = false
+
+    const handleScroll = () => {
+      if (ticking) return
+
+      ticking = true
+      frame = requestAnimationFrame(() => {
+        const currentY = window.scrollY
+        const delta = currentY - lastScrollYRef.current
+
+        // У самого верха страницы кнопка видна всегда — иначе на первых
+        // пикселях скролла (например, из-за резинового оттягивания на iOS)
+        // она бы дёргалась. Дальше — обычное сравнение направления, но с
+        // минимальным порогом (4px), чтобы не мигать от micro-скролла.
+        if (currentY <= 8) {
+          setIsVisible(true)
+        } else if (Math.abs(delta) > 4) {
+          setIsVisible(delta < 0)
+        }
+
+        lastScrollYRef.current = currentY
+        ticking = false
+      })
+    }
+
+    window.addEventListener('scroll', handleScroll, { passive: true })
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll)
+      cancelAnimationFrame(frame)
+    }
+  }, [])
+
+  return isVisible
+}
+
 export const ContentAds = () => {
   const { ads, isLoading } = useMyAds()
+  const isFabVisible = useFabVisibleOnScroll()
 
   if (isLoading)
     return (
@@ -90,6 +144,17 @@ export const ContentAds = () => {
           </TabsContent>
         ))}
       </Tabs>
+      <Link
+        href='/ads/create'
+        className={cn(
+          'hover:bg-primary-foreground l-4 fixed right-4 bottom-[calc(3.5rem+env(safe-area-inset-bottom)+1rem)] z-30 flex h-12 items-center justify-center gap-3 rounded-lg bg-neutral-800 px-5 text-white shadow-lg transition-all duration-300 md:hidden',
+          isFabVisible ? 'translate-y-0 opacity-100' : 'pointer-events-none translate-y-20 opacity-0'
+        )}
+        aria-label='Разместить объявление'
+      >
+        Разместить объявление
+        <Plus className='size-5' />
+      </Link>
     </div>
   )
 }

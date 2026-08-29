@@ -26,6 +26,12 @@ export const Header = () => {
   const isMessagesPage = pathname.startsWith('/profile/settings/messages')
   const isAdsPage = pathname.startsWith('/ads/')
   const isAdFormPage = isAdsPage && (pathname === '/ads/create' || pathname.endsWith('/edit'))
+  // Страница детального просмотра объявления (/ads/[id]) — тоже без
+  // мобильного сирчбара в шапке (см. обсуждение с пользователем: там своя
+  // мобильная верхняя панель "назад / избранное-редактирование" внутри
+  // ad-detail.tsx). Явно исключаем /promote — на ней поведение поиска не
+  // обсуждалось, трогать не будем.
+  const isAdDetailPage = isAdsPage && !isAdFormPage && !pathname.endsWith('/promote')
   const isProfileSection = pathname.startsWith('/profile/') && !isMessagesPage && !isAdsPage
   const showCompactHeader = isProfileSection || isMessagesPage || isAdsPage
   const { user } = useProfile()
@@ -81,8 +87,17 @@ export const Header = () => {
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </div>
-              ) : isAdFormPage ? null : (
-                <SearchBar className='grow' />
+              ) : isAdFormPage || isAdDetailPage ? null : (
+                // showCompactHeader && 'md:hidden' — иначе на десктопе для
+                // страницы объявления/продвижения эта строка поиска
+                // рендерится одновременно с десктопным блоком чуть ниже
+                // (showCompactHeader && ...) — получались два сирчбара
+                // подряд (см. обсуждение с пользователем, реальный скрин).
+                // На обычных страницах (showCompactHeader === false, тот
+                // нижний блок вообще не рендерится) эта строка — единственный
+                // поиск и на мобильном, и на десктопе, поэтому md:hidden
+                // вешаем только когда есть кому её продублировать.
+                <SearchBar className={cn('grow', showCompactHeader && 'md:hidden')} />
               )}
               {showCompactHeader && (
                 <div className='hidden md:block md:grow'>

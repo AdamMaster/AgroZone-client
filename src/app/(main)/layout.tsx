@@ -15,7 +15,7 @@ export default async function MainLayout({
       <CategoryGrid categories={categories} />
       <CatalogBreadcrumbs />
       <CategoryMenu />
-      <main className='flex-1 pb-14 sm:pb-0'>{children}</main>
+      <main className='flex-1 pb-[calc(3.5rem+env(safe-area-inset-bottom)_+_40px)] sm:pb-0 sm:pb-14'>{children}</main>
       <Footer />
       <MobileTabBar />
     </>

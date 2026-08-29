@@ -67,9 +67,6 @@ const SortablePhotoTile = ({ id, url, onRemove }: SortablePhotoTileProps) => {
       <div className='absolute top-1 left-1 rounded-full bg-black/50 p-1 text-white'>
         <GripVertical size={14} />
       </div>
-      {/* activationConstraint у PointerSensor (см. ниже) не даёт обычному тапу
-          запустить драг, так что клик по крестику проходит как обычно —
-          stopPropagation тут просто на всякий случай, а не для обхода dnd-kit */}
       <button
         type='button'
         onClick={e => {
@@ -90,26 +87,12 @@ export const PhotoUploader = ({ control, name, maxFiles, isPremium }: PhotoUploa
     control
   })
   const inputRef = useRef<HTMLInputElement>(null)
-  // useMemo, а не просто `field.value ?? []` — при пустом/неопределённом
-  // field.value каждый рендер иначе создавался бы новый пустой массив
-  // (новый по ссылке), из-за чего эффект ниже (зависит от currentFiles)
-  // гонял бы себя по кругу на каждый рендер.
+
   const currentFiles = useMemo<PhotoItem[]>(() => field.value ?? [], [field.value])
   const count = currentFiles.length
 
   const isLimitReached = count >= maxFiles
 
-  // id + blob-URL на File считаем один раз и переиспользуем, а не на каждый
-  // рендер (было раньше: URL.createObjectURL(file) прямо в JSX) — иначе при
-  // каждом ре-рендере (в т.ч. во время драга) плодятся blob-URL, которые
-  // никогда не освобождаются.
-  //
-  // Раньше и чтение, и запись Map/счётчика (resolveItem) происходили прямо
-  // в теле рендера — React на это стал ругаться runtime-ошибкой "Cannot
-  // access refs during render" (см. обсуждение с пользователем): чтение и
-  // запись ref.current вне обработчиков/эффектов больше не разрешены, даже
-  // для не-DOM ref вроде этого. Переносим весь расчёт items в useEffect —
-  // items теперь стейт, а не значение, посчитанное прямо во время рендера.
   const fileMetaRef = useRef(new Map<File, { id: string; url: string }>())
   const idCounterRef = useRef(0)
   const [items, setItems] = useState<{ item: PhotoItem; id: string; url: string }[]>([])
