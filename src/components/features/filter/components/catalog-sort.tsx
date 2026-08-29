@@ -25,7 +25,7 @@ export const CatalogSort = () => {
   return (
     <Select
       value={value}
-      onValueChange={(val: string | null) => filters.update({ sortBy: val === DEFAULT_SORT ? undefined : val })}
+      onValueChange={(val: string | null) => filters.update({ sortBy: !val || val === DEFAULT_SORT ? undefined : val })}
     >
       <SelectTrigger className='h-11! px-4'>
         <SelectValue>{(v: string | null) => (v ? (LABEL_BY_VALUE[v] ?? v) : LABEL_BY_VALUE[DEFAULT_SORT])}</SelectValue>
