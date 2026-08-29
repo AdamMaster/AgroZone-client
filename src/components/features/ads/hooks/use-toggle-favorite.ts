@@ -8,15 +8,25 @@ import { toastMessageHandler } from '@/shared/utils'
 import { adsService } from '../services/ads.service'
 import { IAd, IAdsListResponse } from '../types/ad.types'
 
+interface ToggleFavoriteVariables {
+  id: string
+  isFavorite: boolean
+}
+
 export function useToggleFavorite() {
   const queryClient = useQueryClient()
 
   const { mutate: toggleFavorite, isPending: isLoadingToggle } = useMutation({
     mutationKey: ['toggle favorite'],
 
-    mutationFn: (id: string) => adsService.toggleFavorite(id),
+    // AdsService не даёт единого toggle-эндпоинта — только раздельные
+    // addFavorite/removeFavorite, поэтому вызывающая сторона обязана
+    // передать текущее isFavorite вместе с id, чтобы хук знал, какой из
+    // двух методов дёрнуть.
+    mutationFn: ({ id, isFavorite }: ToggleFavoriteVariables) =>
+      isFavorite ? adsService.removeFavorite(id) : adsService.addFavorite(id),
 
-    onMutate: async (id: string) => {
+    onMutate: async ({ id }: ToggleFavoriteVariables) => {
       await queryClient.cancelQueries({ queryKey: ['ads'] })
       await queryClient.cancelQueries({ queryKey: ['ad-public', id] })
 
@@ -46,7 +56,7 @@ export function useToggleFavorite() {
       return { previousQueries, previousAd }
     },
 
-    onError: (err, id, context) => {
+    onError: (err, { id }, context) => {
       if (context?.previousQueries) {
         context.previousQueries.forEach(([queryKey, previousData]) => {
           queryClient.setQueryData(queryKey, previousData)
@@ -60,8 +70,10 @@ export function useToggleFavorite() {
       toastMessageHandler(err)
     },
 
-    onSuccess(data) {
-      toast.success(data.isFavorite ? 'Добавлено в избранное' : 'Удалено из избранного')
+    onSuccess(_data, { isFavorite }) {
+      // isFavorite здесь — состояние ДО переключения, поэтому итоговое
+      // состояние (и текст тоста) — обратное.
+      toast.success(!isFavorite ? 'Добавлено в избранное' : 'Удалено из избранного')
 
       // Инвалидируем все запросы, начинающиеся с 'ads' и 'favorite-ads'
       queryClient.invalidateQueries({ queryKey: ['ads'] })

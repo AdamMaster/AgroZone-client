@@ -8,7 +8,7 @@
 # docker-compose.prod.yml: build.args), а не просто положить в .env рядом
 # с контейнером — иначе сайт соберётся, но капча/карты тихо не заработают,
 # и это не сразу очевидно, откуда растут ноги.
-FROM node:20-alpine AS build
+FROM node:20-bookworm-slim AS build
 WORKDIR /app
 
 ARG SERVER_URL
@@ -22,13 +22,14 @@ ENV NEXT_PUBLIC_DADATA_KEY=$NEXT_PUBLIC_DADATA_KEY
 
 COPY package.json package-lock.json ./
 RUN npm ci
+RUN npm install lightningcss-linux-x64-gnu @tailwindcss/oxide-linux-x64-gnu --no-save
 
 COPY . .
 RUN npm run build
 
 # ---- runtime: alpine ок — у Next.js в отличие от сервера нет нативных
 # ONNX/Prisma-зависимостей, только чистый JS/React ----
-FROM node:20-alpine AS runtime
+FROM node:20-bookworm-slim AS runtime
 WORKDIR /app
 ENV NODE_ENV=production
 ENV PORT=3000

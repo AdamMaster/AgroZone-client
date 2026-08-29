@@ -68,8 +68,7 @@ export const ReportAdDialog = ({ adId, open: controlledOpen, onOpenChange }: Rep
       { id: adId, dto: { reason, comment: comment.trim() || undefined } },
       {
         onSuccess: () => {
-          setOpen(false)
-          resetForm()
+          handleOpenChange(false)
         }
       }
     )
