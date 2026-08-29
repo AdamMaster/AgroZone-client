@@ -1,10 +1,13 @@
 'use client'
 
+import { useRouter } from 'next/navigation'
+
 import { Loading } from '@/components/ui'
 
 import { formatPhoneNumber } from '@/shared/utils'
 
 import { useMyAd, useUpdateAd } from '../hooks'
+import { useSaveDraft } from '../hooks/use-save-draft-ad'
 import { TypeCreateAdSchema } from '../schemes'
 import { ICategory, ICategoryFeature } from '../types/ad.types'
 import { buildAdFormData } from '../utils/build-ad-form-data'
@@ -18,6 +21,13 @@ interface AdEditProps {
 export const AdEdit = ({ id, categories }: AdEditProps) => {
   const { ad, isLoading: isLoadingAd } = useMyAd(id)
   const { updateAd, isLoadingUpdate } = useUpdateAd(id)
+  // Объявление ещё в статусе "черновик" — можно продолжать редактировать
+  // и снова уйти "сохранить и выйти", не публикуя (см. AdForm.isDraft и
+  // обсуждение с пользователем про кнопку в духе Авито). Для уже
+  // опубликованного/отклонённого объявления это не имеет смысла — там
+  // единственное осмысленное действие — обычное "Сохранить".
+  const { saveDraft, isLoadingSaveDraft } = useSaveDraft(id)
+  const router = useRouter()
 
   if (isLoadingAd || !ad) return <Loading />
 
@@ -61,14 +71,39 @@ export const AdEdit = ({ id, categories }: AdEditProps) => {
     updateAd(formData, ad.status === 'REJECTED')
   }
 
+  // Тот же формат FormData, что и в AdCreate.onSaveDraft — это тот же
+  // POST /ads/draft (см. AdsService.saveDraft), а не PATCH /ads/:id, что
+  // использует onSubmit выше, поэтому и поле для новых файлов другое
+  // ('files', а не 'images').
+  const onSaveDraftSubmit = (values: Partial<TypeCreateAdSchema>) => {
+    const formData = buildAdFormData(values)
+
+    values.images?.forEach(img => {
+      if (img instanceof File) {
+        formData.append('files', img)
+      } else if (typeof img === 'string') {
+        formData.append('existingImages', img)
+      }
+    })
+
+    saveDraft(formData, {
+      onSuccess: () => {
+        router.push('/profile/settings/ads')
+      }
+    })
+  }
+
   return (
     <AdForm
       categories={categories}
       initialData={initialData}
       isSubmitting={isLoadingUpdate}
+      isSaveDrafting={isLoadingSaveDraft}
       rejectionReason={ad.rejectionReason}
       isRejected={ad.status === 'REJECTED'}
+      isDraft={ad.status === 'DRAFT'}
       onSubmit={onSubmit}
+      onSaveDraft={onSaveDraftSubmit}
     />
   )
 }

@@ -10,7 +10,7 @@ export default async function MainLayout({
   const categories = await categoriesService.findAll()
 
   return (
-    <div className='flex min-h-full flex-1 flex-col pb-14 md:pb-0'>
+    <>
       <Header />
       <CategoryGrid categories={categories} />
       <CatalogBreadcrumbs />
@@ -18,6 +18,6 @@ export default async function MainLayout({
       <main className='flex-1 pb-14 sm:pb-0'>{children}</main>
       <Footer />
       <MobileTabBar />
-    </div>
+    </>
   )
 }

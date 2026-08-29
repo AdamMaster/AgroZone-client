@@ -49,6 +49,12 @@ interface AdFormProps {
   isSaveDrafting?: boolean
   rejectionReason?: string
   isRejected?: boolean
+  // Редактируемое объявление всё ещё черновик (см. AdEdit) — тогда, как и
+  // при создании, есть смысл в "сохранить и выйти" вместо обычного
+  // "Сохранить": черновик и так не опубликован, продолжать его дозаполнять
+  // потом — нормальный сценарий. Для уже опубликованного/отклонённого
+  // объявления не используется — там только обычный сабмит.
+  isDraft?: boolean
   onSubmit: (values: TypeCreateAdSchema) => void
   onSaveDraft?: (values: Partial<TypeCreateAdSchema>) => void
 }
@@ -60,6 +66,7 @@ export const AdForm = ({
   isSaveDrafting,
   rejectionReason,
   isRejected,
+  isDraft,
   onSubmit,
   onSaveDraft
 }: AdFormProps) => {
@@ -111,6 +118,25 @@ export const AdForm = ({
     categoryFeatures: normalizeFeatureUnits(values.categoryFeatures, features)
   })
 
+  // При создании "сохранить и выйти" осмысленно всегда (объявления ещё
+  // нет вообще), при редактировании — только пока это ещё черновик (см.
+  // isDraft/AdEdit). Используем и в верхней мобильной панели, и в кнопке
+  // внизу — раньше вариант "сохранить как черновик" был только при !isEdit.
+  const canSaveDraft = (!isEdit || isDraft) && !!onSaveDraft
+  const handleSaveDraft = onSaveDraft && form.handleSubmit(values => onSaveDraft(withNormalizedUnits(values)))
+  const handleSubmitForm = form.handleSubmit(values => onSubmit(withNormalizedUnits(values)))
+
+  // Кнопка "назад" в верхней мобильной панели (см. ниже) должна работать
+  // и на первом шаге создания, где раньше кнопки назад вообще не было —
+  // плавающий ButtonBack ниже показывается только при step > 1. При
+  // редактировании шага 1 не существует (isEdit сразу открывает step 2),
+  // поэтому там всегда просто уходим со страницы.
+  const handleTopBarBack = () => {
+    if (isEdit) return router.push('/profile/settings/ads')
+    if (step > 1) return handleBack()
+    return router.back()
+  }
+
   useEffect(() => {
     if (isEdit && initialData?.categoryId) {
       const findCategory = (cats: ICategory[]): ICategory | undefined => {
@@ -145,8 +171,32 @@ export const AdForm = ({
 
   return (
     <div className='relative'>
+      <div className='sticky z-10 -mx-4 mb-4 flex items-center justify-between bg-white px-4 md:hidden'>
+        <ButtonBack onClick={handleTopBarBack} className='rounded-none shadow-none!' />
+        {step === 2 &&
+          (canSaveDraft ? (
+            <button
+              type='button'
+              className='text-sm font-medium text-gray-500 disabled:opacity-50'
+              disabled={isSaveDrafting}
+              onClick={handleSaveDraft}
+            >
+              Сохранить и выйти
+            </button>
+          ) : (
+            <button
+              type='button'
+              className='text-primary text-sm font-medium disabled:opacity-50'
+              disabled={isSubmitting}
+              onClick={handleSubmitForm}
+            >
+              {submitButtonText}
+            </button>
+          ))}
+      </div>
+
       {step > 1 && (
-        <div className='absolute top-0 -left-18 h-full'>
+        <div className='absolute top-0 -left-18 hidden h-full md:block'>
           <ButtonBack
             className='sticky top-4'
             onClick={() => {
@@ -379,18 +429,18 @@ export const AdForm = ({
                 size='lg'
                 type='button'
                 disabled={isSubmitting}
-                onClick={form.handleSubmit(values => onSubmit(withNormalizedUnits(values)))}
+                onClick={handleSubmitForm}
               >
                 {submitButtonText}
               </Button>
-              {!isEdit && (
+              {canSaveDraft && (
                 <Button
                   className='h-11 px-5 sm:h-12 md:h-13'
                   variant='outline'
                   size='lg'
                   type='button'
                   disabled={isSaveDrafting}
-                  onClick={onSaveDraft && form.handleSubmit(values => onSaveDraft(withNormalizedUnits(values)))}
+                  onClick={handleSaveDraft}
                 >
                   Сохранить черновик
                 </Button>

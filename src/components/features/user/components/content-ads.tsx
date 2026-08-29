@@ -3,7 +3,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 
-import { Heading, Skeleton, Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui'
+import { Button, Heading, Skeleton, Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui'
 
 import { AdShortCard, AdShortCardSkeleton } from '../../ads/components'
 import { useMyAds } from '../../ads/hooks'

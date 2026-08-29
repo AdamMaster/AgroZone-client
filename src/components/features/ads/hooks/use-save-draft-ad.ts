@@ -11,10 +11,15 @@ import { IAd } from '../types/ad.types'
 
 // Импортируем интерфейс объявления
 
-export function useSaveDraft() {
+// initialDraftId — id уже существующего черновика, если он у нас уже есть
+// (см. AdEdit: там объявление уже создано, просто ещё в статусе DRAFT, и
+// "сохранить и выйти" должно обновлять ЕГО, а не плодить новый черновик
+// каждым сохранением). AdCreate его не передаёт — там черновика ещё нет,
+// draftId появится сам после первого успешного сохранения, как и раньше.
+export function useSaveDraft(initialDraftId?: string) {
   const queryClient = useQueryClient()
 
-  const [draftId, setDraftId] = useState<string | undefined>(undefined)
+  const [draftId, setDraftId] = useState<string | undefined>(initialDraftId)
 
   const { mutate: saveDraft, isPending: isLoadingSaveDraft } = useMutation({
     mutationKey: ['save draft ad'],
