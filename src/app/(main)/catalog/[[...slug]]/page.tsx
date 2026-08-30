@@ -5,6 +5,12 @@ import { categoriesService } from '@/components/features/categories/services'
 import { ICategory } from '@/components/features/categories/types/categories.types'
 import { Container } from '@/components/layout'
 
+// CatalogContent безусловно вызывает useCatalogFilters() (сайдбар
+// фильтров сразу применяет изменения — immediate: true по умолчанию), а
+// внутри этого хука useSearchParams() — без force-dynamic статический
+// пререндер базового /catalog падает так же, как раньше падал /ads/create.
+export const dynamic = 'force-dynamic'
+
 type PageParams = {
   slug?: string[]
 }

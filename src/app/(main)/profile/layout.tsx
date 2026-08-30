@@ -2,6 +2,15 @@ import { SettingsNav } from '@/components/features/user/components'
 import { Container } from '@/components/layout'
 import { Heading } from '@/components/ui'
 
+// Все страницы личного кабинета — только для авторизованных, данные
+// персональные и всегда живые (объявления, премиум-статус после оплаты
+// через query-параметр и т.п.) — статика тут не нужна, а без
+// force-dynamic часть вложенных страниц (например /profile/settings/premium,
+// где PremiumStatusHandler читает useSearchParams()) ломает сборку тем же
+// способом, что раньше ломал /ads/create. Один флаг на весь раздел вместо
+// правки каждой страницы отдельно (тот же приём, что в app/(admin)/layout.tsx).
+export const dynamic = 'force-dynamic'
+
 export default function MainLayout({
   children
 }: Readonly<{
