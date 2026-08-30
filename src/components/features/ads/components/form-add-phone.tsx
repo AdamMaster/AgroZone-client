@@ -119,7 +119,7 @@ export const FormAddPhone = ({ onSuccessComplete, phones = [], mode = 'ad' }: Fo
 
   return (
     <AuthFormWrapper
-      className='mx-auto w-full max-w-md'
+      className='mx-auto w-full max-w-md text-left'
       heading={heading}
       isShowSocial={false}
       description={description}
