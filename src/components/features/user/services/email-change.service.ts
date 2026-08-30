@@ -1,8 +1,10 @@
 import { api } from '@/shared/api'
 
 class EmailChangeService {
-  async request(body: { newEmail: string; password?: string }) {
-    const response = await api.post<boolean>('auth/email-change', body)
+  async request(body: { newEmail: string; password?: string }, recaptcha?: string) {
+    const headers = recaptcha ? { recaptcha } : undefined
+
+    const response = await api.post<boolean>('auth/email-change', body, { headers })
     return response
   }
 

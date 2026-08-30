@@ -6,7 +6,13 @@ export function useChangeEmailMutation() {
   const { mutate: changeEmail, isPending: isChangeEmailLoading } = useMutation({
     mutationKey: ['change email request'],
 
-    mutationFn: (values: { newEmail: string; password?: string }) => emailChangeService.request(values)
+    mutationFn: ({
+      values,
+      recaptcha
+    }: {
+      values: { newEmail: string; password?: string }
+      recaptcha?: string
+    }) => emailChangeService.request(values, recaptcha)
   })
 
   return { changeEmail, isChangeEmailLoading }

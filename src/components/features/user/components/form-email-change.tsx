@@ -4,6 +4,7 @@ import { useAppModal } from '@/store'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Eye, EyeOff, OctagonAlert } from 'lucide-react'
 import { useState } from 'react'
+import { useGoogleReCaptcha } from 'react-google-recaptcha-v3'
 import { Controller, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 
@@ -22,6 +23,8 @@ export const FormEmailChange = () => {
   const [showPassword, setShowPassword] = useState(false)
   const { onOpen, onClose, setView } = useAppModal()
 
+  const { executeRecaptcha } = useGoogleReCaptcha()
+
   const form = useForm<TypeEmailChangeShema>({
     resolver: zodResolver(EmailChangeShema),
     defaultValues: {
@@ -32,28 +35,42 @@ export const FormEmailChange = () => {
 
   const { changeEmail, isChangeEmailLoading } = useChangeEmailMutation()
 
-  const onSubmit = (values: TypeEmailChangeShema) => {
-    changeEmail(values, {
-      onSuccess: () => {
-        setView('change-email-message')
-      },
-      onError: error => {
-        const errorMessage = error.message
+  const onSubmit = async (values: TypeEmailChangeShema) => {
+    if (!executeRecaptcha) {
+      toast.error('Капча еще не загрузилась, попробуйте снова')
+      return
+    }
 
-        if (errorMessage === 'Этот адрес электронной почты уже используется') {
-          form.setError('newEmail', {
-            message: errorMessage
-          })
-        } else if (errorMessage === 'Неверный текущий пароль') {
-          form.setError('password', {
-            type: 'manual',
-            message: errorMessage
-          })
-        } else {
-          toast.error('Произошла ошибка', { description: errorMessage })
+    try {
+      const recaptchaToken = await executeRecaptcha('email_change')
+
+      changeEmail(
+        { values, recaptcha: recaptchaToken },
+        {
+          onSuccess: () => {
+            setView('change-email-message')
+          },
+          onError: error => {
+            const errorMessage = error.message
+
+            if (errorMessage === 'Этот адрес электронной почты уже используется') {
+              form.setError('newEmail', {
+                message: errorMessage
+              })
+            } else if (errorMessage === 'Неверный текущий пароль') {
+              form.setError('password', {
+                type: 'manual',
+                message: errorMessage
+              })
+            } else {
+              toast.error('Произошла ошибка', { description: errorMessage })
+            }
+          }
         }
-      }
-    })
+      )
+    } catch (error) {
+      toast.error('Ошибка проверки безопасности')
+    }
   }
 
   if (!user?.password) {
