@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { Google_Sans, Inter } from 'next/font/google'
+import { Suspense } from 'react'
 
 import { CookieConsentBanner } from '@/components/layout'
 import { AppModal } from '@/components/modals/app'
@@ -43,7 +44,15 @@ export default function RootLayout({
           {children}
           <AppModal />
           <CategoriesModal />
-          <FilterModal />
+          {/* useCatalogFilters() внутри читает useSearchParams() сразу при
+          рендере, не только когда окно реально открыто (см. filter-modal.tsx) —
+          а этот компонент висит в корневом layout, то есть на каждой
+          странице сайта. Без Suspense здесь ломался статический пререндер
+          любого роута (сначала это всплыло на /ads/create, потом на
+          /_not_found — на самом деле проблема была общая для всего сайта). */}
+          <Suspense fallback={null}>
+            <FilterModal />
+          </Suspense>
           <CookieConsentBanner />
         </MainProvider>
       </body>
