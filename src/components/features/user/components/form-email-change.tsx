@@ -4,13 +4,13 @@ import { useAppModal } from '@/store'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Eye, EyeOff, OctagonAlert } from 'lucide-react'
 import { useState } from 'react'
-import { useGoogleReCaptcha } from 'react-google-recaptcha-v3'
 import { Controller, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 
 import { Button, Field, FieldError, FieldGroup, Input, InputGroup, Loading } from '@/components/ui'
 
 import { useProfile } from '@/shared/hooks'
+import { useYandexCaptcha } from '@/shared/hooks/use-yandex-captcha'
 
 import { cn } from '@/lib/utils'
 
@@ -23,7 +23,7 @@ export const FormEmailChange = () => {
   const [showPassword, setShowPassword] = useState(false)
   const { onOpen, onClose, setView } = useAppModal()
 
-  const { executeRecaptcha } = useGoogleReCaptcha()
+  const { executeCaptcha, CaptchaWidget } = useYandexCaptcha()
 
   const form = useForm<TypeEmailChangeShema>({
     resolver: zodResolver(EmailChangeShema),
@@ -36,13 +36,8 @@ export const FormEmailChange = () => {
   const { changeEmail, isChangeEmailLoading } = useChangeEmailMutation()
 
   const onSubmit = async (values: TypeEmailChangeShema) => {
-    if (!executeRecaptcha) {
-      toast.error('Капча еще не загрузилась, попробуйте снова')
-      return
-    }
-
     try {
-      const recaptchaToken = await executeRecaptcha('email_change')
+      const recaptchaToken = await executeCaptcha()
 
       changeEmail(
         { values, recaptcha: recaptchaToken },
@@ -132,6 +127,7 @@ export const FormEmailChange = () => {
           Подтвердить
         </Button>
       </form>
+      {CaptchaWidget}
       {isChangeEmailLoading && <Loading />}
     </UserFormWrapper>
   )

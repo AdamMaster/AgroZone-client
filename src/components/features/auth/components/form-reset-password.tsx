@@ -2,12 +2,12 @@
 
 import { useAppModal } from '@/store'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useState } from 'react'
-import { useGoogleReCaptcha } from 'react-google-recaptcha-v3'
 import { Controller, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 
 import { Button, Field, FieldError, FieldGroup, Input, Loading } from '@/components/ui'
+
+import { useYandexCaptcha } from '@/shared/hooks/use-yandex-captcha'
 
 import { cn } from '@/lib/utils'
 
@@ -16,7 +16,7 @@ import { ResetPasswordSchema, TypeResetPasswordSchema } from '../schemes'
 import { AuthFormWrapper } from './auth-form-wrapper'
 
 export const FormResetPassword = () => {
-  const { executeRecaptcha } = useGoogleReCaptcha()
+  const { executeCaptcha, CaptchaWidget } = useYandexCaptcha()
   const { onOpen, setView } = useAppModal()
 
   const form = useForm<TypeResetPasswordSchema>({
@@ -29,13 +29,8 @@ export const FormResetPassword = () => {
   const { reset, isLoadingReset } = useResetPasswordMutation()
 
   const onSubmit = async (values: TypeResetPasswordSchema) => {
-    if (!executeRecaptcha) {
-      toast.error('Капча еще не загрузилась, попробуйте снова')
-      return
-    }
-
     try {
-      const recaptchaToken = await executeRecaptcha('forgot_password')
+      const recaptchaToken = await executeCaptcha()
 
       reset(
         { values, recaptcha: recaptchaToken },
@@ -76,6 +71,7 @@ export const FormResetPassword = () => {
           Сбросить
         </Button>
       </form>
+      {CaptchaWidget}
       {isLoadingReset && <Loading />}
     </AuthFormWrapper>
   )

@@ -6,7 +6,6 @@ import { Eye, EyeOff } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import React, { useState } from 'react'
-import { useGoogleReCaptcha } from 'react-google-recaptcha-v3'
 import { Controller, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 
@@ -21,6 +20,8 @@ import {
   Loading,
   PasswordToggle
 } from '@/components/ui'
+
+import { useYandexCaptcha } from '@/shared/hooks/use-yandex-captcha'
 
 import { formatPhoneNumber } from '@/shared/utils'
 
@@ -52,7 +53,7 @@ export const FormRegisterSms = () => {
   } = useRegisterSmsMutation()
   const router = useRouter()
 
-  const { executeRecaptcha } = useGoogleReCaptcha()
+  const { executeCaptcha, CaptchaWidget } = useYandexCaptcha()
 
   const formPhone = useForm<TypeRegisterSmsPhoneSchema>({
     resolver: zodResolver(RegisterSmsPhoneSchema),
@@ -70,13 +71,8 @@ export const FormRegisterSms = () => {
   })
 
   const onFormPhoneSubmit = async (data: TypeRegisterSmsPhoneSchema) => {
-    if (!executeRecaptcha) {
-      toast.error('Капча еще не загрузилась, попробуйте снова')
-      return
-    }
-
     try {
-      const recaptchaToken = await executeRecaptcha('register_sms_start')
+      const recaptchaToken = await executeCaptcha()
 
       // Очищаем номер: "+7 (930) 408-79-71" -> "79304087971"
       const cleanPhone = data.phone.replace(/\D/g, '')
@@ -255,6 +251,7 @@ export const FormRegisterSms = () => {
           {isLoadingSmsFinal && <Loading />}
         </form>
       )}
+      {CaptchaWidget}
     </AuthFormWrapper>
   )
 }

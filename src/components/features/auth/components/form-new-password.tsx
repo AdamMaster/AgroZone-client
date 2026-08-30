@@ -4,11 +4,12 @@ import { useAppModal } from '@/store'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Eye, EyeOff } from 'lucide-react'
 import { useState } from 'react'
-import { useGoogleReCaptcha } from 'react-google-recaptcha-v3'
 import { Controller, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 
 import { Button, Field, FieldError, FieldGroup, Input, InputGroup, Loading } from '@/components/ui'
+
+import { useYandexCaptcha } from '@/shared/hooks/use-yandex-captcha'
 
 import { cn } from '@/lib/utils'
 
@@ -17,7 +18,7 @@ import { NewPasswordSchema, TypeNewPasswordSchema } from '../schemes'
 import { AuthFormWrapper } from './auth-form-wrapper'
 
 export const NewPasswordForm = () => {
-  const { executeRecaptcha } = useGoogleReCaptcha()
+  const { executeCaptcha, CaptchaWidget } = useYandexCaptcha()
 
   const form = useForm<TypeNewPasswordSchema>({
     resolver: zodResolver(NewPasswordSchema),
@@ -29,13 +30,8 @@ export const NewPasswordForm = () => {
   const { newPassword, isLoadingNewPassword } = useNewPasswordMutation()
 
   const onSubmit = async (values: TypeNewPasswordSchema) => {
-    if (!executeRecaptcha) {
-      toast.error('Капча еще не загрузилась, попробуйте снова')
-      return
-    }
-
     try {
-      const recaptchaToken = await executeRecaptcha('reset_password')
+      const recaptchaToken = await executeCaptcha()
 
       newPassword({ values, recaptcha: recaptchaToken })
     } catch (error) {
@@ -88,6 +84,7 @@ export const NewPasswordForm = () => {
       <button className='mt-8 block w-full text-center hover:opacity-80' onClick={() => onOpen('login')}>
         Войти в аккаунт
       </button>
+      {CaptchaWidget}
       {isLoadingNewPassword && <Loading />}
     </AuthFormWrapper>
   )

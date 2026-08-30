@@ -5,11 +5,12 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { Eye, EyeOff } from 'lucide-react'
 import Link from 'next/link'
 import React, { useState } from 'react'
-import { useGoogleReCaptcha } from 'react-google-recaptcha-v3'
 import { Controller, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 
 import { Button, Checkbox, Field, FieldError, FieldGroup, Input, InputGroup, Loading } from '@/components/ui'
+
+import { useYandexCaptcha } from '@/shared/hooks/use-yandex-captcha'
 
 import { cn } from '@/lib/utils'
 
@@ -20,7 +21,7 @@ import { AuthFormWrapper } from './auth-form-wrapper'
 export const FormRegister = () => {
   const { onOpen, setView } = useAppModal()
 
-  const { executeRecaptcha } = useGoogleReCaptcha()
+  const { executeCaptcha, CaptchaWidget } = useYandexCaptcha()
 
   const form = useForm<TypeRegisterSchema>({
     resolver: zodResolver(RegisterSchema),
@@ -36,13 +37,8 @@ export const FormRegister = () => {
   const { register, isLoadingRegister } = useRegisterMutation()
 
   const onSubmit = async (values: TypeRegisterSchema) => {
-    if (!executeRecaptcha) {
-      toast.error('Капча еще не загрузилась, попробуйте снова')
-      return
-    }
-
     try {
-      const recaptchaToken = await executeRecaptcha('register')
+      const recaptchaToken = await executeCaptcha()
 
       register(
         { values, recaptcha: recaptchaToken },
@@ -176,6 +172,7 @@ export const FormRegister = () => {
         </Button>
         {isLoadingRegister && <Loading />}
       </form>
+      {CaptchaWidget}
     </AuthFormWrapper>
   )
 }

@@ -4,11 +4,12 @@ import { useAppModal } from '@/store'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Eye, EyeOff } from 'lucide-react'
 import { useState } from 'react'
-import { useGoogleReCaptcha } from 'react-google-recaptcha-v3'
 import { Controller, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 
 import { Button, Field, FieldError, FieldGroup, Input, InputGroup, Loading } from '@/components/ui'
+
+import { useYandexCaptcha } from '@/shared/hooks/use-yandex-captcha'
 
 import { cn } from '@/lib/utils'
 
@@ -25,7 +26,7 @@ export const FormLogin = ({ isShowSocial = true }: LoginFormProps) => {
   const [isShowTwoFactor, setIsShowTwoFactor] = useState(false)
   const { onOpen, onClose } = useAppModal()
 
-  const { executeRecaptcha } = useGoogleReCaptcha()
+  const { executeCaptcha, CaptchaWidget } = useYandexCaptcha()
 
   const form = useForm<TypeLoginSchema>({
     resolver: zodResolver(LoginSchema),
@@ -46,20 +47,13 @@ export const FormLogin = ({ isShowSocial = true }: LoginFormProps) => {
       return
     }
 
-    // 4. Проверяем, загрузилась ли капча на странице
-    if (!executeRecaptcha) {
-      toast.error('Капча еще не загрузилась, попробуйте снова')
-      return
-    }
-
     try {
-      // 5. Генерируем невидимый токен с экшеном 'login'
-      const recaptchaToken = await executeRecaptcha('login')
+      const recaptchaToken = await executeCaptcha()
 
       login(
         {
           values,
-          recaptcha: recaptchaToken // Передаем сгенерированный токен v3
+          recaptcha: recaptchaToken
         },
         {
           onSuccess: data => {
@@ -153,6 +147,7 @@ export const FormLogin = ({ isShowSocial = true }: LoginFormProps) => {
           Войти
         </Button>
       </form>
+      {CaptchaWidget}
       {isLoadingLogin && <Loading />}
     </AuthFormWrapper>
   )
