@@ -2,7 +2,7 @@
 # output: 'standalone').
 #
 # Важный нюанс: NEXT_PUBLIC_*-переменные и всё, что прокинуто через
-# next.config.ts -> env (SERVER_URL, GOOGLE_RECAPTCHA_SITE_KEY) —
+# next.config.ts -> env (SERVER_URL, YANDEX_CAPTCHA_CLIENT_KEY) —
 # запекаются в клиентский бандл ВО ВРЕМЯ `next build`, а не читаются в
 # рантейме контейнера. Поэтому их нужно передать как build-time ARG'и (см.
 # docker-compose.prod.yml: build.args), а не просто положить в .env рядом
@@ -12,11 +12,11 @@ FROM node:20-bookworm-slim AS build
 WORKDIR /app
 
 ARG SERVER_URL
-ARG NEXT_PUBLIC_GOOGLE_RECAPTCHA_SITE_KEY
+ARG NEXT_PUBLIC_YANDEX_CAPTCHA_CLIENT_KEY
 ARG NEXT_PUBLIC_2GIS_KEY
 ARG NEXT_PUBLIC_DADATA_KEY
 ENV SERVER_URL=$SERVER_URL
-ENV NEXT_PUBLIC_GOOGLE_RECAPTCHA_SITE_KEY=$NEXT_PUBLIC_GOOGLE_RECAPTCHA_SITE_KEY
+ENV NEXT_PUBLIC_YANDEX_CAPTCHA_CLIENT_KEY=$NEXT_PUBLIC_YANDEX_CAPTCHA_CLIENT_KEY
 ENV NEXT_PUBLIC_2GIS_KEY=$NEXT_PUBLIC_2GIS_KEY
 ENV NEXT_PUBLIC_DADATA_KEY=$NEXT_PUBLIC_DADATA_KEY
 
