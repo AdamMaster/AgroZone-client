@@ -2,24 +2,13 @@
 
 import { useAppModal } from '@/store'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Eye, EyeOff } from 'lucide-react'
+import { Eye, EyeOff, Loader2 } from 'lucide-react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 
-import {
-  Button,
-  Checkbox,
-  Field,
-  FieldError,
-  FieldGroup,
-  Input,
-  InputGroup,
-  Loading,
-  PasswordToggle
-} from '@/components/ui'
+import { Button, Checkbox, Field, FieldError, FieldGroup, Input, InputGroup, Loading, PasswordToggle } from '@/components/ui'
 
 import { useYandexCaptcha } from '@/shared/hooks/use-yandex-captcha'
 
@@ -29,10 +18,8 @@ import { cn } from '@/lib/utils'
 
 import { useRegisterSmsMutation } from '../hooks/use-register-sms-mutation'
 import {
-  RegisterSmsCodeSchema,
   RegisterSmsFinalSchema,
   RegisterSmsPhoneSchema,
-  TypeRegisterSmsCodeSchema,
   TypeRegisterSmsFinalSchema,
   TypeRegisterSmsPhoneSchema
 } from '../schemes'
@@ -42,16 +29,15 @@ export const FormRegisterSms = () => {
   const { setView, onOpen, onClose } = useAppModal()
   const [step, setStep] = useState(1)
   const [regData, setRegData] = useState({ phone: '', code: '' })
+  const [callNumber, setCallNumber] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const {
     registerSmsStart,
-    isLoadingSmsStart,
+    verifyRegisterCode,
     registerSmsFinal,
     isLoadingSmsFinal,
-    verifyRegisterCode,
-    isLoadingCode
+    useSmsCallbackStatus
   } = useRegisterSmsMutation()
-  const router = useRouter()
 
   const { executeCaptcha, CaptchaWidget } = useYandexCaptcha()
 
@@ -60,15 +46,29 @@ export const FormRegisterSms = () => {
     defaultValues: { phone: '' }
   })
 
-  const formCode = useForm<TypeRegisterSmsCodeSchema>({
-    resolver: zodResolver(RegisterSmsCodeSchema),
-    defaultValues: { code: '' }
-  })
-
   const formFinal = useForm<TypeRegisterSmsFinalSchema>({
     resolver: zodResolver(RegisterSmsFinalSchema),
     defaultValues: { name: '', password: '', passwordRepeat: '', personalDataConsent: false }
   })
+
+  // Опрашиваем, пока не поступит звонок с проверочного номера — только
+  // пока действительно показан экран ожидания (step === 2).
+  const { data: callbackStatus } = useSmsCallbackStatus(regData.phone, step === 2 && !!regData.phone)
+
+  useEffect(() => {
+    if (step !== 2 || !callbackStatus?.confirmed || !callbackStatus.code) return
+
+    verifyRegisterCode(
+      { phone: regData.phone, code: callbackStatus.code },
+      {
+        onSuccess: () => {
+          setRegData(prev => ({ ...prev, code: callbackStatus.code! }))
+          setStep(3)
+        }
+      }
+    )
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [callbackStatus, step])
 
   const onFormPhoneSubmit = async (data: TypeRegisterSmsPhoneSchema) => {
     try {
@@ -81,10 +81,11 @@ export const FormRegisterSms = () => {
       registerSmsStart(
         { values: cleanedData, recaptcha: recaptchaToken },
         {
-          onSuccess: () => {
+          onSuccess: response => {
             // Сохраняем в стейт именно очищенный телефон
             setRegData(prev => ({ ...prev, ...cleanedData }))
-            toast.success('Код успешно отправлен!')
+            setCallNumber(response.callNumber)
+            toast.success('Позвоните на указанный номер для подтверждения')
             setStep(2)
           }
         }
@@ -94,27 +95,12 @@ export const FormRegisterSms = () => {
     }
   }
 
-  const onFormCodeSubmit = (data: TypeRegisterSmsCodeSchema) => {
-    const phone = regData.phone
-
-    verifyRegisterCode(
-      { phone, code: data.code },
-      {
-        onSuccess: () => {
-          setRegData(prev => ({ ...prev, ...data }))
-          setStep(3)
-        }
-      }
-    )
-  }
-
   const onFormFinalSubmit = (data: TypeRegisterSmsFinalSchema) => {
     const fullData = { ...regData, ...data }
 
     registerSmsFinal(fullData, {
       onSuccess: () => {
         formPhone.reset()
-        formCode.reset()
         formFinal.reset()
 
         setView('register-sms-message')
@@ -130,7 +116,9 @@ export const FormRegisterSms = () => {
     <AuthFormWrapper
       heading='Регистрация'
       isShowSocial={false}
-      description={step === 1 ? 'Введите номер телефона' : step === 2 ? 'Введите код из звонка' : 'Придумайте пароль'}
+      description={
+        step === 1 ? 'Введите номер телефона' : step === 2 ? 'Позвоните для подтверждения' : 'Придумайте пароль'
+      }
       switchButtonLabel={
         <>
           Уже есть аккаунт? <span className='text-primary'>Войти</span>
@@ -166,21 +154,26 @@ export const FormRegisterSms = () => {
         </form>
       )}
       {step === 2 && (
-        <form id='form-rhf-demo' onSubmit={formCode.handleSubmit(onFormCodeSubmit)}>
-          <Controller
-            name='code'
-            control={formCode.control}
-            render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid} className={cn(fieldState.invalid && 'pb-5', 'group')}>
-                <Input {...field} placeholder='Код из звонка' maxLength={4} />
-                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-              </Field>
-            )}
-          />
-          <Button variant='secondary' size='lg' type='submit' className='mt-8 w-full'>
-            Продолжить
-          </Button>
-        </form>
+        <div className='flex flex-col items-center gap-4 text-center'>
+          <p className='text-sm text-gray-500'>Позвоните с номера {formatPhoneNumber(regData.phone)} на</p>
+          <p className='text-2xl font-semibold'>{callNumber}</p>
+          <p className='text-sm text-gray-500'>
+            Звонок бесплатный, трубку можно сразу положить — подтверждение придёт автоматически
+          </p>
+
+          <div className='mt-2 flex items-center gap-2 text-sm text-gray-400'>
+            <Loader2 className='text-primary size-4 animate-spin' />
+            Ждём звонка...
+          </div>
+
+          <button
+            type='button'
+            className='text-muted-foreground mt-2 text-sm underline'
+            onClick={() => setStep(1)}
+          >
+            Указать другой номер
+          </button>
+        </div>
       )}
       {step === 3 && (
         <form id='form-rhf-demo' onSubmit={formFinal.handleSubmit(onFormFinalSubmit)}>

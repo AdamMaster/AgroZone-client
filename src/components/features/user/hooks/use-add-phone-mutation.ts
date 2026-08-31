@@ -1,4 +1,4 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { userServices } from '../services'
@@ -67,12 +67,24 @@ export function useAddPhoneMutation() {
     }
   })
 
+  // Опрос каждые 4 секунды, пока не поступит звонок с проверочного номера
+  // (см. UserService.checkPhoneCallbackStatus на бэке).
+  const usePhoneCallbackStatus = (enabled: boolean) =>
+    useQuery({
+      queryKey: ['phone callback status'],
+      queryFn: () => userServices.checkPhoneCallbackStatus(),
+      enabled,
+      refetchInterval: 4000,
+      retry: false
+    })
+
   return {
     requestPhone,
     isRequesting,
     confirmPhone,
     isConfirming,
     setPrimaryPhone,
-    isSettingPrimary
+    isSettingPrimary,
+    usePhoneCallbackStatus
   }
 }

@@ -2,7 +2,8 @@
 
 import { useAppModal } from '@/store'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useState } from 'react'
+import { Loader2 } from 'lucide-react'
+import { useEffect, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 
 import {
@@ -25,7 +26,7 @@ import { cn } from '@/lib/utils'
 import { AuthFormWrapper } from '../../auth/components'
 import { IUserPhone } from '../../auth/types'
 import { useAddPhoneMutation } from '../../user/hooks'
-import { AddPhoneSchema, PhoneCodeSchema, TypeAddPhoneSchema, TypePhoneCodeSchema } from '../schemes'
+import { AddPhoneSchema, TypeAddPhoneSchema } from '../schemes'
 
 interface FormAddPhoneProps {
   onSuccessComplete?: (phone: string) => void
@@ -41,13 +42,21 @@ export const FormAddPhone = ({ onSuccessComplete, phones = [], mode = 'ad' }: Fo
 
   const [step, setStep] = useState(hasExistingPhones ? 0 : 1)
   const [phone, setPhone] = useState('')
+  const [callNumber, setCallNumber] = useState('')
 
   const [selectedPhone, setSelectedPhone] = useState<string | null>(
     phones.find(p => p.isPrimary)?.phone ?? phones[0]?.phone ?? null
   )
 
-  const { requestPhone, confirmPhone, isRequesting, isConfirming, setPrimaryPhone, isSettingPrimary } =
-    useAddPhoneMutation()
+  const {
+    requestPhone,
+    confirmPhone,
+    isRequesting,
+    isConfirming,
+    setPrimaryPhone,
+    isSettingPrimary,
+    usePhoneCallbackStatus
+  } = useAddPhoneMutation()
 
   const formPhone = useForm<TypeAddPhoneSchema>({
     resolver: zodResolver(AddPhoneSchema),
@@ -56,12 +65,27 @@ export const FormAddPhone = ({ onSuccessComplete, phones = [], mode = 'ad' }: Fo
     }
   })
 
-  const formCode = useForm<TypePhoneCodeSchema>({
-    resolver: zodResolver(PhoneCodeSchema),
-    defaultValues: {
-      code: ''
-    }
-  })
+  // Опрашиваем, пока не поступит звонок с проверочного номера — только
+  // пока действительно показан экран ожидания (step === 2).
+  const { data: callbackStatus } = usePhoneCallbackStatus(step === 2)
+
+  useEffect(() => {
+    if (step !== 2 || !callbackStatus?.confirmed || !callbackStatus.code) return
+
+    confirmPhone(
+      { code: callbackStatus.code, makePrimary: isProfileMode },
+      {
+        onSuccess: () => {
+          onSuccessComplete?.(phone)
+
+          formPhone.reset()
+
+          onClose()
+        }
+      }
+    )
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [callbackStatus, step])
 
   const onUseExistingPhone = () => {
     if (!selectedPhone) return
@@ -84,27 +108,12 @@ export const FormAddPhone = ({ onSuccessComplete, phones = [], mode = 'ad' }: Fo
     const cleanPhone = data.phone.replace(/\D/g, '')
 
     requestPhone(cleanPhone, {
-      onSuccess: () => {
+      onSuccess: response => {
         setPhone(cleanPhone)
+        setCallNumber(response.callNumber)
         setStep(2)
       }
     })
-  }
-
-  const onCodeSubmit = (data: TypePhoneCodeSchema) => {
-    confirmPhone(
-      { code: data.code, makePrimary: isProfileMode },
-      {
-        onSuccess: () => {
-          onSuccessComplete?.(phone)
-
-          formPhone.reset()
-          formCode.reset()
-
-          onClose()
-        }
-      }
-    )
   }
 
   const heading = isProfileMode ? 'Изменить номер' : step === 0 ? 'Номер для связи' : 'Добавление номера'
@@ -113,7 +122,7 @@ export const FormAddPhone = ({ onSuccessComplete, phones = [], mode = 'ad' }: Fo
       ? 'Выберите один из привязанных номеров или укажите новый'
       : step === 1
         ? 'Укажите номер телефона для связи'
-        : 'Введите код подтверждения из звонка'
+        : 'Позвоните для подтверждения'
 
   const isBusy = isRequesting || isConfirming || isSettingPrimary
 
@@ -194,36 +203,29 @@ export const FormAddPhone = ({ onSuccessComplete, phones = [], mode = 'ad' }: Fo
             )}
 
             <Button variant='secondary' size='lg' type='submit' className='flex-1' disabled={isRequesting}>
-              {isRequesting ? 'Отправка...' : 'Получить код'}
+              {isRequesting ? 'Отправка...' : 'Продолжить'}
             </Button>
           </div>
         </form>
       )}
 
       {step === 2 && (
-        <form onSubmit={formCode.handleSubmit(onCodeSubmit)}>
-          <Controller
-            name='code'
-            control={formCode.control}
-            render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid} className={cn(fieldState.invalid && 'pb-5', 'group')}>
-                <Input {...field} maxLength={4} placeholder='Код из звонка' />
+        <div className='flex flex-col items-center gap-4 text-center'>
+          <p className='text-muted-foreground text-sm'>Позвоните с номера {formatPhoneNumber(phone)} на</p>
+          <p className='text-2xl font-semibold'>{callNumber}</p>
+          <p className='text-muted-foreground text-sm'>
+            Звонок бесплатный, трубку можно сразу положить — подтверждение придёт автоматически
+          </p>
 
-                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-              </Field>
-            )}
-          />
-
-          <div className='mt-6 flex gap-3'>
-            <Button variant='outline' size='lg' type='button' onClick={() => setStep(1)} disabled={isConfirming}>
-              Назад
-            </Button>
-
-            <Button variant='secondary' size='lg' type='submit' className='flex-1' disabled={isConfirming}>
-              {isConfirming ? 'Проверка...' : 'Подтвердить'}
-            </Button>
+          <div className='text-muted-foreground mt-2 flex items-center gap-2 text-sm'>
+            <Loader2 className='text-primary size-4 animate-spin' />
+            Ждём звонка...
           </div>
-        </form>
+
+          <button type='button' className='text-muted-foreground mt-2 text-sm underline' onClick={() => setStep(1)}>
+            Указать другой номер
+          </button>
+        </div>
       )}
 
       {isBusy && <Loading />}

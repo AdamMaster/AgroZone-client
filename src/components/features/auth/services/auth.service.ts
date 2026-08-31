@@ -7,8 +7,18 @@ class AuthService {
   async registerSmsStart(body: { phone: string }, recaptcha?: string | null) {
     const headers = recaptcha ? { recaptcha } : undefined
 
-    const response = await api.post<{ message: string }>('auth/register/sms/start', body, { headers })
+    const response = await api.post<{ message: string; callNumber: string }>('auth/register/sms/start', body, {
+      headers
+    })
 
+    return response
+  }
+
+  // Опрос, пока пользователь не позвонит на выданный номер (см.
+  // AuthController.checkSmsCallbackStatus). confirmed=false, пока звонка
+  // не было — это не ошибка, а нормальное промежуточное состояние.
+  async checkSmsCallbackStatus(phone: string) {
+    const response = await api.post<{ confirmed: boolean; code?: string }>('auth/register/sms/status', { phone })
     return response
   }
 

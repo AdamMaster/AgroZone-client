@@ -1,6 +1,6 @@
 'use client'
 
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { toastMessageHandler } from '@/shared/utils'
@@ -42,12 +42,25 @@ export function useRegisterSmsMutation() {
     }
   })
 
+  // Опрос каждые 4 секунды, пока не поступит звонок с проверочного номера
+  // (см. AuthService.checkSmsCallbackStatus на бэке) — enabled управляется
+  // снаружи (только пока показан экран ожидания звонка).
+  const useSmsCallbackStatus = (phone: string, enabled: boolean) =>
+    useQuery({
+      queryKey: ['register sms callback status', phone],
+      queryFn: () => authService.checkSmsCallbackStatus(phone),
+      enabled,
+      refetchInterval: 4000,
+      retry: false
+    })
+
   return {
     registerSmsStart,
     isLoadingSmsStart,
     verifyRegisterCode,
     isLoadingCode,
     registerSmsFinal,
-    isLoadingSmsFinal
+    isLoadingSmsFinal,
+    useSmsCallbackStatus
   }
 }

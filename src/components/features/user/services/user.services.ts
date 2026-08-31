@@ -53,7 +53,7 @@ class UserServices {
   }
 
   async requestPhoneChange(newPhone: string) {
-    const response = await api.post<{ success: boolean }>('users/profile/change-phone/request', {
+    const response = await api.post<{ success: boolean; callNumber: string }>('users/profile/change-phone/request', {
       newPhone
     })
 
@@ -69,7 +69,7 @@ class UserServices {
   }
 
   async requestAddPhone(phone: string) {
-    const response = await api.post<{ success: boolean }>('users/profile/phones/request', {
+    const response = await api.post<{ success: boolean; callNumber: string }>('users/profile/phones/request', {
       newPhone: phone
     })
 
@@ -82,6 +82,13 @@ class UserServices {
       makePrimary
     })
 
+    return response
+  }
+
+  // Опрос, пока пользователь не позвонит на выданный номер — общий для
+  // обоих флоу (смена/добавление номера), см. UserController.checkPhoneCallbackStatus.
+  async checkPhoneCallbackStatus() {
+    const response = await api.post<{ confirmed: boolean; code?: string }>('users/profile/phones/status')
     return response
   }
 
