@@ -207,7 +207,7 @@ export const FormAddPhone = ({ onSuccessComplete, phones = [], mode = 'ad' }: Fo
             control={formCode.control}
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid} className={cn(fieldState.invalid && 'pb-5', 'group')}>
-                <Input {...field} maxLength={4} placeholder='Последние 4 цифры номера' />
+                <Input {...field} maxLength={4} placeholder='Код из звонка' />
 
                 {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
               </Field>
