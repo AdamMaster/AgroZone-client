@@ -85,6 +85,7 @@
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
   --text-base: 15px;
+  --color-light: #fff;
 }
 
 .dark {
@@ -94,17 +95,16 @@
   --card-foreground: oklch(0.985 0 0);
   --popover: oklch(0.205 0 0);
   --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
+  --primary: #40a500;
+  --primary-light: oklch(90.482% 0.22207 135.668);
+  --secondary: oklch(46.283% 0.1561 255.675);
+  --secondary-foreground: oklch(51.164% 0.17431 255.949);
   --muted: oklch(0.269 0 0);
   --muted-foreground: oklch(0.708 0 0);
   --accent: oklch(0.269 0 0);
   --accent-foreground: oklch(0.985 0 0);
   --destructive: oklch(0.704 0.191 22.216);
   --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
   --ring: oklch(0.556 0 0);
   --chart-1: #40a500;
   --chart-2: oklch(0.556 0 0);
@@ -120,6 +120,15 @@
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
   --tw-ring-color: #5ea50057;
+  --color-gray-900: #fff;
+  --color-gray-950: #fff;
+  --color-gray-600: #d4d4d4;
+  --color-gray-500: #d4d4d4;
+  --color-gray-200: #585858;
+  --color-gray-100: #404040;
+  --color-gray-50: #212121;
+  --input: #212121;
+  --color-light: #212121;
 }
 
 @layer base {
@@ -163,7 +172,7 @@ button {
 .react-dadata__suggestions {
   border: 1px solid var(--color-gray-200);
   border-radius: .625rem;
-  background: #fff;
+  background: var(--color-light);
   box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
 }
 
@@ -174,7 +183,7 @@ button {
 }
 
 .react-dadata__suggestion:hover {
-  background: var(--color-gray-50);
+  background: var(--accent);
 }
 
 .yarl__container {
@@ -186,7 +195,7 @@ button {
 }
 
 .text-primary-light {
-  color: var(--primary-light)
+  color: var(--primary-light);
 }
 
 .scrollbar-none {

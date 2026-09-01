@@ -48,7 +48,7 @@ export const AdCardList = ({ ad }: AdCardListProps) => {
               <Image
                 src={ad.images[0]}
                 alt={ad.title}
-                className='h-full w-full object-cover object-center mix-blend-darken'
+                className='h-full w-full object-cover object-center'
                 fill
                 sizes='400px'
               />

@@ -26,11 +26,6 @@ export const Header = () => {
   const isMessagesPage = pathname.startsWith('/profile/settings/messages')
   const isAdsPage = pathname.startsWith('/ads/')
   const isAdFormPage = isAdsPage && (pathname === '/ads/create' || pathname.endsWith('/edit'))
-  // Страница детального просмотра объявления (/ads/[id]) — тоже без
-  // мобильного сирчбара в шапке (см. обсуждение с пользователем: там своя
-  // мобильная верхняя панель "назад / избранное-редактирование" внутри
-  // ad-detail.tsx). Явно исключаем /promote — на ней поведение поиска не
-  // обсуждалось, трогать не будем.
   const isAdDetailPage = isAdsPage && !isAdFormPage && !pathname.endsWith('/promote')
   const isProfileSection = pathname.startsWith('/profile/') && !isMessagesPage && !isAdsPage
   const showCompactHeader = isProfileSection || isMessagesPage || isAdsPage
@@ -40,7 +35,7 @@ export const Header = () => {
   return (
     <header
       className={cn(
-        'relative bg-white py-3 md:pt-0 md:pb-2',
+        'relative bg-white py-3 md:pt-0 md:pb-2 dark:bg-neutral-800',
         showCompactHeader ? 'absolute z-10 w-full bg-transparent sm:relative sm:bg-white' : 'relative'
       )}
     >
@@ -48,7 +43,9 @@ export const Header = () => {
         <Container>
           <div className='flex h-14 items-center justify-between gap-6 py-4'>
             <Logo className='block lg:hidden' />
-            <p className='text-secondary hidden text-sm leading-3 lg:inline'>Агропромышленная торговая площадка</p>
+            <p className='text-secondary hidden text-sm leading-3 lg:inline dark:text-neutral-200'>
+              Агропромышленная торговая площадка
+            </p>
             <HeaderActions className='ml-auto' />
           </div>
         </Container>

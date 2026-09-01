@@ -1,5 +1,6 @@
 'use client'
 
+import { ThemeProvider } from 'next-themes'
 import { type PropsWithChildren } from 'react'
 
 import { TooltipProvider } from '../ui'
@@ -8,11 +9,13 @@ import { ToastProvider } from './toast-provider'
 
 export function MainProvider({ children }: PropsWithChildren<unknown>) {
   return (
-    <TanstackQueryProvider>
-      <TooltipProvider>
-        <ToastProvider />
-        {children}
-      </TooltipProvider>
-    </TanstackQueryProvider>
+    <ThemeProvider attribute='class' defaultTheme='system' enableSystem>
+      <TanstackQueryProvider>
+        <TooltipProvider>
+          <ToastProvider />
+          {children}
+        </TooltipProvider>
+      </TanstackQueryProvider>
+    </ThemeProvider>
   )
 }

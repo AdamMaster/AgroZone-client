@@ -38,4 +38,4 @@ export const AD_BADGE_STYLES: Record<AdBadge, string> = {
   NEW: 'bg-lime-300'
 }
 
-export const AD_PRICE_HIGHLIGHT_CLASS = 'rounded bg-amber-200 px-1.5'
+export const AD_PRICE_HIGHLIGHT_CLASS = 'rounded bg-amber-200 px-1.5 dark:text-neutral-900'

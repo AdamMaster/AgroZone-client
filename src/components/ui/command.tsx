@@ -76,14 +76,6 @@ function CommandInput({ className, ...props }: React.ComponentProps<typeof Comma
 
 function CommandList({ className, ...props }: React.ComponentProps<typeof CommandPrimitive.List>) {
   const listRef = React.useRef<React.ComponentRef<typeof CommandPrimitive.List>>(null)
-
-  // cmdk сам не сбрасывает скролл списка при изменении поискового
-  // запроса — если до этого проскроллить длинный список (например,
-  // справочник городов из ~1200 записей) вниз, а потом начать печатать,
-  // отфильтрованные результаты остаются с тем же скроллом, и лучшие
-  // совпадения наверху списка оказываются не видны, пока не проскроллить
-  // руками. Подписываемся на search из внутреннего состояния cmdk и при
-  // каждом его изменении возвращаем список наверх.
   const search = useCommandState(state => state.search)
 
   React.useEffect(() => {

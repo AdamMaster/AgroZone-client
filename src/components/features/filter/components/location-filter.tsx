@@ -95,13 +95,13 @@ export const LocationFilter = ({ value, onChange }: LocationFilterProps) => {
           onBlur={() => setTimeout(() => setOpen(false), 200)}
         />
         {open && (
-          <div className='absolute top-[calc(100%+10px)] left-0 z-10 w-full overflow-hidden rounded-lg border bg-white shadow-[0_4px_16px_rgba(0,0,0,0.08)]'>
+          <div className='absolute top-[calc(100%+10px)] left-0 z-10 w-full overflow-hidden rounded-lg border bg-white shadow-[0_4px_16px_rgba(0,0,0,0.08)] dark:bg-[#212121]'>
             <CommandList className='rounded-0 py-2'>
               <CommandEmpty>Ничего не найдено.</CommandEmpty>
               <CommandGroup>
                 {locations.map(option => (
                   <CommandItem
-                    className='flex cursor-pointer items-center gap-2 px-3.5 py-1.5 text-sm hover:bg-gray-50'
+                    className='flex cursor-pointer items-center gap-2 px-3.5 py-1.5 text-sm hover:bg-gray-50 dark:hover:bg-neutral-800'
                     key={option.type === 'locality' ? `l-${option.localityFiasId}` : `r-${option.regionIsoCode}`}
                     value={option.label}
                     onSelect={() => handleSelect(option)}

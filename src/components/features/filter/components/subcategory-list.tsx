@@ -55,7 +55,7 @@ export const SubcategoryList = ({
           onBlur={() => setTimeout(() => setOpen(false), 200)}
         />
         {open && (
-          <div className='absolute top-[calc(100%+10px)] left-0 z-10 w-full overflow-hidden rounded-lg border bg-white shadow-[0_4px_16px_rgba(0,0,0,0.08)]'>
+          <div className='absolute top-[calc(100%+10px)] left-0 z-10 w-full overflow-hidden rounded-lg border bg-white shadow-[0_4px_16px_rgba(0,0,0,0.08)] dark:bg-[#212121]'>
             <CommandList className='rounded-0 py-2'>
               <CommandEmpty>Категории не найдены.</CommandEmpty>
               <CommandGroup>

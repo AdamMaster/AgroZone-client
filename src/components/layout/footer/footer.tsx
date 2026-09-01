@@ -28,17 +28,8 @@ const FOOTER_LINKS: FooterLink[] = [
 export const Footer = () => {
   const year = new Date().getFullYear()
 
-  // На мобилке футера нет вообще (см. обсуждение с пользователем — как у
-  // Авито и Wildberries): навигацию там уже полностью закрывает
-  // MobileTabBar, а сами ссылки — служебные (Помощь/Безопасность/О
-  // компании и т.п.), их дублирование внизу под списком настроек только
-  // создавало пустую полосу перед нижним баром. hidden md:block, а не
-  // условный рендер — Footer обычный серверный компонент без своего
-  // состояния, прятать через CSS дешевле и не требует useMediaQuery (а
-  // значит не тащит сюда ту же гонку с рендером, что была в хабе, см.
-  // profile/settings/page.tsx).
   return (
-    <footer className='mt-16 hidden border-gray-100 bg-gray-100 md:block'>
+    <footer className='mt-16 hidden border-gray-100 bg-gray-100 md:block dark:bg-neutral-900'>
       <Container>
         <div className='flex flex-wrap items-center gap-x-8 gap-y-3 py-10'>
           {FOOTER_LINKS.map(link => (
@@ -48,7 +39,7 @@ export const Footer = () => {
           ))}
         </div>
 
-        <div className='border-t border-gray-200 py-5'>
+        <div className='dark:border-accent border-t border-gray-200 py-5'>
           <p className='text-xs text-gray-600'>© {year} AgroZone. Все права защищены.</p>
         </div>
       </Container>

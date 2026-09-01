@@ -38,8 +38,12 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang='ru' className={cn('h-full', inter.variable)}>
-      <body className={cn('flex min-h-full flex-col font-sans text-[15px] text-gray-900')}>
+    <html lang='ru' suppressHydrationWarning className={cn('h-full', inter.variable)}>
+      <body
+        className={cn(
+          'flex min-h-full flex-col font-sans text-[15px] text-gray-900 dark:bg-neutral-800 dark:text-white'
+        )}
+      >
         <MainProvider>
           {children}
           <AppModal />

@@ -12,7 +12,7 @@ export const Logo = ({ className }: LogoProps) => {
     <Link href='/' className={className}>
       <Image
         className={cn('h-auto w-30 lg:w-40', className)}
-        src='/images/logo.svg'
+        src='/images/logo-white.svg'
         width={100}
         height={40}
         alt=''
