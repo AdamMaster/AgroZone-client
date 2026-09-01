@@ -13,7 +13,7 @@ const CATEGORIES_STRIP = [
 
 export const AboutHero = () => {
   return (
-    <section className='relative mt-4 overflow-hidden bg-gradient-to-b from-[#f2f8ea] to-white'>
+    <section className='relative mt-4 overflow-hidden bg-gradient-to-b from-[#f2f8ea] to-white dark:from-neutral-900 dark:to-background'>
       {/* <div
         className='pointer-events-none absolute inset-0 opacity-[0.35]'
         style={{
@@ -26,7 +26,7 @@ export const AboutHero = () => {
 
       <Container className='relative pt-28 pb-14'>
         <div className='mx-auto max-w-3xl text-center'>
-          <span className='mb-6 inline-block rounded-2xl bg-gray-900 px-3 py-1 text-xs font-semibold tracking-wide text-white uppercase'>
+          <span className='mb-6 inline-block rounded-2xl bg-neutral-900 px-3 py-1 text-xs font-semibold tracking-wide text-white uppercase'>
             О компании
           </span>
 

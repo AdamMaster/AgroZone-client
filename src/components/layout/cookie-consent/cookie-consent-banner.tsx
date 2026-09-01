@@ -1,9 +1,10 @@
 'use client'
 
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
 
 import { Button } from '@/components/ui'
+
+import { useMounted } from '@/shared/hooks'
 
 import { useCookieConsentStore } from '@/store'
 
@@ -15,11 +16,7 @@ export const CookieConsentBanner = () => {
   // на сервере, и на клиенте при первом рендере — если рендерить баннер
   // сразу по условию status === null, он на долю секунды мигал бы даже у
   // тех, кто уже сделал выбор раньше. Поэтому ждём монтирования.
-  const [mounted, setMounted] = useState(false)
-
-  useEffect(() => {
-    setMounted(true)
-  }, [])
+  const mounted = useMounted()
 
   if (!mounted || status !== null) {
     return null

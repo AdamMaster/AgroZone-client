@@ -1,6 +1,6 @@
 'use client'
 
-import { Bell, Building2, Crown, Heart, Layers, MessageCircle, Shield, User } from 'lucide-react'
+import { Bell, Building2, Crown, Heart, Layers, MessageCircle, Palette, Shield, User } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
@@ -10,6 +10,7 @@ import { useConversations } from '../../messages/hooks'
 
 const items = [
   { label: 'Личные данные', icon: User, id: 'general', href: '/profile/settings/general' },
+  { label: 'Персонализация', icon: Palette, id: 'personalization', href: '/profile/settings/personalization' },
   { label: 'Безопасность', icon: Shield, id: 'security', href: '/profile/settings/security' },
   { label: 'Мои объявления', icon: Layers, id: 'ads', href: '/profile/settings/ads' },
   { label: 'Сообщения', icon: MessageCircle, id: 'messages', href: '/profile/settings/messages' },

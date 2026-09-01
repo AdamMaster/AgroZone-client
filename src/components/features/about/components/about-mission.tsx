@@ -2,7 +2,7 @@ import { Container } from '@/components/layout'
 
 export const AboutMission = () => {
   return (
-    <section className='bg-white py-30'>
+    <section className='bg-white py-30 dark:bg-background'>
       <Container>
         <div className='relative mx-auto max-w-3xl text-center'>
           <span className='text-primary/15 pointer-events-none absolute -top-20 left-1/2 -translate-x-1/2 font-serif text-[9rem] leading-none select-none'>

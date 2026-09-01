@@ -1,7 +1,8 @@
 'use client'
 
 import { LayoutGrid, LayoutList } from 'lucide-react'
-import { useState } from 'react'
+
+import { useCatalogViewStore } from '@/store'
 
 import { useMediaQuery } from '@/shared/hooks'
 
@@ -19,7 +20,7 @@ interface CatalogContentProps {
 }
 
 export const CatalogContent = ({ serverSlug }: CatalogContentProps) => {
-  const [gridLayout, setGridLayout] = useState<'cols-1' | 'cols-4'>('cols-1')
+  const { layout: gridLayout, setLayout: setGridLayout } = useCatalogViewStore()
   const { categories } = useCategories()
   // Сайдбар — сразу применяет каждое изменение (immediate: true по
   // умолчанию), в отличие от мобильного окна фильтра (FilterModal), где
