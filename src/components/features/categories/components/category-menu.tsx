@@ -88,7 +88,7 @@ export const CategoryMenu = () => {
         aria-hidden='true'
       />
       <div ref={menuRef} className='fixed top-[var(--header-height)] left-0 z-50 w-full pb-6'>
-        <div className='h-full bg-white'>
+        <div className='h-full bg-white dark:bg-neutral-800'>
           <Container>
             <div className='mx-[-16px] grid h-full max-w-7xl grid-cols-[340px_1fr] overflow-hidden'>
               <div className='relative flex flex-col overflow-y-auto py-6'>

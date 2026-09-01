@@ -128,7 +128,7 @@ export const CategoryCascader = ({ categories, form, onCategorySelect }: Categor
         />
         <div
           className={cn(
-            'absolute top-[calc(100%+10px)] left-0 z-10 w-full overflow-hidden rounded-lg border bg-white shadow-[0_4px_16px_rgba(0,0,0,0.08)]',
+            'absolute top-[calc(100%+10px)] left-0 z-10 w-full overflow-hidden rounded-lg border bg-white shadow-[0_4px_16px_rgba(0,0,0,0.08)] dark:bg-gray-50',
             !open && 'hidden'
           )}
         >
@@ -155,7 +155,7 @@ export const CategoryCascader = ({ categories, form, onCategorySelect }: Categor
               {isShowingSemanticSuggestions
                 ? semanticSuggestions.map(suggestion => (
                     <CommandItem
-                      className='flex w-full cursor-pointer items-center justify-between gap-2 px-3.5 py-1 hover:bg-gray-50'
+                      className='flex w-full cursor-pointer items-center justify-between gap-2 px-3.5 py-1 hover:bg-gray-50 dark:hover:bg-gray-100'
                       key={suggestion.id}
                       onSelect={() => handleCategorySelect(suggestion.id)}
                     >
@@ -172,7 +172,7 @@ export const CategoryCascader = ({ categories, form, onCategorySelect }: Categor
                   ))
                 : filteredCategories.map(cat => (
                     <CommandItem
-                      className='flex w-full cursor-pointer items-center justify-between gap-2 px-3.5 py-1 hover:bg-gray-50'
+                      className='flex w-full cursor-pointer items-center justify-between gap-2 px-3.5 py-1 hover:bg-gray-50 dark:hover:bg-neutral-700'
                       key={cat.id}
                       onSelect={() => handleCategorySelect(cat.id)}
                     >

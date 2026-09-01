@@ -76,9 +76,9 @@ export const ConversationListItem = ({ conversation, isActive, onClick }: Conver
       <DropdownMenu>
         <DropdownMenuTrigger
           onClick={event => event.stopPropagation()}
-          className='absolute right-3 bottom-3 flex size-9 items-center justify-center rounded-lg bg-white'
+          className='absolute right-3 bottom-3 flex size-9 items-center justify-center rounded-lg bg-white dark:bg-neutral-800'
         >
-          <Ellipsis className='size-5' />
+          <Ellipsis className='size-5 text-gray-700' />
         </DropdownMenuTrigger>
         <DropdownMenuContent onClick={event => event.stopPropagation()} align='end' className='w-44'>
           <DropdownMenuItem disabled={isBlocking} onClick={() => blockUser(counterpart.id)}>
