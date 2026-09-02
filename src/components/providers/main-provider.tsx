@@ -9,7 +9,7 @@ import { ToastProvider } from './toast-provider'
 
 export function MainProvider({ children }: PropsWithChildren<unknown>) {
   return (
-    <ThemeProvider attribute='class' defaultTheme='system' enableSystem>
+    <ThemeProvider attribute='class' defaultTheme='light' enableSystem>
       <TanstackQueryProvider>
         <TooltipProvider>
           <ToastProvider />

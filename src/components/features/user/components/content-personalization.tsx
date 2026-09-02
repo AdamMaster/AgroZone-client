@@ -27,11 +27,6 @@ const OPTION_BUTTON_CLASS_NAME =
 export const ContentPersonalization = () => {
   const { theme, setTheme } = useTheme()
   const { layout, setLayout } = useCatalogViewStore()
-
-  // useTheme() отдаёт актуальную тему только после монтирования на клиенте
-  // (до этого — undefined, чтобы не разъехаться с SSR-рендером). Без этой
-  // проверки активная кнопка на первом рендере мигала бы неверным
-  // состоянием — тот же приём, что рекомендует сам next-themes.
   const mounted = useMounted()
 
   return (
