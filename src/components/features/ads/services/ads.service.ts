@@ -2,6 +2,7 @@ import { api } from '@/shared/api'
 
 import {
   IAd,
+  IAdCounters,
   IAdsListResponse,
   IAdViewStats,
   ICreateAdReportDto,
@@ -147,6 +148,12 @@ class AdsService {
   // прошлая и так далее.
   async getViewStats(id: string, weekOffset: number): Promise<IAdViewStats> {
     return api.get<IAdViewStats>(`${this.URL}/my/${id}/views`, { params: { weekOffset } })
+  }
+
+  // Компактные счётчики (просмотры всего/сегодня, избранное) — для панели
+  // над фото, отдельно от getViewStats (см. AdsController.getMyAdCounters).
+  async getCounters(id: string): Promise<IAdCounters> {
+    return api.get<IAdCounters>(`${this.URL}/my/${id}/counters`)
   }
 }
 

@@ -25,6 +25,7 @@ import { AD_PRICE_HIGHLIGHT_CLASS } from '../constants/ad-services.constants'
 import { useAd, useAddFavorite, useArchiveAd, useRemoveAd, useRemoveFavorite } from '../hooks'
 import { IAd, ICategoryFeature } from '../types/ad.types'
 import { AdBadgeChip } from './ad-badge-chip'
+import { AdCountersPanel } from './ad-counters-panel'
 import { AdServicesStatusHandler } from './ad-services-status-handler'
 import { AdViewsStats } from './ad-views-stats'
 import { BumpStatusHandler } from './bump-status-handler'
@@ -204,7 +205,7 @@ export const AdDetail = ({ ad: initialAd, categoryFeatures = [], categoryPath = 
       {!isOwner && user && (
         <ReportAdDialog adId={ad.id} open={isReportDialogOpen} onOpenChange={setIsReportDialogOpen} />
       )}
-      <div className='sticky top-0 z-10 -mx-4 mb-4 flex items-center justify-between bg-white md:hidden'>
+      <div className='sticky top-0 z-10 -mx-4 mb-4 flex items-center justify-between bg-white md:hidden dark:bg-neutral-800'>
         <ButtonBack onClick={() => router.back()} className='rounded-none shadow-none!' />
         {isOwner ? (
           <div className='flex items-center'>
@@ -222,16 +223,6 @@ export const AdDetail = ({ ad: initialAd, categoryFeatures = [], categoryPath = 
               </DropdownMenuTrigger>
               <DropdownMenuContent className='w-48' align='end'>
                 <DropdownMenuItem onClick={handleShare}>Поделиться</DropdownMenuItem>
-                {ad.status === 'PUBLISHED' && (
-                  <DropdownMenuItem onClick={() => router.push(`/ads/${ad.id}/promote`)}>
-                    Поднять просмотры
-                  </DropdownMenuItem>
-                )}
-                {(ad.status === 'PUBLISHED' || ad.status === 'PENDING') && (
-                  <DropdownMenuItem onClick={handleArchive} disabled={isLoadingArchive}>
-                    Снять с публикации
-                  </DropdownMenuItem>
-                )}
                 <DropdownMenuItem
                   className='text-red-500 hover:text-red-500!'
                   disabled={isLoadingRemove}
@@ -290,7 +281,34 @@ export const AdDetail = ({ ad: initialAd, categoryFeatures = [], categoryPath = 
       <Heading level={1} className='mb-6 hidden sm:block'>
         {ad.title}
       </Heading>
-      {isOwner && <AdViewsStats adId={ad.id} />}
+      {isOwner && (
+        <>
+          <div className='hidden sm:block'>
+            <AdViewsStats adId={ad.id} />
+          </div>
+          <div className='sm:hidden'>
+            <div className='mb-3 flex flex-col gap-1'>
+              {ad.status === 'PUBLISHED' && (
+                <Button size='lg' className='w-full' onClick={() => router.push(`/ads/${ad.id}/promote`)}>
+                  Поднять объявление
+                </Button>
+              )}
+              {(ad.status === 'PUBLISHED' || ad.status === 'PENDING') && (
+                <Button
+                  variant='secondary'
+                  size='lg'
+                  className='w-full'
+                  onClick={handleArchive}
+                  disabled={isLoadingArchive}
+                >
+                  Снять с публикации
+                </Button>
+              )}
+            </div>
+            <AdCountersPanel adId={ad.id} />
+          </div>
+        </>
+      )}
 
       <div className='mb-8 grid grid-cols-1 gap-3 sm:grid-cols-[1fr_280px] lg:grid-cols-[1fr_360px] lg:gap-5 lg:gap-10'>
         <div>
@@ -384,7 +402,7 @@ export const AdDetail = ({ ad: initialAd, categoryFeatures = [], categoryPath = 
                 Редактировать объявление
               </Button>
             ) : (
-              <div className='flex flex-col gap-1.5 lg:flex-row'>
+              <div className='flex gap-1.5 sm:flex-col lg:flex-row'>
                 <Button
                   variant='default'
                   size='lg'

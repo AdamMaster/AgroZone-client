@@ -271,6 +271,15 @@ export interface IAdViewStats {
   days: IAdViewStatsDay[]
 }
 
+// Компактные счётчики для панели над фото на странице объявления владельца
+// (см. AdsController.getMyAdCounters) — в отличие от IAdViewStats, без
+// разбивки по дням, лёгкий запрос.
+export interface IAdCounters {
+  viewsTotal: number
+  viewsToday: number
+  favoritesCount: number
+}
+
 export type LocationOptionType = 'region' | 'locality'
 
 export interface ILocationOption {

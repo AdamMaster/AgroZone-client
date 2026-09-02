@@ -35,7 +35,7 @@ export const Header = () => {
   return (
     <header
       className={cn(
-        'relative bg-white py-3 md:pt-0 md:pb-2 dark:bg-neutral-800',
+        'relative bg-white py-3 md:pt-0 md:pb-2 dark:bg-transparent',
         showCompactHeader ? 'absolute z-10 w-full bg-transparent sm:relative sm:bg-white' : 'relative'
       )}
     >

@@ -49,9 +49,9 @@ export const AdViewsStats = ({ adId }: AdViewsStatsProps) => {
   const canGoForward = weekOffset > 0
 
   return (
-    <div className='custom-shadow mb-8 rounded-3xl bg-white p-6'>
+    <div className='custom-shadow mb-8 rounded-3xl sm:bg-white sm:p-6 dark:bg-transparent dark:sm:bg-neutral-700'>
       <div className='mb-4 flex flex-wrap items-center justify-between gap-3'>
-        <Heading level={4}>Статистика за неделю</Heading>
+        <Heading level={4}>Просмотры</Heading>
 
         <div className='flex items-center gap-1'>
           <Button
@@ -83,7 +83,7 @@ export const AdViewsStats = ({ adId }: AdViewsStatsProps) => {
       </div>
 
       <p className='mb-4 text-sm text-gray-500'>
-        Просмотры за неделю: <span className='text-lg font-semibold text-gray-900'>{stats?.total ?? 0}</span>
+        За неделю: <span className='text-lg font-semibold text-gray-900'>{stats?.total ?? 0}</span>
       </p>
 
       {isLoading ? (
@@ -91,12 +91,25 @@ export const AdViewsStats = ({ adId }: AdViewsStatsProps) => {
       ) : (
         <ChartContainer
           config={chartConfig}
-          className={cn('aspect-auto h-[280px] w-full transition-opacity', isFetching && 'opacity-50')}
+          className={cn('aspect-auto h-[180px] w-full transition-opacity sm:h-[280px]', isFetching && 'opacity-50')}
         >
           <BarChart data={chartData} barCategoryGap={20}>
             <CartesianGrid vertical={false} strokeDasharray='3 3' />
-            <XAxis dataKey='label' tickLine={false} axisLine={false} tickMargin={8} />
-            <YAxis allowDecimals={false} tickLine={false} axisLine={false} width={24} tickMargin={4} />
+            <XAxis
+              dataKey='label'
+              tickLine={false}
+              axisLine={false}
+              tickMargin={8}
+              tick={{ fill: 'var(--muted-foreground)' }}
+            />
+            <YAxis
+              allowDecimals={false}
+              tickLine={false}
+              axisLine={false}
+              width={24}
+              tickMargin={4}
+              tick={{ fill: 'var(--muted-foreground)' }}
+            />
             <ChartTooltip
               cursor={false}
               isAnimationActive={false}
@@ -106,11 +119,6 @@ export const AdViewsStats = ({ adId }: AdViewsStatsProps) => {
                 />
               }
             />
-            {/* activeBar={false} — без этого recharts на клике/наведении
-                подменяет столбец своей дефолтной Rectangle с чёрной заливкой
-                поверх нашего цвета (родной "баг" recharts, не связан с
-                cursor у Tooltip). Выключаем подмену совсем — цвет столбца
-                не должен меняться при взаимодействии. */}
             <Bar maxBarSize={50} dataKey='views' fill='#bed9ff' radius={[6, 6, 0, 0]} activeBar={false} />
           </BarChart>
         </ChartContainer>

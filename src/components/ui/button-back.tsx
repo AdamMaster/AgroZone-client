@@ -11,7 +11,7 @@ export const ButtonBack = ({ className, onClick }: ButtonBack) => {
   return (
     <button
       className={cn(
-        'custom-shadow flex size-13 items-center justify-center rounded-full bg-white dark:bg-neutral-700',
+        'custom-shadow flex size-13 items-center justify-center rounded-full bg-white dark:bg-neutral-800',
         className
       )}
       onClick={onClick}
